@@ -2263,6 +2263,22 @@ export default function Home() {
         4
       );
 
+    /*
+     * Dropping a piece back on
+     * the exact same square is
+     * NOT a puzzle attempt.
+     */
+    if (
+      sourceSquare ===
+      targetSquare
+    ) {
+      setSelectedSquare(
+        null
+      );
+
+      return false;
+    }
+
     if (
       !isPlayersPiece(
         game,
@@ -2502,6 +2518,23 @@ export default function Home() {
       return false;
     }
 
+    /*
+     * User grabbed the piece
+     * but put it straight back.
+     *
+     * Cancel quietly.
+     */
+    if (
+      sourceSquare ===
+      targetSquare
+    ) {
+      setSelectedSquare(
+        null
+      );
+
+      return false;
+    }
+
     if (
       !isPlayersPiece(
         game,
@@ -2572,6 +2605,10 @@ export default function Home() {
       return;
     }
 
+    /*
+     * Touch/click same piece again:
+     * cancel selection.
+     */
     if (
       square ===
       selectedSquare
@@ -2583,6 +2620,11 @@ export default function Home() {
       return;
     }
 
+    /*
+     * Switching to another one
+     * of your pieces is also not
+     * an attempted move.
+     */
     if (
       clickedOwnPiece
     ) {
@@ -2599,6 +2641,14 @@ export default function Home() {
           move.to === square
       );
 
+    /*
+     * Clicking an illegal destination
+     * while a piece is selected just
+     * cancels selection.
+     *
+     * It is not scored as a wrong
+     * tactical attempt.
+     */
     if (
       !legalDestination
     ) {
@@ -3403,6 +3453,22 @@ export default function Home() {
                         return false;
                       }
 
+                      /*
+                       * Same-square drop:
+                       * no wrong move,
+                       * no stats penalty.
+                       */
+                      if (
+                        sourceSquare ===
+                        targetSquare
+                      ) {
+                        setSelectedSquare(
+                          null
+                        );
+
+                        return false;
+                      }
+
                       return handlePieceDrop(
                         sourceSquare,
                         targetSquare
@@ -3416,6 +3482,7 @@ export default function Home() {
             <div className="mt-4 flex items-center gap-5 text-[11px] text-[var(--secondary)]">
               <div className="flex items-center gap-2">
                 <span className="h-[7px] w-[7px] rounded-full bg-[var(--accent)] opacity-60" />
+
                 <span>
                   Legal move
                 </span>
@@ -3423,6 +3490,7 @@ export default function Home() {
 
               <div className="flex items-center gap-2">
                 <span className="h-[13px] w-[13px] rounded-full border-[3px] border-[var(--accent)] opacity-40" />
+
                 <span>
                   Legal capture
                 </span>
@@ -3500,7 +3568,7 @@ export default function Home() {
                     {isOpponentMoving
                       ? "Your pieces are locked until the opponent finishes moving."
                       : selectedSquare
-                        ? "Choose one of the highlighted legal squares."
+                        ? "Choose one of the highlighted legal squares, or tap the selected piece again to cancel."
                         : `Select one of your ${playerColor} pieces to see its legal moves.`}
                   </p>
                 </div>
