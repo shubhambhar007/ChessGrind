@@ -1385,12 +1385,6 @@ export default function Home() {
       )
       .slice(0, 2);
 
-  /*
-   * Legal moves are derived from the
-   * live board position.
-   *
-   * No precomputation needed.
-   */
   const legalMoves =
     useMemo(
       () =>
@@ -2269,13 +2263,6 @@ export default function Home() {
         4
       );
 
-    /*
-     * Additional defensive guard.
-     *
-     * Even if something bypasses the
-     * chessboard UI, opponent pieces
-     * cannot be submitted as moves.
-     */
     if (
       !isPlayersPiece(
         game,
@@ -2515,11 +2502,6 @@ export default function Home() {
       return false;
     }
 
-    /*
-     * Opponent pieces are rejected
-     * here too, even though canDragPiece
-     * already prevents dragging them.
-     */
     if (
       !isPlayersPiece(
         game,
@@ -2576,12 +2558,6 @@ export default function Home() {
         playerColor
       );
 
-    /*
-     * No selected piece yet.
-     *
-     * Only your own pieces can
-     * become selected.
-     */
     if (
       !selectedSquare
     ) {
@@ -2596,10 +2572,6 @@ export default function Home() {
       return;
     }
 
-    /*
-     * Clicking your currently
-     * selected piece deselects it.
-     */
     if (
       square ===
       selectedSquare
@@ -2611,10 +2583,6 @@ export default function Home() {
       return;
     }
 
-    /*
-     * Clicking another one of your
-     * pieces switches selection.
-     */
     if (
       clickedOwnPiece
     ) {
@@ -2625,14 +2593,6 @@ export default function Home() {
       return;
     }
 
-    /*
-     * Determine whether the clicked
-     * destination is actually legal.
-     *
-     * Clicking random illegal squares
-     * does NOT count as a wrong puzzle
-     * attempt. It simply deselects.
-     */
     const legalDestination =
       legalMoves.find(
         (move) =>
@@ -2710,9 +2670,6 @@ export default function Home() {
       React.CSSProperties
     > = {};
 
-  /*
-   * Last move highlight.
-   */
   if (
     lastMove &&
     !isWrong
@@ -2732,9 +2689,6 @@ export default function Home() {
     };
   }
 
-  /*
-   * Selected piece.
-   */
   if (
     selectedSquare &&
     !isWrong
@@ -2753,15 +2707,6 @@ export default function Home() {
     };
   }
 
-  /*
-   * Legal move indicators.
-   *
-   * Empty square:
-   * small central dot.
-   *
-   * Capture:
-   * ring around target.
-   */
   if (
     selectedSquare &&
     !isWrong &&
@@ -2810,10 +2755,6 @@ export default function Home() {
     }
   }
 
-  /*
-   * Make ownership visually clear
-   * at interaction level too.
-   */
   for (
     const file of [
       "a",
@@ -2878,10 +2819,6 @@ export default function Home() {
     }
   }
 
-  /*
-   * Wrong move overrides
-   * all normal highlights.
-   */
   if (
     wrongMove
   ) {
@@ -2899,10 +2836,6 @@ export default function Home() {
         "inset 0 0 0 9999px rgba(217, 45, 32, 0.3)",
     };
   }
-
-  /*
-   * SESSION RESULTS
-   */
 
   if (
     sessionMode === "ten" &&
@@ -3084,8 +3017,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* HEADER */}
-
       <header className="border-b border-[var(--line)] bg-white/55 backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <div className="flex items-center gap-2.5">
@@ -3123,8 +3054,6 @@ export default function Home() {
       </header>
 
       <div className="mx-auto max-w-[1060px] px-6 pb-16 pt-7">
-        {/* SESSION MODE */}
-
         <div className="mb-5 flex justify-center">
           <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
             {SESSION_MODES.map(
@@ -3165,8 +3094,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* SESSION PROGRESS */}
-
         {sessionMode ===
           "ten" && (
           <div className="mb-6">
@@ -3198,8 +3125,6 @@ export default function Home() {
             </div>
           </div>
         )}
-
-        {/* TRAINING TOOLBAR */}
 
         <section className="mb-9 flex flex-col gap-5 border-b border-[var(--line)] pb-6 xl:flex-row xl:items-center xl:justify-between">
           <div className="inline-flex self-start rounded-[12px] bg-black/[0.045] p-[3px]">
@@ -3323,8 +3248,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* PUZZLE HEADER */}
-
         <section className="mb-6 max-w-[620px]">
           <PlayerColorIndicator
             playerColor={
@@ -3368,11 +3291,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* WORKSPACE */}
-
         <div className="grid gap-10 lg:grid-cols-[560px_350px] lg:items-start lg:gap-[48px]">
-          {/* BOARD */}
-
           <section>
             <div
               className={[
@@ -3413,19 +3332,11 @@ export default function Home() {
 
                     squareStyles,
 
-                    /*
-                     * HARD OWNERSHIP LOCK.
-                     *
-                     * If you are White,
-                     * only White pieces can
-                     * ever be dragged.
-                     *
-                     * Vice versa for Black.
-                     */
                     canDragPiece: ({
                       square,
                     }) => {
                       if (
+                        !square ||
                         solved ||
                         isOpponentMoving ||
                         pendingPromotion
@@ -3440,15 +3351,11 @@ export default function Home() {
                       );
                     },
 
-                    /*
-                     * Show legal moves as soon
-                     * as the user begins dragging
-                     * one of their pieces.
-                     */
                     onPieceDrag: ({
                       square,
                     }) => {
                       if (
+                        !square ||
                         solved ||
                         isOpponentMoving ||
                         pendingPromotion
@@ -3469,12 +3376,15 @@ export default function Home() {
                       }
                     },
 
-                    /*
-                     * Proper click-to-move.
-                     */
                     onSquareClick: ({
                       square,
                     }) => {
+                      if (
+                        !square
+                      ) {
+                        return;
+                      }
+
                       handleSquareClick(
                         square
                       );
@@ -3485,6 +3395,7 @@ export default function Home() {
                       targetSquare,
                     }) => {
                       if (
+                        !sourceSquare ||
                         !targetSquare ||
                         isOpponentMoving ||
                         pendingPromotion
@@ -3518,8 +3429,6 @@ export default function Home() {
               </div>
             </div>
           </section>
-
-          {/* RIGHT */}
 
           <aside>
             <section className="min-h-[112px]">
@@ -3598,8 +3507,6 @@ export default function Home() {
               )}
             </section>
 
-            {/* LINE */}
-
             <section className="mt-6 border-t border-[var(--line)] pt-5">
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-[13px] font-semibold">
@@ -3644,8 +3551,6 @@ export default function Home() {
                 </div>
               )}
             </section>
-
-            {/* HINT */}
 
             {!solved && (
               <section className="mt-6 border-t border-[var(--line)] pt-5">
@@ -3692,8 +3597,6 @@ export default function Home() {
               </section>
             )}
 
-            {/* LESSON */}
-
             {solved && (
               <section className="appear mt-6 border-t border-[var(--line)] pt-5">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
@@ -3707,8 +3610,6 @@ export default function Home() {
                 </p>
               </section>
             )}
-
-            {/* ACTIONS */}
 
             <section className="mt-6 border-t border-[var(--line)] pt-5">
               <div className="flex gap-3">
@@ -3760,8 +3661,6 @@ export default function Home() {
           </aside>
         </div>
       </div>
-
-      {/* PROMOTION */}
 
       {pendingPromotion && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 px-5 backdrop-blur-[3px]">
