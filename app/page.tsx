@@ -7,7 +7,10 @@ import {
   useRef,
   useState,
 } from "react";
-import { Chess } from "chess.js";
+import {
+  Chess,
+  type Square,
+} from "chess.js";
 import { Chessboard } from "react-chessboard";
 import {
   puzzles,
@@ -355,6 +358,56 @@ function buildPuzzlePosition(
   return game;
 }
 
+function getPlayerChessColor(
+  playerColor: "white" | "black"
+) {
+  return playerColor ===
+    "white"
+    ? "w"
+    : "b";
+}
+
+function isPlayersPiece(
+  game: Chess,
+  square: string,
+  playerColor: "white" | "black"
+) {
+  const piece =
+    game.get(
+      square as Square
+    );
+
+  if (!piece) {
+    return false;
+  }
+
+  return (
+    piece.color ===
+    getPlayerChessColor(
+      playerColor
+    )
+  );
+}
+
+function getLegalMoves(
+  game: Chess,
+  square: string | null
+) {
+  if (!square) {
+    return [];
+  }
+
+  try {
+    return game.moves({
+      square:
+        square as Square,
+      verbose: true,
+    });
+  } catch {
+    return [];
+  }
+}
+
 function isPromotionMove(
   game: Chess,
   sourceSquare: string,
@@ -362,7 +415,7 @@ function isPromotionMove(
 ) {
   const piece =
     game.get(
-      sourceSquare as never
+      sourceSquare as Square
     );
 
   if (
@@ -442,7 +495,9 @@ function getPuzzleGoal(
 ) {
   const mateTheme =
     themes.find((theme) =>
-      /^mateIn\d+$/i.test(theme)
+      /^mateIn\d+$/i.test(
+        theme
+      )
     );
 
   if (mateTheme) {
@@ -1014,7 +1069,6 @@ function ThemeTooltip({
 
   return (
     <span className="group relative inline-flex items-center">
-
       <button
         type="button"
         className="inline-flex items-center gap-1 border-b border-dotted border-black/20 text-left focus:outline-none"
@@ -1066,8 +1120,49 @@ function ThemeTooltip({
           {explanation}
         </span>
       </span>
-
     </span>
+  );
+}
+
+function PlayerColorIndicator({
+  playerColor,
+}: {
+  playerColor:
+    | "white"
+    | "black";
+}) {
+  const isWhite =
+    playerColor ===
+    "white";
+
+  return (
+    <div className="flex items-center gap-2.5">
+      <span
+        className={[
+          "h-[13px] w-[13px] rounded-full",
+          isWhite
+            ? "border border-black/20 bg-white shadow-sm"
+            : "bg-[#161617]",
+        ].join(" ")}
+      />
+
+      <span className="text-[12px] font-bold uppercase tracking-[0.13em] text-[var(--text)]">
+        You are{" "}
+        {isWhite
+          ? "White"
+          : "Black"}
+      </span>
+
+      <span className="text-[var(--tertiary)]">
+        ·
+      </span>
+
+      <span className="text-[11px] font-medium text-[var(--secondary)]">
+        {isWhite
+          ? "White pieces only"
+          : "Black pieces only"}
+      </span>
+    </div>
   );
 }
 
@@ -1232,7 +1327,8 @@ export default function Home() {
       [puzzleIndex]
     );
 
-  const playerColor =
+  const playerColor:
+    "white" | "black" =
     initialGame.turn() ===
     "w"
       ? "white"
@@ -1289,6 +1385,25 @@ export default function Home() {
       )
       .slice(0, 2);
 
+  /*
+   * Legal moves are derived from the
+   * live board position.
+   *
+   * No precomputation needed.
+   */
+  const legalMoves =
+    useMemo(
+      () =>
+        getLegalMoves(
+          game,
+          selectedSquare
+        ),
+      [
+        game,
+        selectedSquare,
+      ]
+    );
+
   useEffect(() => {
     try {
       const raw =
@@ -1308,9 +1423,7 @@ export default function Home() {
             saved.themes || {},
         });
       }
-    } catch {
-      // Ignore bad storage.
-    }
+    } catch {}
 
     setProgressLoaded(true);
   }, []);
@@ -1414,9 +1527,7 @@ export default function Home() {
               next
             )
           );
-        } catch {
-          // Ignore storage errors.
-        }
+        } catch {}
 
         return next;
       }
@@ -1529,7 +1640,7 @@ export default function Home() {
 
     const piece =
       game.get(
-        from as never
+        from as Square
       );
 
     const pieceName =
@@ -1553,7 +1664,10 @@ export default function Home() {
 
     if (promotion) {
       const promotionNames:
-        Record<string, string> = {
+        Record<
+          string,
+          string
+        > = {
         q: "queen",
         r: "rook",
         b: "bishop",
@@ -1780,7 +1894,8 @@ export default function Home() {
 
     setSessionStats(
       (previous) => {
-        const next: SessionStats = {
+        const next:
+          SessionStats = {
           ...previous,
 
           completed:
@@ -1860,18 +1975,15 @@ export default function Home() {
 
   function handleNextAfterSolved() {
     if (
-      sessionMode === "ten"
-    ) {
-      if (
-        sessionStats.completed >=
+      sessionMode === "ten" &&
+      sessionStats.completed >=
         SESSION_LENGTH
-      ) {
-        setSessionComplete(
-          true
-        );
+    ) {
+      setSessionComplete(
+        true
+      );
 
-        return;
-      }
+      return;
     }
 
     pickNextPuzzle();
@@ -2124,6 +2236,10 @@ export default function Home() {
   function finishPuzzle() {
     setSolved(true);
 
+    setSelectedSquare(
+      null
+    );
+
     setMessage(
       "Puzzle solved."
     );
@@ -2152,6 +2268,23 @@ export default function Home() {
         2,
         4
       );
+
+    /*
+     * Additional defensive guard.
+     *
+     * Even if something bypasses the
+     * chessboard UI, opponent pieces
+     * cannot be submitted as moves.
+     */
+    if (
+      !isPlayersPiece(
+        game,
+        sourceSquare,
+        playerColor
+      )
+    ) {
+      return false;
+    }
 
     const expectedMove =
       puzzle.moves[
@@ -2376,7 +2509,23 @@ export default function Home() {
   ) {
     if (
       solved ||
-      isOpponentMoving
+      isOpponentMoving ||
+      pendingPromotion
+    ) {
+      return false;
+    }
+
+    /*
+     * Opponent pieces are rejected
+     * here too, even though canDragPiece
+     * already prevents dragging them.
+     */
+    if (
+      !isPlayersPiece(
+        game,
+        sourceSquare,
+        playerColor
+      )
     ) {
       return false;
     }
@@ -2393,11 +2542,138 @@ export default function Home() {
         targetSquare,
       });
 
+      setSelectedSquare(
+        null
+      );
+
       return false;
     }
 
     return executeUserMove(
       `${sourceSquare}${targetSquare}`
+    );
+  }
+
+  function handleSquareClick(
+    square: string
+  ) {
+    if (
+      solved ||
+      isOpponentMoving ||
+      pendingPromotion
+    ) {
+      return;
+    }
+
+    const clickedPiece =
+      game.get(
+        square as Square
+      );
+
+    const clickedOwnPiece =
+      clickedPiece?.color ===
+      getPlayerChessColor(
+        playerColor
+      );
+
+    /*
+     * No selected piece yet.
+     *
+     * Only your own pieces can
+     * become selected.
+     */
+    if (
+      !selectedSquare
+    ) {
+      if (
+        clickedOwnPiece
+      ) {
+        setSelectedSquare(
+          square
+        );
+      }
+
+      return;
+    }
+
+    /*
+     * Clicking your currently
+     * selected piece deselects it.
+     */
+    if (
+      square ===
+      selectedSquare
+    ) {
+      setSelectedSquare(
+        null
+      );
+
+      return;
+    }
+
+    /*
+     * Clicking another one of your
+     * pieces switches selection.
+     */
+    if (
+      clickedOwnPiece
+    ) {
+      setSelectedSquare(
+        square
+      );
+
+      return;
+    }
+
+    /*
+     * Determine whether the clicked
+     * destination is actually legal.
+     *
+     * Clicking random illegal squares
+     * does NOT count as a wrong puzzle
+     * attempt. It simply deselects.
+     */
+    const legalDestination =
+      legalMoves.find(
+        (move) =>
+          move.to === square
+      );
+
+    if (
+      !legalDestination
+    ) {
+      setSelectedSquare(
+        null
+      );
+
+      return;
+    }
+
+    const sourceSquare =
+      selectedSquare;
+
+    if (
+      isPromotionMove(
+        game,
+        sourceSquare,
+        square
+      )
+    ) {
+      setPendingPromotion({
+        sourceSquare,
+        targetSquare:
+          square,
+      });
+
+      setSelectedSquare(
+        null
+      );
+
+      return;
+    }
+
+    executeUserMove(
+      `${sourceSquare}${square}`
     );
   }
 
@@ -2434,6 +2710,9 @@ export default function Home() {
       React.CSSProperties
     > = {};
 
+  /*
+   * Last move highlight.
+   */
   if (
     lastMove &&
     !isWrong
@@ -2453,6 +2732,9 @@ export default function Home() {
     };
   }
 
+  /*
+   * Selected piece.
+   */
   if (
     selectedSquare &&
     !isWrong
@@ -2460,11 +2742,146 @@ export default function Home() {
     squareStyles[
       selectedSquare
     ] = {
+      ...(squareStyles[
+        selectedSquare
+      ] || {}),
+
       boxShadow:
-        "inset 0 0 0 3px rgba(59, 92, 255, 0.68)",
+        "inset 0 0 0 3px rgba(59, 92, 255, 0.72)",
+
+      cursor: "grab",
     };
   }
 
+  /*
+   * Legal move indicators.
+   *
+   * Empty square:
+   * small central dot.
+   *
+   * Capture:
+   * ring around target.
+   */
+  if (
+    selectedSquare &&
+    !isWrong &&
+    !solved &&
+    !isOpponentMoving
+  ) {
+    for (
+      const move of
+      legalMoves
+    ) {
+      const target =
+        move.to;
+
+      const existing =
+        squareStyles[
+          target
+        ] || {};
+
+      if (
+        move.captured
+      ) {
+        squareStyles[
+          target
+        ] = {
+          ...existing,
+
+          cursor:
+            "pointer",
+
+          boxShadow:
+            "inset 0 0 0 5px rgba(59, 92, 255, 0.28)",
+        };
+      } else {
+        squareStyles[
+          target
+        ] = {
+          ...existing,
+
+          cursor:
+            "pointer",
+
+          backgroundImage:
+            "radial-gradient(circle at center, rgba(59, 92, 255, 0.52) 0, rgba(59, 92, 255, 0.52) 12%, transparent 13%)",
+        };
+      }
+    }
+  }
+
+  /*
+   * Make ownership visually clear
+   * at interaction level too.
+   */
+  for (
+    const file of [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+    ]
+  ) {
+    for (
+      let rank = 1;
+      rank <= 8;
+      rank++
+    ) {
+      const square =
+        `${file}${rank}`;
+
+      const piece =
+        game.get(
+          square as Square
+        );
+
+      if (!piece) {
+        continue;
+      }
+
+      const ownPiece =
+        piece.color ===
+        getPlayerChessColor(
+          playerColor
+        );
+
+      if (ownPiece) {
+        squareStyles[
+          square
+        ] = {
+          ...squareStyles[
+            square
+          ],
+
+          cursor:
+            solved ||
+            isOpponentMoving
+              ? "default"
+              : "grab",
+        };
+      } else {
+        squareStyles[
+          square
+        ] = {
+          ...squareStyles[
+            square
+          ],
+
+          cursor:
+            "default",
+        };
+      }
+    }
+  }
+
+  /*
+   * Wrong move overrides
+   * all normal highlights.
+   */
   if (
     wrongMove
   ) {
@@ -2484,7 +2901,7 @@ export default function Home() {
   }
 
   /*
-   * SESSION SUMMARY
+   * SESSION RESULTS
    */
 
   if (
@@ -2493,13 +2910,9 @@ export default function Home() {
   ) {
     return (
       <main className="min-h-screen">
-
         <header className="border-b border-[var(--line)] bg-white/55 backdrop-blur-xl">
-
           <div className="mx-auto flex h-[56px] max-w-[920px] items-center justify-between px-6">
-
             <div className="flex items-center gap-2.5">
-
               <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#161617] text-[15px] text-white">
                 ♞
               </div>
@@ -2507,7 +2920,6 @@ export default function Home() {
               <div className="text-[16px] font-semibold tracking-[-0.025em]">
                 ChessGrind
               </div>
-
             </div>
 
             <Link
@@ -2516,13 +2928,10 @@ export default function Home() {
             >
               Insights
             </Link>
-
           </div>
-
         </header>
 
         <div className="mx-auto max-w-[820px] px-6 pb-20 pt-16">
-
           <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--success)]">
             Session complete
           </div>
@@ -2535,10 +2944,7 @@ export default function Home() {
             You finished a 10-puzzle training session. Here&apos;s how it went.
           </p>
 
-          {/* SCORE */}
-
           <section className="mt-10 grid grid-cols-2 gap-y-7 border-y border-[var(--line)] py-7 sm:grid-cols-4">
-
             <div>
               <div className="text-[12px] text-[var(--secondary)]">
                 Solved
@@ -2579,71 +2985,51 @@ export default function Home() {
                 {sessionStats.hintsUsed}
               </div>
             </div>
-
           </section>
 
-          {/* ANALYSIS */}
-
           <section className="mt-10 grid gap-4 sm:grid-cols-2">
-
             <div className="rounded-[18px] border border-[var(--line)] bg-white p-6">
-
               <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                 Strongest pattern
               </div>
 
               <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
-
                 {sessionStrongestTheme
                   ? formatTheme(
                       sessionStrongestTheme
                     )
                   : "Still learning"}
-
               </h2>
 
               <p className="mt-3 text-[14px] leading-6 text-[var(--secondary)]">
-
                 {sessionStrongestTheme
                   ? "This was your cleanest tactical pattern in this session."
                   : "Solve more varied motifs to build a clearer profile."}
-
               </p>
-
             </div>
 
             <div className="rounded-[18px] border border-[var(--line)] bg-white p-6">
-
               <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                 Needs work
               </div>
 
               <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
-
                 {sessionWeakestTheme
                   ? formatTheme(
                       sessionWeakestTheme
                     )
                   : "No clear weakness"}
-
               </h2>
 
               <p className="mt-3 text-[14px] leading-6 text-[var(--secondary)]">
-
                 {sessionWeakestTheme
                   ? "Smart Training will give this motif slightly more weight next time."
                   : "This was a balanced session with no obvious weak pattern."}
-
               </p>
-
             </div>
-
           </section>
 
-          {/* EXTRA */}
-
           <section className="mt-8 text-[13px] text-[var(--secondary)]">
-
             <span>
               Skipped{" "}
               <strong className="text-[var(--text)]">
@@ -2661,13 +3047,9 @@ export default function Home() {
                 {sessionStats.correctMoves}
               </strong>
             </span>
-
           </section>
 
-          {/* ACTIONS */}
-
           <section className="mt-10 flex flex-wrap gap-3 border-t border-[var(--line)] pt-7">
-
             <button
               type="button"
               onClick={
@@ -2694,26 +3076,19 @@ export default function Home() {
             >
               View insights
             </Link>
-
           </section>
-
         </div>
-
       </main>
     );
   }
 
   return (
     <main className="min-h-screen">
-
       {/* HEADER */}
 
       <header className="border-b border-[var(--line)] bg-white/55 backdrop-blur-xl">
-
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
-
           <div className="flex items-center gap-2.5">
-
             <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#161617] text-[15px] text-white">
               ♞
             </div>
@@ -2721,11 +3096,9 @@ export default function Home() {
             <div className="text-[16px] font-semibold tracking-[-0.025em]">
               ChessGrind
             </div>
-
           </div>
 
           <div className="flex items-center gap-5">
-
             <Link
               href="/insights"
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
@@ -2736,7 +3109,6 @@ export default function Home() {
             <span className="h-4 w-px bg-[var(--line-strong)]" />
 
             <span className="text-[12px] font-medium text-[var(--secondary)]">
-
               {sessionMode ===
               "ten"
                 ? `${Math.min(
@@ -2745,26 +3117,18 @@ export default function Home() {
                     SESSION_LENGTH
                   )} of ${SESSION_LENGTH}`
                 : `${availablePuzzleCount} puzzles`}
-
             </span>
-
           </div>
-
         </div>
-
       </header>
 
       <div className="mx-auto max-w-[1060px] px-6 pb-16 pt-7">
-
-        {/* SESSION TYPE */}
+        {/* SESSION MODE */}
 
         <div className="mb-5 flex justify-center">
-
           <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
-
             {SESSION_MODES.map(
               (mode) => {
-
                 const active =
                   sessionMode ===
                   mode.value;
@@ -2798,32 +3162,29 @@ export default function Home() {
                 );
               }
             )}
-
           </div>
-
         </div>
 
         {/* SESSION PROGRESS */}
 
-        {sessionMode === "ten" && (
-
+        {sessionMode ===
+          "ten" && (
           <div className="mb-6">
-
             <div className="mb-2 flex items-center justify-between text-[11px] text-[var(--secondary)]">
-
               <span>
                 Training session
               </span>
 
               <span className="tabular-nums">
-                {sessionStats.completed}/
-                {SESSION_LENGTH} completed
+                {
+                  sessionStats.completed
+                }
+                /{SESSION_LENGTH}{" "}
+                completed
               </span>
-
             </div>
 
             <div className="h-[3px] overflow-hidden rounded-full bg-black/[0.06]">
-
               <div
                 className="h-full rounded-full bg-[var(--accent)] transition-all duration-300"
                 style={{
@@ -2834,22 +3195,16 @@ export default function Home() {
                   }%`,
                 }}
               />
-
             </div>
-
           </div>
-
         )}
 
         {/* TRAINING TOOLBAR */}
 
         <section className="mb-9 flex flex-col gap-5 border-b border-[var(--line)] pb-6 xl:flex-row xl:items-center xl:justify-between">
-
           <div className="inline-flex self-start rounded-[12px] bg-black/[0.045] p-[3px]">
-
             {TRAINING_MODES.map(
               (mode) => {
-
                 const active =
                   difficulty ===
                   mode.value;
@@ -2883,11 +3238,9 @@ export default function Home() {
                 );
               }
             )}
-
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-
             <button
               type="button"
               onClick={() =>
@@ -2898,7 +3251,6 @@ export default function Home() {
               }
               className="flex items-center gap-2 text-[12px] text-[var(--secondary)]"
             >
-
               <span
                 className={[
                   "relative inline-flex h-[18px] w-[31px] items-center rounded-full transition",
@@ -2910,7 +3262,6 @@ export default function Home() {
                   " "
                 )}
               >
-
                 <span
                   className={[
                     "h-[14px] w-[14px] rounded-full bg-white shadow-sm transition-transform",
@@ -2922,7 +3273,6 @@ export default function Home() {
                     " "
                   )}
                 />
-
               </span>
 
               <span>
@@ -2934,13 +3284,11 @@ export default function Home() {
                     : "Smart training"
                   : "Smart training off"}
               </span>
-
             </button>
 
             <span className="hidden h-4 w-px bg-[var(--line)] sm:block" />
 
             <div className="flex items-center gap-3 text-[12px] text-[var(--secondary)]">
-
               <span>
                 Solved{" "}
                 <strong className="text-[var(--text)]">
@@ -2950,9 +3298,7 @@ export default function Home() {
                 </strong>
               </span>
 
-              <span>
-                ·
-              </span>
+              <span>·</span>
 
               <span>
                 Accuracy{" "}
@@ -2963,9 +3309,7 @@ export default function Home() {
                 </strong>
               </span>
 
-              <span>
-                ·
-              </span>
+              <span>·</span>
 
               <span>
                 Streak{" "}
@@ -2975,24 +3319,24 @@ export default function Home() {
                     : "—"}
                 </strong>
               </span>
-
             </div>
-
           </div>
-
         </section>
 
         {/* PUZZLE HEADER */}
 
-        <section className="mb-6 max-w-[600px]">
+        <section className="mb-6 max-w-[620px]">
+          <PlayerColorIndicator
+            playerColor={
+              playerColor
+            }
+          />
 
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--secondary)]">
-
+          <div className="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--secondary)]">
             {playerColor ===
             "white"
               ? "White to move"
               : "Black to move"}
-
           </div>
 
           <h1 className="mt-2 text-[38px] font-semibold leading-[1.04] tracking-[-0.045em]">
@@ -3000,7 +3344,6 @@ export default function Home() {
           </h1>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--secondary)]">
-
             <span>
               Rating{" "}
               {puzzle.rating}
@@ -3008,12 +3351,10 @@ export default function Home() {
 
             {visibleThemes.map(
               (theme) => (
-
                 <div
                   key={theme}
                   className="flex items-center gap-2.5"
                 >
-
                   <span className="text-[var(--tertiary)]">
                     ·
                   </span>
@@ -3021,24 +3362,18 @@ export default function Home() {
                   <ThemeTooltip
                     theme={theme}
                   />
-
                 </div>
-
               )
             )}
-
           </div>
-
         </section>
 
         {/* WORKSPACE */}
 
         <div className="grid gap-10 lg:grid-cols-[560px_350px] lg:items-start lg:gap-[48px]">
-
           {/* BOARD */}
 
           <section>
-
             <div
               className={[
                 "overflow-hidden rounded-[21px] bg-white p-[7px]",
@@ -3054,9 +3389,7 @@ export default function Home() {
                     : "var(--shadow-board)",
               }}
             >
-
               <div className="overflow-hidden rounded-[15px]">
-
                 <Chessboard
                   options={{
                     position:
@@ -3080,7 +3413,39 @@ export default function Home() {
 
                     squareStyles,
 
-                    onSquareClick: ({
+                    /*
+                     * HARD OWNERSHIP LOCK.
+                     *
+                     * If you are White,
+                     * only White pieces can
+                     * ever be dragged.
+                     *
+                     * Vice versa for Black.
+                     */
+                    canDragPiece: ({
+                      square,
+                    }) => {
+                      if (
+                        solved ||
+                        isOpponentMoving ||
+                        pendingPromotion
+                      ) {
+                        return false;
+                      }
+
+                      return isPlayersPiece(
+                        game,
+                        square,
+                        playerColor
+                      );
+                    },
+
+                    /*
+                     * Show legal moves as soon
+                     * as the user begins dragging
+                     * one of their pieces.
+                     */
+                    onPieceDrag: ({
                       square,
                     }) => {
                       if (
@@ -3091,7 +3456,26 @@ export default function Home() {
                         return;
                       }
 
-                      setSelectedSquare(
+                      if (
+                        isPlayersPiece(
+                          game,
+                          square,
+                          playerColor
+                        )
+                      ) {
+                        setSelectedSquare(
+                          square
+                        );
+                      }
+                    },
+
+                    /*
+                     * Proper click-to-move.
+                     */
+                    onSquareClick: ({
+                      square,
+                    }) => {
+                      handleSquareClick(
                         square
                       );
                     },
@@ -3115,23 +3499,32 @@ export default function Home() {
                     },
                   }}
                 />
-
               </div>
-
             </div>
 
+            <div className="mt-4 flex items-center gap-5 text-[11px] text-[var(--secondary)]">
+              <div className="flex items-center gap-2">
+                <span className="h-[7px] w-[7px] rounded-full bg-[var(--accent)] opacity-60" />
+                <span>
+                  Legal move
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="h-[13px] w-[13px] rounded-full border-[3px] border-[var(--accent)] opacity-40" />
+                <span>
+                  Legal capture
+                </span>
+              </div>
+            </div>
           </section>
 
           {/* RIGHT */}
 
           <aside>
-
             <section className="min-h-[112px]">
-
               {isWrong ? (
-
                 <div className="wrong-message">
-
                   <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--danger)]">
                     Incorrect
                   </div>
@@ -3143,13 +3536,9 @@ export default function Home() {
                   <p className="mt-2 text-[14px] text-[var(--danger)]">
                     That move doesn&apos;t work. Try again.
                   </p>
-
                 </div>
-
               ) : solved ? (
-
                 <div className="appear">
-
                   <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--success)]">
                     Solved
                   </div>
@@ -3159,7 +3548,6 @@ export default function Home() {
                   </h2>
 
                   <p className="mt-2 text-[14px] leading-6 text-[var(--secondary)]">
-
                     {puzzleWrongMoves ===
                     0
                       ? puzzleHintsUsed ===
@@ -3177,19 +3565,20 @@ export default function Home() {
                             ? "mistake"
                             : "mistakes"
                         }.`}
-
                   </p>
-
                 </div>
-
               ) : (
-
                 <div>
+                  <div className="flex items-center gap-2">
+                    {isOpponentMoving && (
+                      <span className="pulse-dot h-2 w-2 rounded-full bg-[var(--accent)]" />
+                    )}
 
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--secondary)]">
-                    {isOpponentMoving
-                      ? "Opponent"
-                      : "Your move"}
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--secondary)]">
+                      {isOpponentMoving
+                        ? "Opponent"
+                        : `Your move · ${playerColor}`}
+                    </div>
                   </div>
 
                   <h2 className="mt-2 text-[25px] font-semibold">
@@ -3198,51 +3587,43 @@ export default function Home() {
                       : message}
                   </h2>
 
-                  <p className="mt-2 text-[14px] text-[var(--secondary)]">
+                  <p className="mt-2 text-[14px] leading-6 text-[var(--secondary)]">
                     {isOpponentMoving
-                      ? "The opponent is responding."
-                      : "Calculate before committing to a move."}
+                      ? "Your pieces are locked until the opponent finishes moving."
+                      : selectedSquare
+                        ? "Choose one of the highlighted legal squares."
+                        : `Select one of your ${playerColor} pieces to see its legal moves.`}
                   </p>
-
                 </div>
-
               )}
-
             </section>
 
             {/* LINE */}
 
             <section className="mt-6 border-t border-[var(--line)] pt-5">
-
               <div className="mb-4 flex items-center justify-between">
-
                 <span className="text-[13px] font-semibold">
                   Line
                 </span>
 
                 <span className="text-[11px] text-[var(--tertiary)]">
-                  {moveLog.length} played
+                  {moveLog.length}{" "}
+                  played
                 </span>
-
               </div>
 
               {moveLog.length ===
               0 ? (
-
                 <p className="text-[14px] text-[var(--secondary)]">
                   Your solution will build here.
                 </p>
-
               ) : (
-
                 <div className="flex flex-wrap items-center gap-2">
-
                   {moveLog.map(
                     (
                       move,
                       index
                     ) => (
-
                       <span
                         key={`${move.san}-${index}`}
                         className={[
@@ -3258,22 +3639,16 @@ export default function Home() {
                       >
                         {move.san}
                       </span>
-
                     )
                   )}
-
                 </div>
-
               )}
-
             </section>
 
             {/* HINT */}
 
             {!solved && (
-
               <section className="mt-6 border-t border-[var(--line)] pt-5">
-
                 <button
                   type="button"
                   onClick={
@@ -3286,9 +3661,7 @@ export default function Home() {
                   }
                   className="flex w-full items-center justify-between text-left disabled:opacity-50"
                 >
-
                   <div>
-
                     <div className="text-[13px] font-semibold">
                       Hint
                     </div>
@@ -3299,37 +3672,30 @@ export default function Home() {
                         ? "Reveal a clue"
                         : `Hint ${hintLevel} of 3`}
                     </div>
-
                   </div>
 
                   <span className="text-[18px] text-[var(--accent)]">
-                    ›
+                    {hintLevel >=
+                    3
+                      ? "✓"
+                      : "›"}
                   </span>
-
                 </button>
 
                 {currentHint && (
-
                   <div className="appear mt-4 rounded-[10px] bg-[var(--accent-soft)] px-4 py-3">
-
                     <p className="text-[14px] leading-6 text-[#3447b8]">
                       {currentHint}
                     </p>
-
                   </div>
-
                 )}
-
               </section>
-
             )}
 
             {/* LESSON */}
 
             {solved && (
-
               <section className="appear mt-6 border-t border-[var(--line)] pt-5">
-
                 <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                   Why it works
                 </div>
@@ -3339,17 +3705,13 @@ export default function Home() {
                     puzzle.themes
                   )}
                 </p>
-
               </section>
-
             )}
 
             {/* ACTIONS */}
 
             <section className="mt-6 border-t border-[var(--line)] pt-5">
-
               <div className="flex gap-3">
-
                 <button
                   type="button"
                   onClick={
@@ -3375,7 +3737,6 @@ export default function Home() {
                   }
                   className="control min-h-[44px] rounded-[11px] bg-[#161617] px-7 text-[14px] font-semibold text-white disabled:opacity-40"
                 >
-
                   {solved
                     ? sessionMode ===
                       "ten"
@@ -3385,11 +3746,8 @@ export default function Home() {
                         : "Next puzzle"
                       : "Next puzzle"
                     : "Skip"}
-
                 </button>
-
               </div>
-
             </section>
 
             <div className="mt-4 text-[10px] text-[var(--tertiary)]">
@@ -3399,21 +3757,15 @@ export default function Home() {
               · Lichess{" "}
               {puzzle.id}
             </div>
-
           </aside>
-
         </div>
-
       </div>
 
       {/* PROMOTION */}
 
       {pendingPromotion && (
-
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 px-5 backdrop-blur-[3px]">
-
           <div className="appear w-full max-w-[360px] rounded-[20px] border border-black/[0.08] bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.20)]">
-
             <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
               Promotion
             </div>
@@ -3423,10 +3775,8 @@ export default function Home() {
             </h2>
 
             <div className="mt-5 grid grid-cols-4 gap-2">
-
               {PROMOTION_OPTIONS.map(
                 (option) => {
-
                   const symbol =
                     playerColor ===
                     "white"
@@ -3446,7 +3796,6 @@ export default function Home() {
                       }
                       className="control flex aspect-square flex-col items-center justify-center rounded-[13px] border border-[var(--line)] bg-[#f7f7f8]"
                     >
-
                       <span className="text-[36px]">
                         {symbol}
                       </span>
@@ -3454,12 +3803,10 @@ export default function Home() {
                       <span className="mt-1 text-[10px] text-[var(--secondary)]">
                         {option.label}
                       </span>
-
                     </button>
                   );
                 }
               )}
-
             </div>
 
             <button
@@ -3473,13 +3820,9 @@ export default function Home() {
             >
               Cancel
             </button>
-
           </div>
-
         </div>
-
       )}
-
     </main>
   );
 }
