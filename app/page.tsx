@@ -1057,6 +1057,78 @@ function ThemeTooltip({
       theme
     ];
 
+  const [
+    isOpen,
+    setIsOpen,
+  ] = useState(false);
+
+  const containerRef =
+    useRef<HTMLSpanElement | null>(
+      null
+    );
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(
+      event: PointerEvent
+    ) {
+      const target =
+        event.target;
+
+      if (
+        !(target instanceof Node)
+      ) {
+        return;
+      }
+
+      if (
+        containerRef.current?.contains(
+          target
+        )
+      ) {
+        return;
+      }
+
+      setIsOpen(false);
+    }
+
+    function handleKeyDown(
+      event: KeyboardEvent
+    ) {
+      if (
+        event.key ===
+        "Escape"
+      ) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener(
+      "pointerdown",
+      handlePointerDown
+    );
+
+    document.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () => {
+      document.removeEventListener(
+        "pointerdown",
+        handlePointerDown
+      );
+
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+    };
+  }, [isOpen]);
+
   if (!explanation) {
     return (
       <span>
@@ -1068,10 +1140,29 @@ function ThemeTooltip({
   }
 
   return (
-    <span className="group relative inline-flex items-center">
+    <span
+      ref={containerRef}
+      className="group relative inline-flex items-center"
+    >
       <button
         type="button"
-        className="inline-flex items-center gap-1 border-b border-dotted border-black/20 text-left focus:outline-none"
+        aria-expanded={
+          isOpen
+        }
+        aria-label={`Explain ${formatTheme(
+          theme
+        )}`}
+        onClick={(
+          event
+        ) => {
+          event.stopPropagation();
+
+          setIsOpen(
+            (current) =>
+              !current
+          );
+        }}
+        className="inline-flex touch-manipulation items-center gap-1 border-b border-dotted border-black/20 text-left focus:outline-none"
       >
         {formatTheme(
           theme
@@ -1082,42 +1173,95 @@ function ThemeTooltip({
         </span>
       </button>
 
+      {/*
+        MOBILE:
+        Fixed near the bottom of the
+        screen so it can never overflow
+        left/right.
+
+        DESKTOP:
+        Traditional hover tooltip above
+        the label.
+      */}
+
       <span
         role="tooltip"
-        className="
-          pointer-events-none
-          absolute
-          bottom-[calc(100%+9px)]
-          left-1/2
-          z-50
-          w-[230px]
-          -translate-x-1/2
-          translate-y-1
-          rounded-[10px]
-          border
-          border-black/[0.08]
-          bg-white
-          px-3.5
-          py-3
-          text-left
-          opacity-0
-          shadow-[0_10px_30px_rgba(0,0,0,0.10)]
-          transition
-          duration-150
-          group-hover:translate-y-0
-          group-hover:opacity-100
-          group-focus-within:translate-y-0
-          group-focus-within:opacity-100
-        "
-      >
-        <span className="block text-[12px] font-semibold">
-          {formatTheme(
-            theme
-          )}
-        </span>
+        className={[
+          `
+            fixed
+            inset-x-4
+            bottom-5
+            z-[200]
+            mx-auto
+            max-w-[340px]
+            rounded-[14px]
+            border
+            border-black/[0.08]
+            bg-white
+            px-4
+            py-3.5
+            text-left
+            shadow-[0_16px_50px_rgba(0,0,0,0.16)]
+            transition
+            duration-150
 
-        <span className="mt-1 block text-[12px] leading-5 text-[var(--secondary)]">
-          {explanation}
+            sm:absolute
+            sm:inset-x-auto
+            sm:bottom-[calc(100%+9px)]
+            sm:left-1/2
+            sm:w-[230px]
+            sm:max-w-none
+            sm:-translate-x-1/2
+            sm:rounded-[10px]
+            sm:px-3.5
+            sm:py-3
+            sm:shadow-[0_10px_30px_rgba(0,0,0,0.10)]
+          `,
+
+          isOpen
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : `
+                pointer-events-none
+                translate-y-2
+                opacity-0
+
+                sm:group-hover:pointer-events-auto
+                sm:group-hover:translate-y-0
+                sm:group-hover:opacity-100
+
+                sm:group-focus-within:pointer-events-auto
+                sm:group-focus-within:translate-y-0
+                sm:group-focus-within:opacity-100
+              `,
+        ].join(" ")}
+      >
+        <span className="flex items-start justify-between gap-4">
+          <span>
+            <span className="block text-[12px] font-semibold">
+              {formatTheme(
+                theme
+              )}
+            </span>
+
+            <span className="mt-1 block text-[12px] leading-5 text-[var(--secondary)]">
+              {explanation}
+            </span>
+          </span>
+
+          <button
+            type="button"
+            aria-label="Close explanation"
+            onClick={(
+              event
+            ) => {
+              event.stopPropagation();
+
+              setIsOpen(false);
+            }}
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[15px] text-[var(--tertiary)] hover:bg-black/[0.05] sm:hidden"
+          >
+            ×
+          </button>
         </span>
       </span>
     </span>
@@ -2263,11 +2407,6 @@ export default function Home() {
         4
       );
 
-    /*
-     * Dropping a piece back on
-     * the exact same square is
-     * NOT a puzzle attempt.
-     */
     if (
       sourceSquare ===
       targetSquare
@@ -2518,12 +2657,6 @@ export default function Home() {
       return false;
     }
 
-    /*
-     * User grabbed the piece
-     * but put it straight back.
-     *
-     * Cancel quietly.
-     */
     if (
       sourceSquare ===
       targetSquare
@@ -2605,10 +2738,6 @@ export default function Home() {
       return;
     }
 
-    /*
-     * Touch/click same piece again:
-     * cancel selection.
-     */
     if (
       square ===
       selectedSquare
@@ -2620,11 +2749,6 @@ export default function Home() {
       return;
     }
 
-    /*
-     * Switching to another one
-     * of your pieces is also not
-     * an attempted move.
-     */
     if (
       clickedOwnPiece
     ) {
@@ -2641,14 +2765,6 @@ export default function Home() {
           move.to === square
       );
 
-    /*
-     * Clicking an illegal destination
-     * while a piece is selected just
-     * cancels selection.
-     *
-     * It is not scored as a wrong
-     * tactical attempt.
-     */
     if (
       !legalDestination
     ) {
@@ -3453,11 +3569,6 @@ export default function Home() {
                         return false;
                       }
 
-                      /*
-                       * Same-square drop:
-                       * no wrong move,
-                       * no stats penalty.
-                       */
                       if (
                         sourceSquare ===
                         targetSquare
