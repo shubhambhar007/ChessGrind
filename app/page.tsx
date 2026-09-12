@@ -54,46 +54,32 @@ type ThemeProgress = {
 type Progress = {
   solved: number;
   skipped: number;
-
   correctMoves: number;
   wrongMoves: number;
   hintsUsed: number;
-
   currentStreak: number;
   bestStreak: number;
-
-  themes: Record<
-    string,
-    ThemeProgress
-  >;
+  themes: Record<string, ThemeProgress>;
 };
 
 type SessionStats = {
   completed: number;
   solved: number;
   skipped: number;
-
   correctMoves: number;
   wrongMoves: number;
   hintsUsed: number;
-
-  themes: Record<
-    string,
-    ThemeProgress
-  >;
+  themes: Record<string, ThemeProgress>;
 };
 
 const DEFAULT_PROGRESS: Progress = {
   solved: 0,
   skipped: 0,
-
   correctMoves: 0,
   wrongMoves: 0,
   hintsUsed: 0,
-
   currentStreak: 0,
   bestStreak: 0,
-
   themes: {},
 };
 
@@ -101,16 +87,13 @@ const DEFAULT_SESSION_STATS: SessionStats = {
   completed: 0,
   solved: 0,
   skipped: 0,
-
   correctMoves: 0,
   wrongMoves: 0,
   hintsUsed: 0,
-
   themes: {},
 };
 
 const SESSION_LENGTH = 10;
-
 const RECENT_PUZZLE_LIMIT = 12;
 
 const PROGRESS_KEY =
@@ -126,22 +109,10 @@ const TRAINING_MODES: {
   value: TrainingMode;
   label: string;
 }[] = [
-  {
-    value: "easy",
-    label: "Easy",
-  },
-  {
-    value: "medium",
-    label: "Medium",
-  },
-  {
-    value: "hard",
-    label: "Hard",
-  },
-  {
-    value: "mixed",
-    label: "Mixed",
-  },
+  { value: "easy", label: "Easy" },
+  { value: "medium", label: "Medium" },
+  { value: "hard", label: "Hard" },
+  { value: "mixed", label: "Mixed" },
 ];
 
 const SESSION_MODES: {
@@ -158,45 +129,36 @@ const SESSION_MODES: {
   },
 ];
 
-const TRAINABLE_THEMES =
-  new Set([
-    "mate",
-    "mateIn1",
-    "mateIn2",
-    "mateIn3",
-    "mateIn4",
-    "mateIn5",
-
-    "fork",
-    "pin",
-    "skewer",
-
-    "discoveredAttack",
-    "discoveredCheck",
-    "doubleCheck",
-
-    "sacrifice",
-
-    "attraction",
-    "deflection",
-    "clearance",
-    "interference",
-
-    "hangingPiece",
-    "trappedPiece",
-
-    "promotion",
-
-    "backRankMate",
-    "smotheredMate",
-    "arabianMate",
-    "anastasiaMate",
-    "bodenMate",
-    "hookMate",
-
-    "capturingDefender",
-    "defensiveMove",
-  ]);
+const TRAINABLE_THEMES = new Set([
+  "mate",
+  "mateIn1",
+  "mateIn2",
+  "mateIn3",
+  "mateIn4",
+  "mateIn5",
+  "fork",
+  "pin",
+  "skewer",
+  "discoveredAttack",
+  "discoveredCheck",
+  "doubleCheck",
+  "sacrifice",
+  "attraction",
+  "deflection",
+  "clearance",
+  "interference",
+  "hangingPiece",
+  "trappedPiece",
+  "promotion",
+  "backRankMate",
+  "smotheredMate",
+  "arabianMate",
+  "anastasiaMate",
+  "bodenMate",
+  "hookMate",
+  "capturingDefender",
+  "defensiveMove",
+]);
 
 const THEME_EXPLANATIONS:
   Record<string, string> = {
@@ -316,11 +278,8 @@ function applyUciMove(
   game: Chess,
   uci: string
 ) {
-  const from =
-    uci.slice(0, 2);
-
-  const to =
-    uci.slice(2, 4);
+  const from = uci.slice(0, 2);
+  const to = uci.slice(2, 4);
 
   const promotion =
     uci.length > 4
@@ -359,7 +318,9 @@ function buildPuzzlePosition(
 }
 
 function getPlayerChessColor(
-  playerColor: "white" | "black"
+  playerColor:
+    | "white"
+    | "black"
 ) {
   return playerColor ===
     "white"
@@ -370,7 +331,9 @@ function getPlayerChessColor(
 function isPlayersPiece(
   game: Chess,
   square: string,
-  playerColor: "white" | "black"
+  playerColor:
+    | "white"
+    | "black"
 ) {
   const piece =
     game.get(
@@ -1132,9 +1095,7 @@ function ThemeTooltip({
   if (!explanation) {
     return (
       <span>
-        {formatTheme(
-          theme
-        )}
+        {formatTheme(theme)}
       </span>
     );
   }
@@ -1164,25 +1125,12 @@ function ThemeTooltip({
         }}
         className="inline-flex touch-manipulation items-center gap-1 border-b border-dotted border-black/20 text-left focus:outline-none"
       >
-        {formatTheme(
-          theme
-        )}
+        {formatTheme(theme)}
 
         <span className="text-[9px] text-[var(--tertiary)]">
           ⓘ
         </span>
       </button>
-
-      {/*
-        MOBILE:
-        Fixed near the bottom of the
-        screen so it can never overflow
-        left/right.
-
-        DESKTOP:
-        Traditional hover tooltip above
-        the label.
-      */}
 
       <span
         role="tooltip"
@@ -1255,7 +1203,6 @@ function ThemeTooltip({
               event
             ) => {
               event.stopPropagation();
-
               setIsOpen(false);
             }}
             className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[15px] text-[var(--tertiary)] hover:bg-black/[0.05] sm:hidden"
@@ -1459,6 +1406,14 @@ export default function Home() {
       typeof setTimeout
     > | null>(null);
 
+  /*
+   * Wooden move sound.
+   */
+  const moveSoundRef =
+    useRef<HTMLAudioElement | null>(
+      null
+    );
+
   const puzzle =
     puzzles[puzzleIndex];
 
@@ -1542,6 +1497,55 @@ export default function Home() {
       ]
     );
 
+  /*
+   * Preload the wooden piece sound once.
+   */
+  useEffect(() => {
+    const audio =
+      new Audio(
+        "/sounds/wood-knock.wav"
+      );
+
+    audio.preload = "auto";
+    audio.volume = 0.34;
+
+    moveSoundRef.current =
+      audio;
+
+    return () => {
+      audio.pause();
+
+      moveSoundRef.current =
+        null;
+    };
+  }, []);
+
+  function playMoveSound() {
+    const audio =
+      moveSoundRef.current;
+
+    if (!audio) {
+      return;
+    }
+
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+
+      void audio
+        .play()
+        .catch(() => {
+          /*
+           * Browsers may block audio
+           * until user interaction.
+           * Never let that affect chess.
+           */
+        });
+    } catch {
+      // Sound must never break gameplay.
+    }
+  }
+
   useEffect(() => {
     try {
       const raw =
@@ -1556,7 +1560,6 @@ export default function Home() {
         setProgress({
           ...DEFAULT_PROGRESS,
           ...saved,
-
           themes:
             saved.themes || {},
         });
@@ -1661,9 +1664,7 @@ export default function Home() {
         try {
           window.localStorage.setItem(
             PROGRESS_KEY,
-            JSON.stringify(
-              next
-            )
+            JSON.stringify(next)
           );
         } catch {}
 
@@ -1684,17 +1685,14 @@ export default function Home() {
       return;
     }
 
-    setSessionStats(
-      updater
-    );
+    setSessionStats(updater);
   }
 
   function addThemesToSession(
-    previous:
-      Record<
-        string,
-        ThemeProgress
-      >,
+    previous: Record<
+      string,
+      ThemeProgress
+    >,
     solvedCount: number,
     wrongCount: number,
     hintCount: number
@@ -1802,10 +1800,7 @@ export default function Home() {
 
     if (promotion) {
       const promotionNames:
-        Record<
-          string,
-          string
-        > = {
+        Record<string, string> = {
         q: "queen",
         r: "rook",
         b: "bishop",
@@ -1843,7 +1838,6 @@ export default function Home() {
     updateProgress(
       (previous) => ({
         ...previous,
-
         hintsUsed:
           previous.hintsUsed +
           1,
@@ -1853,7 +1847,6 @@ export default function Home() {
     updateSession(
       (previous) => ({
         ...previous,
-
         hintsUsed:
           previous.hintsUsed +
           1,
@@ -1953,9 +1946,7 @@ export default function Home() {
         adaptiveTraining
       );
 
-    loadPuzzle(
-      nextIndex
-    );
+    loadPuzzle(nextIndex);
   }
 
   function startSession() {
@@ -1965,9 +1956,7 @@ export default function Home() {
       DEFAULT_SESSION_STATS
     );
 
-    setSessionComplete(
-      false
-    );
+    setSessionComplete(false);
 
     const nextIndex =
       choosePuzzleIndex(
@@ -1978,9 +1967,7 @@ export default function Home() {
         adaptiveTraining
       );
 
-    loadPuzzle(
-      nextIndex
-    );
+    loadPuzzle(nextIndex);
   }
 
   function endSession() {
@@ -1992,9 +1979,7 @@ export default function Home() {
       DEFAULT_SESSION_STATS
     );
 
-    setSessionComplete(
-      false
-    );
+    setSessionComplete(false);
 
     pickNextPuzzle();
   }
@@ -2003,8 +1988,7 @@ export default function Home() {
     mode: SessionMode
   ) {
     if (
-      mode ===
-      sessionMode
+      mode === sessionMode
     ) {
       return;
     }
@@ -2013,7 +1997,6 @@ export default function Home() {
       mode === "ten"
     ) {
       startSession();
-
       return;
     }
 
@@ -2024,8 +2007,7 @@ export default function Home() {
     solvedPuzzle: boolean
   ) {
     if (
-      sessionMode !==
-      "ten"
+      sessionMode !== "ten"
     ) {
       return;
     }
@@ -2167,9 +2149,7 @@ export default function Home() {
         adaptiveTraining
       );
 
-    loadPuzzle(
-      nextIndex
-    );
+    loadPuzzle(nextIndex);
   }
 
   function restartPuzzle() {
@@ -2262,7 +2242,6 @@ export default function Home() {
     wrongTimer.current =
       setTimeout(() => {
         setIsWrong(false);
-
         setWrongMove(null);
 
         setMessage(
@@ -2487,6 +2466,12 @@ export default function Home() {
       return false;
     }
 
+    /*
+     * Real chess move successfully
+     * landed: wooden knock.
+     */
+    playMoveSound();
+
     recordCorrectMove();
 
     setLastMove({
@@ -2530,7 +2515,6 @@ export default function Home() {
       gameCopy.isCheckmate()
     ) {
       finishPuzzle();
-
       return true;
     }
 
@@ -2584,6 +2568,12 @@ export default function Home() {
 
         return;
       }
+
+      /*
+       * Opponent move lands:
+       * same wooden knock.
+       */
+      playMoveSound();
 
       setLastMove({
         from:
@@ -3545,9 +3535,7 @@ export default function Home() {
                     onSquareClick: ({
                       square,
                     }) => {
-                      if (
-                        !square
-                      ) {
+                      if (!square) {
                         return;
                       }
 
