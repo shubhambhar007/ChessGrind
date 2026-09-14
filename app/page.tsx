@@ -13,6 +13,7 @@ import {
 } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "./theme-toggle";
+import VisitorCounter from "./visitor-counter";
 import {
   puzzles,
   type PuzzleDifficulty,
@@ -44,7 +45,8 @@ type TrainingMode =
 
 type SessionMode =
   | "endless"
-  | "ten";
+  | "ten"
+  | "learn";
 
 type ColorPreference =
   | "either"
@@ -135,6 +137,10 @@ const SESSION_MODES: {
   {
     value: "ten",
     label: "10 Puzzle Session",
+  },
+  {
+    value: "learn",
+    label: "Learn",
   },
 ];
 
@@ -2091,7 +2097,12 @@ export default function Home() {
       return;
     }
 
-    endSession();
+    setSessionMode(mode);
+    setSessionStats(
+      DEFAULT_SESSION_STATS
+    );
+    setSessionComplete(false);
+    pickNextPuzzle();
   }
 
   function completeSessionPuzzle(
@@ -3145,6 +3156,8 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <VisitorCounter />
+
               <Link
                 href="/insights"
                 className="text-[12px] font-semibold text-[var(--secondary)]"
@@ -3323,6 +3336,8 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-5">
+            <VisitorCounter />
+
             <Link
               href="/insights"
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
