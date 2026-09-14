@@ -21,8 +21,12 @@ export default function VisitorCounter() {
   }, []);
 
   return (
-    <span className="text-[12px] font-medium text-[var(--secondary)]">
-      {count === null ? "—" : count.toLocaleString()} visitors
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--line)] bg-[var(--surface)] px-2.5 py-1 text-[12px] font-medium text-[var(--secondary)]">
+      {count === null ? (
+        <span className="pulse-dot h-1.5 w-1.5 rounded-full bg-red-500" />
+      ) : null}
+
+      {count === null ? "visitors" : `${count.toLocaleString()} visitors`}
     </span>
   );
 }
