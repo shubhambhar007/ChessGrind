@@ -13,6 +13,7 @@ import {
 } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "./theme-toggle";
+import VisitorCounter from "./visitor-counter";
 import {
   puzzles,
   type PuzzleDifficulty,
@@ -3145,6 +3146,8 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-3">
+              <VisitorCounter />
+
               <Link
                 href="/insights"
                 className="text-[12px] font-semibold text-[var(--secondary)]"
@@ -3323,6 +3326,8 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-5">
+            <VisitorCounter />
+
             <Link
               href="/insights"
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
