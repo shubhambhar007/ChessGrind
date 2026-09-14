@@ -20,11 +20,9 @@ export default function VisitorCounter() {
     };
   }, []);
 
-  if (count === null) return null;
-
   return (
     <span className="text-[12px] font-medium text-[var(--secondary)]">
-      {count.toLocaleString()} visitors
+      {count === null ? "—" : count.toLocaleString()} visitors
     </span>
   );
 }
