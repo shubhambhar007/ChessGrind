@@ -45,7 +45,8 @@ type TrainingMode =
 
 type SessionMode =
   | "endless"
-  | "ten";
+  | "ten"
+  | "learn";
 
 type ColorPreference =
   | "either"
@@ -136,6 +137,10 @@ const SESSION_MODES: {
   {
     value: "ten",
     label: "10 Puzzle Session",
+  },
+  {
+    value: "learn",
+    label: "Learn",
   },
 ];
 
@@ -2092,7 +2097,12 @@ export default function Home() {
       return;
     }
 
-    endSession();
+    setSessionMode(mode);
+    setSessionStats(
+      DEFAULT_SESSION_STATS
+    );
+    setSessionComplete(false);
+    pickNextPuzzle();
   }
 
   function completeSessionPuzzle(
