@@ -547,6 +547,195 @@ function getPuzzleGoal(
   return "Find the best move";
 }
 
+const PIECE_VALUES: Record<
+  string,
+  number
+> = {
+  p: 1,
+  n: 3,
+  b: 3,
+  r: 5,
+  q: 9,
+  k: 0,
+};
+
+const PIECE_NAMES: Record<
+  string,
+  string
+> = {
+  p: "pawn",
+  n: "knight",
+  b: "bishop",
+  r: "rook",
+  q: "queen",
+  k: "king",
+};
+
+const THEME_LEARN_HINTS: Record<
+  string,
+  string
+> = {
+  fork: "There's a move here that attacks two enemy pieces at once — look for it.",
+  pin: "Look for a move that pins an enemy piece to something more valuable behind it.",
+  skewer: "Look for a move that forces a valuable piece to move and exposes what's behind it.",
+  discoveredAttack: "Look for a move that unleashes an attack by moving a piece out of the way.",
+  discoveredCheck: "Look for a move that opens a check by moving a piece out of the way.",
+  doubleCheck: "Look for a move that checks the king with two pieces at once.",
+  deflection: "Look for a move that forces a defending piece to abandon its job.",
+  attraction: "Look for a move that lures an enemy piece onto a bad square.",
+  trappedPiece: "One of the opponent's pieces has nowhere safe to go — look for the move that attacks it.",
+  hangingPiece: "There's an undefended enemy piece somewhere on the board — look for the move that wins it.",
+  clearance: "Look for a move that clears a square or line so another piece can strike.",
+  xRayAttack: "Look along a file, rank, or diagonal for a piece attacking through another piece.",
+  intermezzo: "There's a bigger threat available before the obvious recapture — look for it.",
+  zugzwang: "The opponent doesn't want to move at all here — look for a quiet move that keeps the pressure on.",
+};
+
+function getMateLearnHint(
+  themes: string[]
+) {
+  const hasMateTheme =
+    themes.some((theme) =>
+      /^mateIn\d+$/i.test(theme)
+    ) ||
+    themes.includes("mate");
+
+  if (!hasMateTheme) {
+    return null;
+  }
+
+  return "This position has a forced mate — the winning move is usually the most forcing one (often a check).";
+}
+
+function explainWrongMove(
+  game: Chess,
+  attemptedMove: string,
+  themes: string[]
+): string {
+  const sourceSquare =
+    attemptedMove.slice(
+      0,
+      2
+    ) as Square;
+
+  const targetSquare =
+    attemptedMove.slice(
+      2,
+      4
+    ) as Square;
+
+  const movedPiece = game.get(
+    sourceSquare
+  );
+
+  const testGame = new Chess(
+    game.fen()
+  );
+
+  let applied;
+
+  try {
+    applied = applyUciMove(
+      testGame,
+      attemptedMove
+    );
+  } catch {
+    applied = null;
+  }
+
+  if (!applied || !movedPiece) {
+    return "That's not a legal move for that piece from here.";
+  }
+
+  const opponentReplies =
+    testGame.moves({
+      verbose: true,
+    });
+
+  const captureOfMovedPiece =
+    opponentReplies.find(
+      (reply) =>
+        reply.to ===
+          targetSquare &&
+        reply.captured
+    );
+
+  if (captureOfMovedPiece) {
+    const afterCapture =
+      new Chess(
+        testGame.fen()
+      );
+
+    afterCapture.move({
+      from: captureOfMovedPiece.from,
+      to: captureOfMovedPiece.to,
+      promotion:
+        captureOfMovedPiece.promotion,
+    });
+
+    const canRecapture =
+      afterCapture
+        .moves({
+          verbose: true,
+        })
+        .some(
+          (reply) =>
+            reply.to ===
+              targetSquare &&
+            reply.captured
+        );
+
+    const movedValue =
+      PIECE_VALUES[
+        movedPiece.type
+      ] ?? 0;
+
+    const attackerValue =
+      PIECE_VALUES[
+        captureOfMovedPiece
+          .piece
+      ] ?? 0;
+
+    const pieceLabel =
+      PIECE_NAMES[
+        movedPiece.type
+      ] ?? "piece";
+
+    if (!canRecapture) {
+      return `This leaves your ${pieceLabel} on ${targetSquare} hanging — the opponent can just capture it for free.`;
+    }
+
+    if (
+      movedValue >
+      attackerValue + 1
+    ) {
+      return `This lets the opponent win your ${pieceLabel} for much less material in return.`;
+    }
+  }
+
+  const mateHint =
+    getMateLearnHint(themes);
+
+  if (
+    mateHint &&
+    !testGame.inCheck()
+  ) {
+    return mateHint;
+  }
+
+  for (const theme of themes) {
+    if (
+      THEME_LEARN_HINTS[theme]
+    ) {
+      return THEME_LEARN_HINTS[
+        theme
+      ];
+    }
+  }
+
+  return "That move doesn't solve the puzzle — look for a more forcing continuation (a check, a capture, or a threat the opponent can't answer).";
+}
+
 function formatTheme(
   theme: string
 ) {
@@ -1426,6 +1615,13 @@ export default function Home() {
   ] = useState(false);
 
   const [
+    wrongExplanation,
+    setWrongExplanation,
+  ] = useState<string | null>(
+    null
+  );
+
+  const [
     pendingPromotion,
     setPendingPromotion,
   ] =
@@ -1995,6 +2191,7 @@ export default function Home() {
     setLastMove(null);
     setWrongMove(null);
     setIsWrong(false);
+    setWrongExplanation(null);
 
     setPendingPromotion(
       null
@@ -2311,6 +2508,7 @@ export default function Home() {
     setLastMove(null);
     setWrongMove(null);
     setIsWrong(false);
+    setWrongExplanation(null);
 
     setPendingPromotion(
       null
@@ -2331,7 +2529,8 @@ export default function Home() {
 
   function triggerWrongMove(
     sourceSquare: string,
-    targetSquare: string
+    targetSquare: string,
+    explanation?: string
   ) {
     if (
       wrongTimer.current
@@ -2375,6 +2574,10 @@ export default function Home() {
 
     setIsWrong(true);
 
+    setWrongExplanation(
+      explanation ?? null
+    );
+
     setSelectedSquare(
       null
     );
@@ -2387,11 +2590,14 @@ export default function Home() {
       setTimeout(() => {
         setIsWrong(false);
         setWrongMove(null);
+        setWrongExplanation(
+          null
+        );
 
         setMessage(
           "Find the strongest move."
         );
-      }, 900);
+      }, explanation ? 3500 : 900);
   }
 
   function recordCorrectMove() {
@@ -2565,9 +2771,19 @@ export default function Home() {
       );
 
     if (!accepted) {
+      const explanation =
+        sessionMode === "learn"
+          ? explainWrongMove(
+              game,
+              attemptedMove,
+              puzzle.themes
+            )
+          : undefined;
+
       triggerWrongMove(
         sourceSquare,
-        targetSquare
+        targetSquare,
+        explanation
       );
 
       return false;
@@ -2583,6 +2799,7 @@ export default function Home() {
 
     setIsWrong(false);
     setWrongMove(null);
+    setWrongExplanation(null);
 
     const gameCopy =
       new Chess(
@@ -3813,8 +4030,9 @@ export default function Home() {
                     Wrong move.
                   </h2>
 
-                  <p className="mt-2 text-[14px] text-[var(--danger)]">
-                    That move doesn&apos;t work. Try again.
+                  <p className="mt-2 text-[14px] leading-6 text-[var(--danger)]">
+                    {wrongExplanation ??
+                      "That move doesn't work. Try again."}
                   </p>
                 </div>
               ) : solved ? (
