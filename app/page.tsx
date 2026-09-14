@@ -3326,6 +3326,24 @@ export default function Home() {
     > = {};
 
   if (
+    wrongMove
+  ) {
+    squareStyles[
+      wrongMove.from
+    ] = {
+      boxShadow:
+        "inset 0 0 0 9999px rgba(217, 45, 32, 0.18)",
+    };
+
+    squareStyles[
+      wrongMove.to
+    ] = {
+      boxShadow:
+        "inset 0 0 0 9999px rgba(217, 45, 32, 0.3)",
+    };
+  }
+
+  if (
     lastMove &&
     !isWrong
   ) {
@@ -3345,8 +3363,7 @@ export default function Home() {
   }
 
   if (
-    selectedSquare &&
-    !isWrong
+    selectedSquare
   ) {
     squareStyles[
       selectedSquare
@@ -3364,7 +3381,6 @@ export default function Home() {
 
   if (
     selectedSquare &&
-    !isWrong &&
     !solved &&
     !isOpponentMoving
   ) {
@@ -3472,24 +3488,6 @@ export default function Home() {
         };
       }
     }
-  }
-
-  if (
-    wrongMove
-  ) {
-    squareStyles[
-      wrongMove.from
-    ] = {
-      boxShadow:
-        "inset 0 0 0 9999px rgba(217, 45, 32, 0.18)",
-    };
-
-    squareStyles[
-      wrongMove.to
-    ] = {
-      boxShadow:
-        "inset 0 0 0 9999px rgba(217, 45, 32, 0.3)",
-    };
   }
 
   if (
