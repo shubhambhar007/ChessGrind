@@ -736,6 +736,104 @@ function explainWrongMove(
   return "That move doesn't solve the puzzle — look for a more forcing continuation (a check, a capture, or a threat the opponent can't answer).";
 }
 
+const THEME_WIN_EXPLANATIONS: Record<
+  string,
+  string
+> = {
+  fork: "It forks two of the opponent's pieces at once — they can't save both.",
+  pin: "It pins the opponent's piece to something more valuable behind it, freezing it in place.",
+  skewer: "It forces a valuable piece to move, exposing what's behind it to attack.",
+  discoveredAttack: "Moving this piece out of the way unleashes an attack from another piece.",
+  discoveredCheck: "Moving this piece out of the way opens a check on the king.",
+  doubleCheck: "It checks the king with two pieces at once — there's no single reply that stops both.",
+  deflection: "It forces a defending piece away from the square it was protecting.",
+  attraction: "It lures the opponent's piece onto a square where it becomes vulnerable.",
+  trappedPiece: "It attacks a piece that has nowhere safe to run.",
+  hangingPiece: "It wins a piece the opponent left undefended.",
+  clearance: "It clears the way for another piece to deliver the real blow.",
+  xRayAttack: "It attacks along a line through another piece to the real target behind it.",
+  intermezzo: "It throws in a bigger threat before dealing with the obvious recapture.",
+  sacrifice: "It gives up material on purpose to force a much bigger gain right after.",
+  zugzwang: "The opponent has no good move available, so this quiet move keeps them stuck.",
+};
+
+function explainCorrectMove(
+  game: Chess,
+  acceptedMove: string,
+  themes: string[]
+): string {
+  const targetSquare =
+    acceptedMove.slice(
+      2,
+      4
+    ) as Square;
+
+  const testGame = new Chess(
+    game.fen()
+  );
+
+  let applied;
+
+  try {
+    applied = applyUciMove(
+      testGame,
+      acceptedMove
+    );
+  } catch {
+    applied = null;
+  }
+
+  if (!applied) {
+    return "This is the winning move.";
+  }
+
+  if (testGame.isCheckmate()) {
+    return "Checkmate — the king has no legal move, no block, and no capture that helps.";
+  }
+
+  if (applied.captured) {
+    const opponentReplies =
+      testGame.moves({
+        verbose: true,
+      });
+
+    const canRecapture =
+      opponentReplies.some(
+        (reply) =>
+          reply.to ===
+            targetSquare &&
+          reply.captured
+      );
+
+    const capturedLabel =
+      PIECE_NAMES[
+        applied.captured
+      ] ?? "piece";
+
+    if (!canRecapture) {
+      return `It wins the ${capturedLabel} outright — there's no way for the opponent to take it back.`;
+    }
+  }
+
+  if (testGame.inCheck()) {
+    return "It puts the king in check, forcing a response and keeping the attack going.";
+  }
+
+  for (const theme of themes) {
+    if (
+      THEME_WIN_EXPLANATIONS[
+        theme
+      ]
+    ) {
+      return THEME_WIN_EXPLANATIONS[
+        theme
+      ];
+    }
+  }
+
+  return "It's the strongest move available — every other try lets the opponent off the hook.";
+}
+
 function formatTheme(
   theme: string
 ) {
@@ -1622,6 +1720,13 @@ export default function Home() {
   );
 
   const [
+    correctExplanation,
+    setCorrectExplanation,
+  ] = useState<string | null>(
+    null
+  );
+
+  const [
     pendingPromotion,
     setPendingPromotion,
   ] =
@@ -2192,6 +2297,7 @@ export default function Home() {
     setWrongMove(null);
     setIsWrong(false);
     setWrongExplanation(null);
+    setCorrectExplanation(null);
 
     setPendingPromotion(
       null
@@ -2509,6 +2615,7 @@ export default function Home() {
     setWrongMove(null);
     setIsWrong(false);
     setWrongExplanation(null);
+    setCorrectExplanation(null);
 
     setPendingPromotion(
       null
@@ -2586,6 +2693,16 @@ export default function Home() {
       "Wrong move"
     );
 
+    if (explanation) {
+      /*
+       * Learn mode: leave the explanation on
+       * screen until the player tries a
+       * different move, instead of
+       * auto-hiding it.
+       */
+      return;
+    }
+
     wrongTimer.current =
       setTimeout(() => {
         setIsWrong(false);
@@ -2597,7 +2714,7 @@ export default function Home() {
         setMessage(
           "Find the strongest move."
         );
-      }, explanation ? 3500 : 900);
+      }, 900);
   }
 
   function recordCorrectMove() {
@@ -2700,7 +2817,11 @@ export default function Home() {
     );
   }
 
-  function finishPuzzle() {
+  function finishPuzzle(
+    explanation?:
+      | string
+      | null
+  ) {
     setSolved(true);
 
     setSelectedSquare(
@@ -2709,6 +2830,10 @@ export default function Home() {
 
     setMessage(
       "Puzzle solved."
+    );
+
+    setCorrectExplanation(
+      explanation ?? null
     );
 
     recordPuzzleSolved();
@@ -2788,6 +2913,15 @@ export default function Home() {
 
       return false;
     }
+
+    const winExplanation =
+      sessionMode === "learn"
+        ? explainCorrectMove(
+            game,
+            attemptedMove,
+            puzzle.themes
+          )
+        : null;
 
     if (
       wrongTimer.current
@@ -2875,7 +3009,9 @@ export default function Home() {
         puzzle.moves.length ||
       gameCopy.isCheckmate()
     ) {
-      finishPuzzle();
+      finishPuzzle(
+        winExplanation
+      );
       return true;
     }
 
@@ -2984,7 +3120,9 @@ export default function Home() {
           afterOpponent >=
           puzzle.moves.length
         ) {
-          finishPuzzle();
+          finishPuzzle(
+            winExplanation
+          );
         } else {
           setMessage(
             "Your turn."
@@ -4064,6 +4202,15 @@ export default function Home() {
                             : "mistakes"
                         }.`}
                   </p>
+
+                  {correctExplanation && (
+                    <p className="mt-3 text-[14px] leading-6 text-[var(--secondary)]">
+                      <strong className="text-[var(--text)]">
+                        Why it works:
+                      </strong>{" "}
+                      {correctExplanation}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div>
