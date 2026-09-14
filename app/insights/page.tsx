@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import ThemeToggle from "../theme-toggle";
 import {
   useEffect,
   useMemo,
@@ -361,7 +362,7 @@ function ThemeTooltip({
           rounded-[10px]
           border
           border-black/[0.08]
-          bg-white
+          bg-[var(--surface)]
           px-3.5
           py-3
           text-left
@@ -527,7 +528,7 @@ export default function InsightsPage() {
 
       {/* HEADER */}
 
-      <header className="border-b border-[var(--line)] bg-white/55 backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
 
         <div className="mx-auto flex h-[56px] max-w-[1060px] items-center justify-between px-6">
 
@@ -536,7 +537,7 @@ export default function InsightsPage() {
             className="flex items-center gap-2.5"
           >
 
-            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#161617] text-[15px] text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
               ♞
             </div>
 
@@ -546,12 +547,16 @@ export default function InsightsPage() {
 
           </Link>
 
-          <Link
-            href="/"
-            className="control text-[13px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
-          >
-            Back to puzzles
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="control text-[13px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Back to puzzles
+            </Link>
+
+            <ThemeToggle />
+          </div>
 
         </div>
 
@@ -629,7 +634,7 @@ export default function InsightsPage() {
 
           <div className="grid gap-5 md:grid-cols-2">
 
-            <div className="rounded-[18px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow-soft)]">
+            <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
 
               <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                 Training focus
@@ -697,7 +702,7 @@ export default function InsightsPage() {
 
             </div>
 
-            <div className="rounded-[18px] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow-soft)]">
+            <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
 
               <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                 Strongest pattern
@@ -832,7 +837,7 @@ export default function InsightsPage() {
                       <div className="h-[7px] w-full overflow-hidden rounded-full bg-black/[0.055]">
 
                         <div
-                          className="h-full rounded-full bg-[#161617] transition-all duration-500"
+                          className="h-full rounded-full bg-[var(--button)] transition-all duration-500"
                           style={{
                             width: `${insight.performance}%`,
                           }}
@@ -881,7 +886,7 @@ export default function InsightsPage() {
 
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
 
-            <div className="rounded-[15px] border border-[var(--line)] bg-white p-5">
+            <div className="rounded-[15px] border border-[var(--line)] bg-[var(--surface)] p-5">
 
               <div className="text-[12px] text-[var(--secondary)]">
                 Correct moves
@@ -893,7 +898,7 @@ export default function InsightsPage() {
 
             </div>
 
-            <div className="rounded-[15px] border border-[var(--line)] bg-white p-5">
+            <div className="rounded-[15px] border border-[var(--line)] bg-[var(--surface)] p-5">
 
               <div className="text-[12px] text-[var(--secondary)]">
                 Wrong moves
@@ -905,7 +910,7 @@ export default function InsightsPage() {
 
             </div>
 
-            <div className="rounded-[15px] border border-[var(--line)] bg-white p-5">
+            <div className="rounded-[15px] border border-[var(--line)] bg-[var(--surface)] p-5">
 
               <div className="text-[12px] text-[var(--secondary)]">
                 Hints used
@@ -917,7 +922,7 @@ export default function InsightsPage() {
 
             </div>
 
-            <div className="rounded-[15px] border border-[var(--line)] bg-white p-5">
+            <div className="rounded-[15px] border border-[var(--line)] bg-[var(--surface)] p-5">
 
               <div className="text-[12px] text-[var(--secondary)]">
                 Skipped
@@ -962,7 +967,7 @@ export default function InsightsPage() {
 
             <Link
               href="/"
-              className="control inline-flex min-h-[44px] items-center justify-center rounded-[11px] bg-[#161617] px-6 text-[14px] font-semibold text-white"
+              className="control inline-flex min-h-[44px] items-center justify-center rounded-[11px] bg-[var(--button)] px-6 text-[14px] font-semibold text-[var(--button-text)]"
             >
               Continue training
             </Link>

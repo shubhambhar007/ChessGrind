@@ -12,6 +12,7 @@ import {
   type Square,
 } from "chess.js";
 import { Chessboard } from "react-chessboard";
+import ThemeToggle from "./theme-toggle";
 import {
   puzzles,
   type PuzzleDifficulty,
@@ -1194,7 +1195,7 @@ function ThemeTooltip({
             rounded-[14px]
             border
             border-black/[0.08]
-            bg-white
+            bg-[var(--surface)]
             px-4
             py-3.5
             text-left
@@ -3131,10 +3132,10 @@ export default function Home() {
   ) {
     return (
       <main className="min-h-screen">
-        <header className="border-b border-[var(--line)] bg-white/55 backdrop-blur-xl">
+        <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
           <div className="mx-auto flex h-[56px] max-w-[920px] items-center justify-between px-6">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#161617] text-[15px] text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
                 ♞
               </div>
 
@@ -3143,12 +3144,16 @@ export default function Home() {
               </div>
             </div>
 
-            <Link
-              href="/insights"
-              className="text-[12px] font-semibold text-[var(--secondary)]"
-            >
-              Insights
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/insights"
+                className="text-[12px] font-semibold text-[var(--secondary)]"
+              >
+                Insights
+              </Link>
+
+              <ThemeToggle />
+            </div>
           </div>
         </header>
 
@@ -3209,7 +3214,7 @@ export default function Home() {
           </section>
 
           <section className="mt-10 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[18px] border border-[var(--line)] bg-white p-6">
+            <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6">
               <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                 Strongest pattern
               </div>
@@ -3229,7 +3234,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-[18px] border border-[var(--line)] bg-white p-6">
+            <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6">
               <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
                 Needs work
               </div>
@@ -3276,7 +3281,7 @@ export default function Home() {
               onClick={
                 startSession
               }
-              className="control min-h-[46px] rounded-[11px] bg-[#161617] px-6 text-[14px] font-semibold text-white"
+              className="control min-h-[46px] rounded-[11px] bg-[var(--button)] px-6 text-[14px] font-semibold text-[var(--button-text)]"
             >
               Start another session
             </button>
@@ -3286,7 +3291,7 @@ export default function Home() {
               onClick={
                 endSession
               }
-              className="control min-h-[46px] rounded-[11px] border border-[var(--line-strong)] bg-white px-6 text-[14px] font-semibold"
+              className="control min-h-[46px] rounded-[11px] border border-[var(--line-strong)] bg-[var(--surface)] px-6 text-[14px] font-semibold"
             >
               Back to endless
             </button>
@@ -3305,10 +3310,10 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <header className="border-b border-[var(--line)] bg-white/55 backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[#161617] text-[15px] text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
               ♞
             </div>
 
@@ -3324,6 +3329,8 @@ export default function Home() {
             >
               Insights
             </Link>
+
+            <ThemeToggle />
 
             <span className="h-4 w-px bg-[var(--line-strong)]" />
 
@@ -3368,7 +3375,7 @@ export default function Home() {
                       "control rounded-[9px] px-5 py-2 text-[12px] font-semibold",
 
                       active
-                        ? "bg-white text-[var(--text)] shadow-sm"
+                        ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
                         : "text-[var(--secondary)]",
                     ].join(
                       " "
@@ -3446,7 +3453,7 @@ export default function Home() {
                           "control min-w-[72px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
 
                           active
-                            ? "bg-white text-[var(--text)] shadow-sm"
+                            ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
                             : "text-[var(--secondary)]",
                         ].join(
                           " "
@@ -3490,7 +3497,7 @@ export default function Home() {
                           "control min-w-[68px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
 
                           active
-                            ? "bg-white text-[var(--text)] shadow-sm"
+                            ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
                             : "text-[var(--secondary)]",
                         ].join(" ")}
                       >
@@ -3633,7 +3640,7 @@ export default function Home() {
           <section>
             <div
               className={[
-                "overflow-hidden rounded-[21px] bg-white p-[7px]",
+                "overflow-hidden rounded-[21px] bg-[var(--surface)] p-[7px]",
 
                 isWrong
                   ? "wrong-shake"
@@ -3970,7 +3977,7 @@ export default function Home() {
                   disabled={
                     isOpponentMoving
                   }
-                  className="control min-h-[44px] rounded-[11px] border border-[var(--line-strong)] bg-white px-5 text-[14px] font-semibold disabled:opacity-40"
+                  className="control min-h-[44px] rounded-[11px] border border-[var(--line-strong)] bg-[var(--surface)] px-5 text-[14px] font-semibold disabled:opacity-40"
                 >
                   Restart
                 </button>
@@ -3985,7 +3992,7 @@ export default function Home() {
                   disabled={
                     isOpponentMoving
                   }
-                  className="control min-h-[44px] rounded-[11px] bg-[#161617] px-7 text-[14px] font-semibold text-white disabled:opacity-40"
+                  className="control min-h-[44px] rounded-[11px] bg-[var(--button)] px-7 text-[14px] font-semibold text-[var(--button-text)] disabled:opacity-40"
                 >
                   {solved
                     ? sessionMode ===
@@ -4013,7 +4020,7 @@ export default function Home() {
 
       {pendingPromotion && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 px-5 backdrop-blur-[3px]">
-          <div className="appear w-full max-w-[360px] rounded-[20px] border border-black/[0.08] bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.20)]">
+          <div className="appear w-full max-w-[360px] rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.20)]">
             <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
               Promotion
             </div>

@@ -3,6 +3,9 @@
 :root {
   --background: #f7f7f8;
   --surface: #ffffff;
+  --header: rgba(255, 255, 255, 0.55);
+  --button: #161617;
+  --button-text: #ffffff;
 
   --text: #161617;
   --secondary: #707074;
@@ -33,6 +36,38 @@
     0 8px 24px rgba(0, 0, 0, 0.045);
 }
 
+:root[data-theme="dark"] {
+  --background: #0e1014;
+  --surface: #171a20;
+  --header: rgba(14, 16, 20, 0.72);
+
+  --text: #f1f3f7;
+  --secondary: #a3a9b4;
+  --tertiary: #737b88;
+
+  --line: rgba(255, 255, 255, 0.085);
+  --line-strong: rgba(255, 255, 255, 0.14);
+
+  --accent: #8096ff;
+  --accent-soft: rgba(128, 150, 255, 0.13);
+  --accent-soft-strong: rgba(128, 150, 255, 0.22);
+
+  --success: #62d47e;
+  --danger: #ff716b;
+  --danger-soft: rgba(255, 113, 107, 0.13);
+  --danger-strong: rgba(255, 113, 107, 0.25);
+
+  --button: #f1f3f7;
+  --button-text: #111318;
+
+  --shadow-board:
+    0 1px 2px rgba(0, 0, 0, 0.28),
+    0 18px 44px rgba(0, 0, 0, 0.3);
+  --shadow-soft:
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -48,7 +83,11 @@ body {
   background:
     radial-gradient(
       circle at 44% -12%,
-      rgba(255, 255, 255, 0.95),
+      color-mix(
+        in srgb,
+        var(--surface) 88%,
+        transparent
+      ),
       transparent 40%
     ),
     var(--background);
@@ -64,6 +103,9 @@ body {
 
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
 }
 
 button {
