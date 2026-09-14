@@ -45,6 +45,11 @@ type SessionMode =
   | "endless"
   | "ten";
 
+type ColorPreference =
+  | "either"
+  | "white"
+  | "black";
+
 type ThemeProgress = {
   solved: number;
   wrongMoves: number;
@@ -105,6 +110,9 @@ const DIFFICULTY_KEY =
 const ADAPTIVE_KEY =
   "chessgrind-adaptive-training";
 
+const COLOR_PREFERENCE_KEY =
+  "chessgrind-color-preference";
+
 const TRAINING_MODES: {
   value: TrainingMode;
   label: string;
@@ -127,6 +135,15 @@ const SESSION_MODES: {
     value: "ten",
     label: "10 Puzzle Session",
   },
+];
+
+const COLOR_PREFERENCES: {
+  value: ColorPreference;
+  label: string;
+}[] = [
+  { value: "either", label: "Either" },
+  { value: "white", label: "White" },
+  { value: "black", label: "Black" },
 ];
 
 const TRAINABLE_THEMES = new Set([
@@ -666,19 +683,46 @@ function getLesson(
 }
 
 function getModePuzzleCount(
-  mode: TrainingMode
+  mode: TrainingMode,
+  colorPreference: ColorPreference
 ) {
-  if (
-    mode === "mixed"
-  ) {
-    return puzzles.length;
-  }
-
   return puzzles.filter(
     (puzzle) =>
-      puzzle.difficulty ===
-      mode
+      (mode === "mixed" ||
+        puzzle.difficulty ===
+          mode) &&
+      puzzleMatchesColor(
+        puzzle,
+        colorPreference
+      )
   ).length;
+}
+
+function puzzleMatchesColor(
+  puzzle: (typeof puzzles)[number],
+  colorPreference: ColorPreference
+) {
+  if (
+    colorPreference === "either"
+  ) {
+    return true;
+  }
+
+  const game = new Chess(
+    puzzle.fen
+  );
+
+  applyUciMove(
+    game,
+    puzzle.moves[0]
+  );
+
+  return (
+    game.turn() ===
+    (colorPreference === "white"
+      ? "w"
+      : "b")
+  );
 }
 
 function getThemeWeaknessScore(
@@ -796,6 +840,7 @@ function weightedRandomIndex(
 
 function choosePuzzleIndex(
   mode: TrainingMode,
+  colorPreference: ColorPreference,
   currentIndex: number,
   recentIds: string[],
   progress: Progress,
@@ -814,9 +859,13 @@ function choosePuzzleIndex(
       )
       .filter(
         ({ puzzle }) =>
-          mode === "mixed" ||
-          puzzle.difficulty ===
-            mode
+          (mode === "mixed" ||
+            puzzle.difficulty ===
+              mode) &&
+          puzzleMatchesColor(
+            puzzle,
+            colorPreference
+          )
       );
 
   let candidates =
@@ -1280,6 +1329,13 @@ export default function Home() {
     );
 
   const [
+    colorPreference,
+    setColorPreference,
+  ] = useState<ColorPreference>(
+    "either"
+  );
+
+  const [
     sessionStats,
     setSessionStats,
   ] =
@@ -1440,7 +1496,8 @@ export default function Home() {
 
   const availablePuzzleCount =
     getModePuzzleCount(
-      difficulty
+      difficulty,
+      colorPreference
     );
 
   const overallAccuracy =
@@ -1607,6 +1664,24 @@ export default function Home() {
       );
     }
 
+    const savedColorPreference =
+      window.localStorage.getItem(
+        COLOR_PREFERENCE_KEY
+      );
+
+    if (
+      savedColorPreference ===
+        "either" ||
+      savedColorPreference ===
+        "white" ||
+      savedColorPreference ===
+        "black"
+    ) {
+      setColorPreference(
+        savedColorPreference
+      );
+    }
+
     hasLoadedPreferences.current =
       true;
   }, []);
@@ -1638,6 +1713,19 @@ export default function Home() {
       )
     );
   }, [adaptiveTraining]);
+
+  useEffect(() => {
+    if (
+      !hasLoadedPreferences.current
+    ) {
+      return;
+    }
+
+    window.localStorage.setItem(
+      COLOR_PREFERENCE_KEY,
+      colorPreference
+    );
+  }, [colorPreference]);
 
   useEffect(() => {
     return () => {
@@ -1940,6 +2028,7 @@ export default function Home() {
     const nextIndex =
       choosePuzzleIndex(
         mode,
+        colorPreference,
         puzzleIndex,
         history,
         progress,
@@ -1961,6 +2050,7 @@ export default function Home() {
     const nextIndex =
       choosePuzzleIndex(
         difficulty,
+        colorPreference,
         puzzleIndex,
         recentPuzzleIds,
         progress,
@@ -2140,6 +2230,48 @@ export default function Home() {
     const nextIndex =
       choosePuzzleIndex(
         newDifficulty,
+        colorPreference,
+        puzzleIndex,
+        [
+          puzzle.id,
+          ...recentPuzzleIds,
+        ],
+        progress,
+        adaptiveTraining
+      );
+
+    loadPuzzle(nextIndex);
+  }
+
+  function changeColorPreference(
+    newColorPreference:
+      ColorPreference
+  ) {
+    if (
+      isOpponentMoving ||
+      newColorPreference ===
+        colorPreference
+    ) {
+      return;
+    }
+
+    setColorPreference(
+      newColorPreference
+    );
+
+    if (
+      sessionMode === "ten"
+    ) {
+      setSessionStats(
+        DEFAULT_SESSION_STATS
+      );
+      setSessionComplete(false);
+    }
+
+    const nextIndex =
+      choosePuzzleIndex(
+        difficulty,
+        newColorPreference,
         puzzleIndex,
         [
           puzzle.id,
@@ -3282,43 +3414,93 @@ export default function Home() {
           </div>
         )}
 
-        <section className="mb-9 flex flex-col gap-5 border-b border-[var(--line)] pb-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="inline-flex self-start rounded-[12px] bg-black/[0.045] p-[3px]">
-            {TRAINING_MODES.map(
-              (mode) => {
-                const active =
-                  difficulty ===
-                  mode.value;
+        <section className="mb-9 flex flex-col gap-5 border-b border-[var(--line)] pb-6 xl:flex-row xl:items-end xl:justify-between">
+          <div className="flex flex-wrap gap-4">
+            <div>
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.13em] text-[var(--tertiary)]">
+                Difficulty
+              </div>
 
-                return (
-                  <button
-                    key={
-                      mode.value
-                    }
-                    type="button"
-                    disabled={
-                      isOpponentMoving
-                    }
-                    onClick={() =>
-                      changeDifficulty(
-                        mode.value
-                      )
-                    }
-                    className={[
-                      "control min-w-[72px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
+              <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
+                {TRAINING_MODES.map(
+                  (mode) => {
+                    const active =
+                      difficulty ===
+                      mode.value;
 
-                      active
-                        ? "bg-white text-[var(--text)] shadow-sm"
-                        : "text-[var(--secondary)]",
-                    ].join(
-                      " "
-                    )}
-                  >
-                    {mode.label}
-                  </button>
-                );
-              }
-            )}
+                    return (
+                      <button
+                        key={
+                          mode.value
+                        }
+                        type="button"
+                        disabled={
+                          isOpponentMoving
+                        }
+                        onClick={() =>
+                          changeDifficulty(
+                            mode.value
+                          )
+                        }
+                        className={[
+                          "control min-w-[72px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
+
+                          active
+                            ? "bg-white text-[var(--text)] shadow-sm"
+                            : "text-[var(--secondary)]",
+                        ].join(
+                          " "
+                        )}
+                      >
+                        {mode.label}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.13em] text-[var(--tertiary)]">
+                Play as
+              </div>
+
+              <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
+                {COLOR_PREFERENCES.map(
+                  (option) => {
+                    const active =
+                      colorPreference ===
+                      option.value;
+
+                    return (
+                      <button
+                        key={
+                          option.value
+                        }
+                        type="button"
+                        disabled={
+                          isOpponentMoving
+                        }
+                        onClick={() =>
+                          changeColorPreference(
+                            option.value
+                          )
+                        }
+                        className={[
+                          "control min-w-[68px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
+
+                          active
+                            ? "bg-white text-[var(--text)] shadow-sm"
+                            : "text-[var(--secondary)]",
+                        ].join(" ")}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  }
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
