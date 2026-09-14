@@ -76,17 +76,10 @@ export default function ThemeToggle() {
       title={`Switch to ${
         isDark ? "light" : "dark"
       } mode`}
-      className="control flex h-8 items-center gap-1.5 rounded-[9px] border border-[var(--line-strong)] bg-[var(--surface)] px-2.5 text-[11px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+      className="control flex h-8 w-8 items-center justify-center text-[17px] text-[var(--secondary)] hover:text-[var(--text)]"
     >
-      <span
-        aria-hidden="true"
-        className="text-[13px]"
-      >
+      <span aria-hidden="true">
         {isDark ? "☀" : "☾"}
-      </span>
-
-      <span className="hidden sm:inline">
-        {isDark ? "Light" : "Dark"}
       </span>
     </button>
   );
