@@ -3862,48 +3862,6 @@ export default function Home() {
                 )}
               </div>
             </div>
-
-            <div>
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.13em] text-[var(--tertiary)]">
-                Play as
-              </div>
-
-              <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
-                {COLOR_PREFERENCES.map(
-                  (option) => {
-                    const active =
-                      colorPreference ===
-                      option.value;
-
-                    return (
-                      <button
-                        key={
-                          option.value
-                        }
-                        type="button"
-                        disabled={
-                          isOpponentMoving
-                        }
-                        onClick={() =>
-                          changeColorPreference(
-                            option.value
-                          )
-                        }
-                        className={[
-                          "control min-w-[68px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
-
-                          active
-                            ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
-                            : "text-[var(--secondary)]",
-                        ].join(" ")}
-                      >
-                        {option.label}
-                      </button>
-                    );
-                  }
-                )}
-              </div>
-            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
@@ -4006,6 +3964,42 @@ export default function Home() {
           <h1 className="mt-2 text-[38px] font-semibold leading-[1.04] tracking-[-0.045em]">
             {goal}
           </h1>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {COLOR_PREFERENCES.map(
+              (option) => {
+                const active =
+                  colorPreference ===
+                  option.value;
+
+                return (
+                  <button
+                    key={
+                      option.value
+                    }
+                    type="button"
+                    disabled={
+                      isOpponentMoving
+                    }
+                    onClick={() =>
+                      changeColorPreference(
+                        option.value
+                      )
+                    }
+                    className={[
+                      "control rounded-full border px-4 py-1.5 text-[13px] font-medium",
+
+                      active
+                        ? "border-[var(--text)] text-[var(--text)]"
+                        : "border-[var(--line-strong)] text-[var(--secondary)]",
+                    ].join(" ")}
+                  >
+                    {option.label}
+                  </button>
+                );
+              }
+            )}
+          </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[12px] text-[var(--secondary)]">
             <span>
