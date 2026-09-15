@@ -3935,12 +3935,8 @@ export default function Home() {
         )}
 
         <section className="mb-9 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-b border-[var(--line)] pb-6">
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <div>
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.13em] text-[var(--tertiary)]">
-                Difficulty
-              </div>
-
               <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
                 {TRAINING_MODES.map(
                   (mode) => {
@@ -3981,10 +3977,6 @@ export default function Home() {
             </div>
 
             <div>
-              <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.13em] text-[var(--tertiary)]">
-                Play as
-              </div>
-
               <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
                 {COLOR_PREFERENCES.map(
                   (option) => {
