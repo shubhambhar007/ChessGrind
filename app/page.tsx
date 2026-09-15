@@ -4241,52 +4241,57 @@ export default function Home() {
               )}
             </section>
 
-            <section className="mt-6 border-t border-[var(--line)] pt-5">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-[13px] font-semibold">
-                  Line
-                </span>
+            {sessionMode !==
+              "learn" && (
+              <section className="mt-6 border-t border-[var(--line)] pt-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="text-[13px] font-semibold">
+                    Line
+                  </span>
 
-                <span className="text-[11px] text-[var(--tertiary)]">
-                  {moveLog.length}{" "}
-                  played
-                </span>
-              </div>
-
-              {moveLog.length ===
-              0 ? (
-                <p className="text-[14px] text-[var(--secondary)]">
-                  Your solution will build here.
-                </p>
-              ) : (
-                <div className="flex flex-wrap items-center gap-2">
-                  {moveLog.map(
-                    (
-                      move,
-                      index
-                    ) => (
-                      <span
-                        key={`${move.san}-${index}`}
-                        className={[
-                          "rounded-[8px] px-2.5 py-1.5 font-mono text-[13px] font-semibold",
-
-                          move.player ===
-                          "you"
-                            ? "bg-[var(--accent-soft)] text-[var(--accent)]"
-                            : "bg-black/[0.04] text-[var(--secondary)]",
-                        ].join(
-                          " "
-                        )}
-                      >
-                        {move.san}
-                      </span>
-                    )
-                  )}
+                  <span className="text-[11px] text-[var(--tertiary)]">
+                    {moveLog.length}{" "}
+                    played
+                  </span>
                 </div>
-              )}
-            </section>
 
-            {!solved && (
+                {moveLog.length ===
+                0 ? (
+                  <p className="text-[14px] text-[var(--secondary)]">
+                    Your solution will build here.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {moveLog.map(
+                      (
+                        move,
+                        index
+                      ) => (
+                        <span
+                          key={`${move.san}-${index}`}
+                          className={[
+                            "rounded-[8px] px-2.5 py-1.5 font-mono text-[13px] font-semibold",
+
+                            move.player ===
+                            "you"
+                              ? "bg-[var(--accent-soft)] text-[var(--accent)]"
+                              : "bg-black/[0.04] text-[var(--secondary)]",
+                          ].join(
+                            " "
+                          )}
+                        >
+                          {move.san}
+                        </span>
+                      )
+                    )}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {!solved &&
+              sessionMode !==
+                "learn" && (
               <section className="mt-6 border-t border-[var(--line)] pt-5">
                 <button
                   type="button"
