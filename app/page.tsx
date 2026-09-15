@@ -4034,7 +4034,13 @@ export default function Home() {
 
         <div className="grid gap-10 lg:grid-cols-[560px_350px] lg:items-start lg:gap-[48px]">
           <section>
-            <div className="flex">
+            <div
+              className="flex rounded-[21px] bg-[var(--surface)] p-4"
+              style={{
+                boxShadow:
+                  "var(--shadow-board)",
+              }}
+            >
               <div className="flex flex-col pr-2">
                 {boardRanks.map(
                   (rank) => (
