@@ -326,36 +326,12 @@ function applyUciMove(
 }
 
 function describeAttemptedMove(
-  game: Chess,
   attemptedMove: string
 ): string {
-  const testGame = new Chess(
-    game.fen()
-  );
-
-  try {
-    const move = applyUciMove(
-      testGame,
-      attemptedMove
-    );
-
-    if (move) {
-      return move.san;
-    }
-  } catch {
-    // Not a legal move — fall
-    // through to raw squares.
-  }
-
-  const from =
-    attemptedMove.slice(0, 2);
-
-  const to = attemptedMove.slice(
+  return attemptedMove.slice(
     2,
     4
   );
-
-  return `${from}-${to}`;
 }
 
 function buildPuzzlePosition(
@@ -3034,7 +3010,6 @@ export default function Home() {
         sourceSquare,
         targetSquare,
         describeAttemptedMove(
-          game,
           attemptedMove
         ),
         explanation
@@ -3082,7 +3057,6 @@ export default function Home() {
         sourceSquare,
         targetSquare,
         describeAttemptedMove(
-          game,
           attemptedMove
         )
       );
@@ -3119,7 +3093,7 @@ export default function Home() {
 
         {
           text:
-            userMove.san,
+            userMove.to,
 
           color:
             playerColor,
@@ -3233,7 +3207,7 @@ export default function Home() {
 
           {
             text:
-              response.san,
+              response.to,
 
             color:
               playerColor ===
