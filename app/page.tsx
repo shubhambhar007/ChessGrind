@@ -3319,6 +3319,34 @@ export default function Home() {
   const currentHint =
     getCurrentHint();
 
+  const boardFiles =
+    playerColor === "white"
+      ? [
+          "a",
+          "b",
+          "c",
+          "d",
+          "e",
+          "f",
+          "g",
+          "h",
+        ]
+      : [
+          "h",
+          "g",
+          "f",
+          "e",
+          "d",
+          "c",
+          "b",
+          "a",
+        ];
+
+  const boardRanks =
+    playerColor === "white"
+      ? [8, 7, 6, 5, 4, 3, 2, 1]
+      : [1, 2, 3, 4, 5, 6, 7, 8];
+
   const squareStyles:
     Record<
       string,
@@ -4006,18 +4034,35 @@ export default function Home() {
 
         <div className="grid gap-10 lg:grid-cols-[560px_350px] lg:items-start lg:gap-[48px]">
           <section>
-            <div
-              className={[
-                "overflow-hidden",
+            <div className="flex">
+              <div className="flex flex-col pr-2">
+                {boardRanks.map(
+                  (rank) => (
+                    <div
+                      key={rank}
+                      className="flex flex-1 items-center justify-center text-[11px] text-[var(--tertiary)]"
+                    >
+                      {rank}
+                    </div>
+                  )
+                )}
+              </div>
 
-                isWrong
-                  ? "wrong-shake border-[3px] border-[rgba(217,45,32,0.35)]"
-                  : "border-[3px] border-transparent",
-              ].join(" ")}
-            >
-              <div className="overflow-hidden">
-                <Chessboard
-                  options={{
+              <div className="min-w-0 flex-1">
+                <div
+                  className={[
+                    "overflow-hidden",
+
+                    isWrong
+                      ? "wrong-shake border-[3px] border-[rgba(217,45,32,0.35)]"
+                      : "border-[3px] border-transparent",
+                  ].join(" ")}
+                >
+                  <div className="overflow-hidden">
+                    <Chessboard
+                      options={{
+                        showNotation: false,
+
                     position:
                       game.fen(),
 
@@ -4125,7 +4170,22 @@ export default function Home() {
                       );
                     },
                   }}
-                />
+                    />
+                  </div>
+                </div>
+
+                <div className="flex pl-1 pt-2">
+                  {boardFiles.map(
+                    (file) => (
+                      <div
+                        key={file}
+                        className="flex-1 text-center text-[11px] text-[var(--tertiary)]"
+                      >
+                        {file}
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
             </div>
 
