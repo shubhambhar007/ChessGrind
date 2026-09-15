@@ -1586,16 +1586,6 @@ function PlayerColorIndicator({
           ? "White"
           : "Black"}
       </span>
-
-      <span className="text-[var(--tertiary)]">
-        ·
-      </span>
-
-      <span className="text-[11px] font-medium text-[var(--secondary)]">
-        {isWhite
-          ? "White pieces only"
-          : "Black pieces only"}
-      </span>
     </div>
   );
 }
@@ -3954,14 +3944,7 @@ export default function Home() {
             }
           />
 
-          <div className="mt-4 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--secondary)]">
-            {playerColor ===
-            "white"
-              ? "White to move"
-              : "Black to move"}
-          </div>
-
-          <h1 className="mt-2 text-[38px] font-semibold leading-[1.04] tracking-[-0.045em]">
+          <h1 className="mt-4 text-[38px] font-semibold leading-[1.04] tracking-[-0.045em]">
             {goal}
           </h1>
 
