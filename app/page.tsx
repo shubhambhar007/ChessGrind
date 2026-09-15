@@ -4034,7 +4034,13 @@ export default function Home() {
 
         <div className="grid gap-10 lg:grid-cols-[560px_350px] lg:items-start lg:gap-[48px]">
           <section>
-            <div className="flex">
+            <div
+              className="flex rounded-[21px] bg-[var(--surface)] p-4"
+              style={{
+                boxShadow:
+                  "var(--shadow-board)",
+              }}
+            >
               <div className="flex flex-col pr-2">
                 {boardRanks.map(
                   (rank) => (
@@ -4051,11 +4057,11 @@ export default function Home() {
               <div className="min-w-0 flex-1">
                 <div
                   className={[
-                    "overflow-hidden",
+                    "overflow-hidden border-[6px]",
 
                     isWrong
-                      ? "wrong-shake border-[3px] border-[rgba(217,45,32,0.35)]"
-                      : "border-[3px] border-transparent",
+                      ? "wrong-shake border-[rgba(217,45,32,0.35)]"
+                      : "border-white",
                   ].join(" ")}
                 >
                   <div className="overflow-hidden">
