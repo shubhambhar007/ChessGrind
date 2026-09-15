@@ -3807,7 +3807,7 @@ export default function Home() {
           </div>
         )}
 
-        <section className="mb-9 flex flex-col gap-5 border-b border-[var(--line)] pb-6 xl:flex-row xl:items-end xl:justify-between">
+        <section className="mb-9 flex flex-wrap items-start justify-between gap-5 border-b border-[var(--line)] pb-6">
           <div className="flex flex-wrap gap-4">
             <div>
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.13em] text-[var(--tertiary)]">
