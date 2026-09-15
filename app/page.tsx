@@ -20,8 +20,9 @@ import {
 } from "@/data/puzzles";
 
 type MoveLog = {
-  san: string;
-  player: "you" | "opponent";
+  text: string;
+  color: "white" | "black";
+  status: "correct" | "wrong";
 };
 
 type LastMove = {
@@ -322,6 +323,39 @@ function applyUciMove(
     from,
     to,
   });
+}
+
+function describeAttemptedMove(
+  game: Chess,
+  attemptedMove: string
+): string {
+  const testGame = new Chess(
+    game.fen()
+  );
+
+  try {
+    const move = applyUciMove(
+      testGame,
+      attemptedMove
+    );
+
+    if (move) {
+      return move.san;
+    }
+  } catch {
+    // Not a legal move — fall
+    // through to raw squares.
+  }
+
+  const from =
+    attemptedMove.slice(0, 2);
+
+  const to = attemptedMove.slice(
+    2,
+    4
+  );
+
+  return `${from}-${to}`;
 }
 
 function buildPuzzlePosition(
@@ -832,6 +866,63 @@ function explainCorrectMove(
   }
 
   return "It's the strongest move available — every other try lets the opponent off the hook.";
+}
+
+type MoveRow = {
+  number: number;
+  white: MoveLog[] | null;
+  black: MoveLog[] | null;
+};
+
+function buildMoveRows(
+  moveLog: MoveLog[]
+): MoveRow[] {
+  const rows: MoveRow[] = [];
+
+  let index = 0;
+
+  while (index < moveLog.length) {
+    const color =
+      moveLog[index].color;
+
+    const group: MoveLog[] = [];
+
+    while (
+      index < moveLog.length &&
+      moveLog[index].color ===
+        color
+    ) {
+      group.push(
+        moveLog[index]
+      );
+      index++;
+    }
+
+    if (color === "white") {
+      rows.push({
+        number:
+          rows.length + 1,
+        white: group,
+        black: null,
+      });
+    } else {
+      const last =
+        rows[rows.length - 1];
+
+      if (last && !last.black) {
+        last.black = group;
+      } else {
+        rows.push({
+          number:
+            rows.length + 1,
+          white: null,
+          black: group,
+        });
+      }
+    }
+  }
+
+  return rows;
 }
 
 function formatTheme(
@@ -1554,6 +1645,33 @@ function ThemeTooltip({
           </button>
         </span>
       </span>
+    </span>
+  );
+}
+
+function MoveCell({
+  entries,
+}: {
+  entries: MoveLog[];
+}) {
+  return (
+    <span className="flex flex-wrap items-center gap-1.5">
+      {entries.map(
+        (entry, index) =>
+          entry.status ===
+          "wrong" ? (
+            <span
+              key={index}
+              className="text-[var(--danger)] line-through decoration-2"
+            >
+              {entry.text}
+            </span>
+          ) : (
+            <span key={index}>
+              {entry.text}
+            </span>
+          )
+      )}
     </span>
   );
 }
@@ -2627,6 +2745,7 @@ export default function Home() {
   function triggerWrongMove(
     sourceSquare: string,
     targetSquare: string,
+    attemptedText: string,
     explanation?: string
   ) {
     if (
@@ -2636,6 +2755,18 @@ export default function Home() {
         wrongTimer.current
       );
     }
+
+    setMoveLog(
+      (previous) => [
+        ...previous,
+
+        {
+          text: attemptedText,
+          color: playerColor,
+          status: "wrong",
+        },
+      ]
+    );
 
     setPuzzleWrongMoves(
       (current) =>
@@ -2898,6 +3029,10 @@ export default function Home() {
       triggerWrongMove(
         sourceSquare,
         targetSquare,
+        describeAttemptedMove(
+          game,
+          attemptedMove
+        ),
         explanation
       );
 
@@ -2941,7 +3076,11 @@ export default function Home() {
     } catch {
       triggerWrongMove(
         sourceSquare,
-        targetSquare
+        targetSquare,
+        describeAttemptedMove(
+          game,
+          attemptedMove
+        )
       );
 
       return false;
@@ -2975,10 +3114,14 @@ export default function Home() {
         ...previous,
 
         {
-          san:
+          text:
             userMove.san,
 
-          player: "you",
+          color:
+            playerColor,
+
+          status:
+            "correct",
         },
       ]
     );
@@ -3085,11 +3228,17 @@ export default function Home() {
           ...previous,
 
           {
-            san:
+            text:
               response.san,
 
-            player:
-              "opponent",
+            color:
+              playerColor ===
+              "white"
+                ? "black"
+                : "white",
+
+            status:
+              "correct",
           },
         ]
       );
@@ -4284,53 +4433,84 @@ export default function Home() {
               )}
             </section>
 
-            {sessionMode !==
-              "learn" && (
-              <section className="mt-6 border-t border-[var(--line)] pt-5">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="text-[13px] font-semibold">
-                    Line
-                  </span>
+            <section className="mt-6 border-t border-[var(--line)] pt-5">
+              <table className="w-full border-collapse text-[13px]">
+                <thead>
+                  <tr>
+                    <th className="w-[32px]" />
 
-                  <span className="text-[11px] text-[var(--tertiary)]">
-                    {moveLog.length}{" "}
-                    played
-                  </span>
-                </div>
+                    <th className="pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
+                      White
+                    </th>
 
-                {moveLog.length ===
-                0 ? (
-                  <p className="text-[14px] text-[var(--secondary)]">
-                    Your solution will build here.
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {moveLog.map(
-                      (
-                        move,
-                        index
-                      ) => (
-                        <span
-                          key={`${move.san}-${index}`}
-                          className={[
-                            "rounded-[8px] px-2.5 py-1.5 font-mono text-[13px] font-semibold",
+                    <th className="pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
+                      Black
+                    </th>
+                  </tr>
+                </thead>
 
-                            move.player ===
-                            "you"
-                              ? "bg-[var(--accent-soft)] text-[var(--accent)]"
-                              : "bg-black/[0.04] text-[var(--secondary)]",
-                          ].join(
-                            " "
-                          )}
-                        >
-                          {move.san}
-                        </span>
+                <tbody>
+                  {(moveLog.length ===
+                  0
+                    ? [1, 2, 3].map(
+                        (
+                          number
+                        ) => ({
+                          number,
+                          white:
+                            null,
+                          black:
+                            null,
+                        })
                       )
-                    )}
-                  </div>
-                )}
-              </section>
-            )}
+                    : buildMoveRows(
+                        moveLog
+                      )
+                  ).map((row) => (
+                    <tr
+                      key={
+                        row.number
+                      }
+                      className="border-t border-[var(--line)]"
+                    >
+                      <td className="py-1.5 text-[12px] text-[var(--tertiary)]">
+                        {
+                          row.number
+                        }
+                      </td>
+
+                      <td className="py-1.5 font-mono">
+                        {row.white ? (
+                          <MoveCell
+                            entries={
+                              row.white
+                            }
+                          />
+                        ) : (
+                          <span className="text-[var(--tertiary)]">
+                            -
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-1.5 font-mono">
+                        {row.black ? (
+                          <MoveCell
+                            entries={
+                              row.black
+                            }
+                          />
+                        ) : (
+                          <span className="text-[var(--tertiary)]">
+                            -
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
 
             {!solved &&
               sessionMode !==
