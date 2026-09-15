@@ -3862,14 +3862,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto max-w-[1060px] px-6 pb-16 pt-7">
-        <div className="mb-5 flex items-center justify-end gap-3">
-          <Link
-            href="/play"
-            className="control rounded-[10px] border border-[var(--line-strong)] px-4 py-2 text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
-          >
-            Play a full game
-          </Link>
-
+        <div className="mb-5 flex items-center justify-between gap-3">
           <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
             {SESSION_MODES.map(
               (mode) => {
@@ -3907,6 +3900,13 @@ export default function Home() {
               }
             )}
           </div>
+
+          <Link
+            href="/play"
+            className="control rounded-[10px] border border-[var(--line-strong)] px-4 py-2 text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+          >
+            Play a full game
+          </Link>
         </div>
 
         {sessionMode ===
