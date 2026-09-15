@@ -3858,7 +3858,7 @@ export default function Home() {
                 Play as
               </div>
 
-              <div className="flex flex-wrap gap-2">
+              <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
                 {COLOR_PREFERENCES.map(
                   (option) => {
                     const active =
@@ -3880,11 +3880,11 @@ export default function Home() {
                           )
                         }
                         className={[
-                          "control rounded-full border px-4 py-1.5 text-[13px] font-medium",
+                          "control min-w-[68px] rounded-[9px] px-4 py-2 text-[12px] font-semibold",
 
                           active
-                            ? "border-[var(--text)] text-[var(--text)]"
-                            : "border-[var(--line-strong)] text-[var(--secondary)]",
+                            ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
+                            : "text-[var(--secondary)]",
                         ].join(" ")}
                       >
                         {option.label}
