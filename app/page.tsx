@@ -879,46 +879,50 @@ function buildMoveRows(
 ): MoveRow[] {
   const rows: MoveRow[] = [];
 
-  let index = 0;
+  let pendingWhiteRow: MoveRow | null =
+    null;
 
-  while (index < moveLog.length) {
-    const color =
-      moveLog[index].color;
-
-    const group: MoveLog[] = [];
-
-    while (
-      index < moveLog.length &&
-      moveLog[index].color ===
-        color
-    ) {
-      group.push(
-        moveLog[index]
+  for (const entry of moveLog) {
+    if (entry.status === "wrong") {
+      rows.push(
+        entry.color === "white"
+          ? {
+              number:
+                rows.length + 1,
+              white: [entry],
+              black: null,
+            }
+          : {
+              number:
+                rows.length + 1,
+              white: null,
+              black: [entry],
+            }
       );
-      index++;
+
+      continue;
     }
 
-    if (color === "white") {
-      rows.push({
-        number:
-          rows.length + 1,
-        white: group,
+    if (entry.color === "white") {
+      const row: MoveRow = {
+        number: rows.length + 1,
+        white: [entry],
         black: null,
-      });
-    } else {
-      const last =
-        rows[rows.length - 1];
+      };
 
-      if (last && !last.black) {
-        last.black = group;
-      } else {
-        rows.push({
-          number:
-            rows.length + 1,
-          white: null,
-          black: group,
-        });
-      }
+      rows.push(row);
+      pendingWhiteRow = row;
+    } else if (pendingWhiteRow) {
+      pendingWhiteRow.black = [
+        entry,
+      ];
+      pendingWhiteRow = null;
+    } else {
+      rows.push({
+        number: rows.length + 1,
+        white: null,
+        black: [entry],
+      });
     }
   }
 
@@ -4445,82 +4449,84 @@ export default function Home() {
                 Moves
               </div>
 
-              <table className="w-full border-collapse text-[13px]">
-                <thead>
-                  <tr>
-                    <th className="w-[32px]" />
+              <div className="max-h-[132px] overflow-y-auto">
+                <table className="w-full table-fixed border-collapse text-[13px]">
+                  <thead className="sticky top-0 bg-[var(--surface)]">
+                    <tr>
+                      <th className="w-[28px]" />
 
-                    <th className="pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
-                      White
-                    </th>
+                      <th className="w-[calc(50%-14px)] pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
+                        White
+                      </th>
 
-                    <th className="pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
-                      Black
-                    </th>
-                  </tr>
-                </thead>
+                      <th className="w-[calc(50%-14px)] pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
+                        Black
+                      </th>
+                    </tr>
+                  </thead>
 
-                <tbody>
-                  {(moveLog.length ===
-                  0
-                    ? [1, 2, 3].map(
-                        (
-                          number
-                        ) => ({
-                          number,
-                          white:
-                            null,
-                          black:
-                            null,
-                        })
-                      )
-                    : buildMoveRows(
-                        moveLog
-                      )
-                  ).map((row) => (
-                    <tr
-                      key={
-                        row.number
-                      }
-                      className="border-t border-[var(--line)]"
-                    >
-                      <td className="py-1.5 text-[12px] text-[var(--tertiary)]">
-                        {
+                  <tbody>
+                    {(moveLog.length ===
+                    0
+                      ? [1, 2, 3].map(
+                          (
+                            number
+                          ) => ({
+                            number,
+                            white:
+                              null,
+                            black:
+                              null,
+                          })
+                        )
+                      : buildMoveRows(
+                          moveLog
+                        )
+                    ).map((row) => (
+                      <tr
+                        key={
                           row.number
                         }
-                      </td>
+                        className="border-t border-[var(--line)]"
+                      >
+                        <td className="py-1.5 align-top text-[12px] text-[var(--tertiary)]">
+                          {
+                            row.number
+                          }
+                        </td>
 
-                      <td className="py-1.5 font-mono">
-                        {row.white ? (
-                          <MoveCell
-                            entries={
-                              row.white
-                            }
-                          />
-                        ) : (
-                          <span className="text-[var(--tertiary)]">
-                            -
-                          </span>
-                        )}
-                      </td>
+                        <td className="py-1.5 align-top font-mono">
+                          {row.white ? (
+                            <MoveCell
+                              entries={
+                                row.white
+                              }
+                            />
+                          ) : (
+                            <span className="text-[var(--tertiary)]">
+                              -
+                            </span>
+                          )}
+                        </td>
 
-                      <td className="py-1.5 font-mono">
-                        {row.black ? (
-                          <MoveCell
-                            entries={
-                              row.black
-                            }
-                          />
-                        ) : (
-                          <span className="text-[var(--tertiary)]">
-                            -
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <td className="py-1.5 align-top font-mono">
+                          {row.black ? (
+                            <MoveCell
+                              entries={
+                                row.black
+                              }
+                            />
+                          ) : (
+                            <span className="text-[var(--tertiary)]">
+                              -
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </section>
 
             {!solved &&
