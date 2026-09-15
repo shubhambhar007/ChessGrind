@@ -4433,7 +4433,11 @@ export default function Home() {
               )}
             </section>
 
-            <section className="mt-6 border-t border-[var(--line)] pt-5">
+            <section className="mt-6 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5">
+              <div className="mb-3 text-[13px] font-semibold">
+                Moves
+              </div>
+
               <table className="w-full border-collapse text-[13px]">
                 <thead>
                   <tr>
