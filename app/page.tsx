@@ -4008,20 +4008,14 @@ export default function Home() {
           <section>
             <div
               className={[
-                "overflow-hidden rounded-[21px] bg-[var(--surface)] p-[7px]",
+                "overflow-hidden",
 
                 isWrong
-                  ? "wrong-shake"
-                  : "",
+                  ? "wrong-shake border-[3px] border-[rgba(217,45,32,0.35)]"
+                  : "border-[3px] border-transparent",
               ].join(" ")}
-              style={{
-                boxShadow:
-                  isWrong
-                    ? "0 0 0 3px rgba(217,45,32,0.12), var(--shadow-board)"
-                    : "var(--shadow-board)",
-              }}
             >
-              <div className="overflow-hidden rounded-[15px]">
+              <div className="overflow-hidden">
                 <Chessboard
                   options={{
                     position:
