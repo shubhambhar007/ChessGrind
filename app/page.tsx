@@ -4057,11 +4057,11 @@ export default function Home() {
               <div className="min-w-0 flex-1">
                 <div
                   className={[
-                    "overflow-hidden",
+                    "overflow-hidden border-[6px]",
 
                     isWrong
-                      ? "wrong-shake border-[3px] border-[rgba(217,45,32,0.35)]"
-                      : "border-[3px] border-transparent",
+                      ? "wrong-shake border-[rgba(217,45,32,0.35)]"
+                      : "border-white",
                   ].join(" ")}
                 >
                   <div className="overflow-hidden">
