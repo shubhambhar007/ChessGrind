@@ -4080,7 +4080,14 @@ export default function Home() {
                 />
               </span>
 
-              <span>
+              <span
+                className={
+                  adaptiveTraining &&
+                  weakestTheme
+                    ? "max-w-[130px] truncate"
+                    : ""
+                }
+              >
                 {adaptiveTraining
                   ? weakestTheme
                     ? `Smart · ${formatTheme(
