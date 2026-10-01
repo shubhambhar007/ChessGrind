@@ -18,6 +18,7 @@ import {
   puzzles,
   type PuzzleDifficulty,
 } from "@/data/puzzles";
+import { addToGrindbook } from "@/lib/grindbook";
 
 type MoveLog = {
   text: string;
@@ -1838,6 +1839,11 @@ export default function Home() {
   ] = useState(0);
 
   const [
+    savedToGrindbook,
+    setSavedToGrindbook,
+  ] = useState(false);
+
+  const [
     progress,
     setProgress,
   ] =
@@ -2365,6 +2371,25 @@ export default function Home() {
     setPuzzleHintsUsed(0);
   }
 
+  function savePuzzleToGrindbook() {
+    const result = addToGrindbook({
+      fen: initialGame.fen(),
+      orientation: playerColor,
+      title: `${goal} · Puzzle ${puzzle.id}`,
+      prompt: "Find the strongest move in this position.",
+      solutionUci: puzzle.moves[1],
+      explanation: getLesson(puzzle.themes),
+      tags: puzzle.themes,
+      source: "puzzle",
+    });
+
+    setSavedToGrindbook(true);
+
+    if (!result.added) {
+      setMessage("Already saved in your Grindbook.");
+    }
+  }
+
   function loadPuzzle(
     index: number
   ) {
@@ -2380,6 +2405,7 @@ export default function Home() {
     setSolved(false);
     setMoveLog([]);
     setHintLevel(0);
+    setSavedToGrindbook(false);
 
     setLastMove(null);
     setWrongMove(null);
@@ -3657,6 +3683,13 @@ export default function Home() {
               <VisitorCounter />
 
               <Link
+                href="/grindbook"
+                className="text-[12px] font-semibold text-[var(--secondary)]"
+              >
+                Grindbook
+              </Link>
+
+              <Link
                 href="/insights"
                 className="text-[12px] font-semibold text-[var(--secondary)]"
               >
@@ -3835,6 +3868,13 @@ export default function Home() {
 
           <div className="flex items-center gap-5">
             <VisitorCounter />
+
+            <Link
+              href="/grindbook"
+              className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Grindbook
+            </Link>
 
             <Link
               href="/insights"
@@ -4564,7 +4604,17 @@ export default function Home() {
             )}
 
             <section className="mt-6 border-t border-[var(--line)] pt-5">
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={savePuzzleToGrindbook}
+                  className="control min-h-[44px] rounded-[11px] border border-[var(--line-strong)] bg-[var(--accent-soft)] px-5 text-[14px] font-semibold text-[var(--accent)]"
+                >
+                  {savedToGrindbook
+                    ? "Saved ✓"
+                    : "Save to Grindbook"}
+                </button>
+
                 <button
                   type="button"
                   onClick={

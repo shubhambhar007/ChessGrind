@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "../theme-toggle";
+import VisitorCounter from "../visitor-counter";
+import { addToGrindbook } from "@/lib/grindbook";
 
 type PlayColor = "white" | "black";
 type Difficulty = "easy" | "medium" | "hard";
@@ -241,6 +243,7 @@ export default function PlayPage() {
   const [activeTab, setActiveTab] = useState<
     "moves" | "analysis" | "info"
   >("moves");
+  const [savedPosition, setSavedPosition] = useState(false);
 
   const aiColor: PlayColor =
     playerColor === "white" ? "black" : "white";
@@ -274,6 +277,7 @@ export default function PlayPage() {
         aiGame.move(move);
 
         setGame(aiGame);
+        setSavedPosition(false);
         setLastMove({ from: move.from, to: move.to });
         setMoveLog((previous) => [
           ...previous,
@@ -308,6 +312,7 @@ export default function PlayPage() {
     setGameStatus("playing");
     setResignedColor(null);
     setActiveTab("moves");
+    setSavedPosition(false);
 
     if (getChessColor(color) !== "w") {
       // AI plays white's opening move.
@@ -339,6 +344,7 @@ export default function PlayPage() {
       aiGame.move(move);
 
       setGame(aiGame);
+      setSavedPosition(false);
       setLastMove({ from: move.from, to: move.to });
       setMoveLog((previous) => [
         ...previous,
@@ -378,6 +384,7 @@ export default function PlayPage() {
     if (!move) return false;
 
     setGame(gameCopy);
+    setSavedPosition(false);
     setLastMove({ from, to });
     setSelectedSquare(null);
     setMoveLog((previous) => [
@@ -454,6 +461,7 @@ export default function PlayPage() {
       trimmedHistory[trimmedHistory.length - 1];
 
     setGame(replay);
+    setSavedPosition(false);
     setHistory(trimmedHistory);
     setMoveLog((previous) =>
       previous.slice(0, -removeCount)
@@ -482,6 +490,27 @@ export default function PlayPage() {
       await navigator.clipboard.writeText(game.pgn());
     } catch {
       // Clipboard unavailable — ignore.
+    }
+  }
+
+  function saveCurrentPosition() {
+    const moveNumber = Math.floor(moveLog.length / 2) + 1;
+    const result = addToGrindbook({
+      fen: game.fen(),
+      orientation: playerColor,
+      title: `AI game · Move ${moveNumber}`,
+      prompt:
+        "Revisit this position. What would you play, and what is your plan?",
+      explanation:
+        "Use this position to remember the idea you noticed during your game.",
+      tags: ["game position", difficulty],
+      source: "game",
+    });
+
+    setSavedPosition(true);
+
+    if (!result.added) {
+      setActiveTab("info");
     }
   }
 
@@ -631,6 +660,13 @@ export default function PlayPage() {
           </Link>
 
           <div className="flex items-center gap-5">
+            <VisitorCounter />
+            <Link
+              href="/grindbook"
+              className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Grindbook
+            </Link>
             <Link
               href="/"
               className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
@@ -866,6 +902,14 @@ export default function PlayPage() {
             </div>
 
             <div className="mt-4 flex gap-3">
+              <button
+                type="button"
+                onClick={saveCurrentPosition}
+                className="control rounded-[10px] border border-[var(--line-strong)] bg-[var(--accent-soft)] px-4 py-2 text-[13px] font-semibold text-[var(--accent)]"
+              >
+                {savedPosition ? "Saved ✓" : "Save position"}
+              </button>
+
               <button
                 type="button"
                 onClick={undoMove}

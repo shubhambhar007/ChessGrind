@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import ThemeToggle from "../theme-toggle";
+import VisitorCounter from "../visitor-counter";
 import {
   useEffect,
   useMemo,
@@ -548,6 +549,14 @@ export default function InsightsPage() {
           </Link>
 
           <div className="flex items-center gap-3">
+            <VisitorCounter />
+            <Link
+              href="/grindbook"
+              className="control text-[13px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Grindbook
+            </Link>
+
             <Link
               href="/"
               className="control text-[13px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
