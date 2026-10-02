@@ -3,18 +3,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 const VISITOR_KEY = "chessgrind:visitors:total";
 const ONLINE_KEY = "chessgrind:visitors:online";
+const PAGE_VIEW_KEY = "chessgrind:pageviews:total";
 const VISITOR_COOKIE = "chessgrind-visitor-v1";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 const ONLINE_WINDOW_MS = 75_000;
+const PAGE_VIEW_BASELINE = 422;
 
-const ONLINE_SCRIPT = `
+const PRESENCE_SCRIPT = `
 redis.call("ZREMRANGEBYSCORE", KEYS[1], "-inf", ARGV[1])
 redis.call("ZADD", KEYS[1], ARGV[2], ARGV[3])
-return redis.call("ZCARD", KEYS[1])
+redis.call("SET", KEYS[2], ARGV[4], "NX")
+local pageViews = tonumber(redis.call("GET", KEYS[2]))
+if ARGV[5] == "1" then
+  pageViews = redis.call("INCR", KEYS[2])
+end
+return {redis.call("ZCARD", KEYS[1]), pageViews}
 `;
 
 type VisitorGlobals = typeof globalThis & {
   __chessgrindVisitorCount?: number;
+  __chessgrindPageViews?: number;
   __chessgrindOnlineVisitors?: Map<string, number>;
 };
 
@@ -28,6 +36,14 @@ function localVisitorCount(isNewVisitor: boolean) {
     isNewVisitor || current === 0 ? current + 1 : current;
 
   return globals.__chessgrindVisitorCount;
+}
+
+function localPageViewCount(recordPageView: boolean) {
+  const globals = globalThis as VisitorGlobals;
+  const current = globals.__chessgrindPageViews ?? PAGE_VIEW_BASELINE;
+
+  globals.__chessgrindPageViews = recordPageView ? current + 1 : current;
+  return globals.__chessgrindPageViews;
 }
 
 function localOnlineCount(visitorId: string, now: number) {
@@ -52,11 +68,12 @@ export async function GET(request: NextRequest) {
     process.env.UPSTASH_REDIS_REST_TOKEN ??
     process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN;
   const isNewVisitor = !request.cookies.has(VISITOR_COOKIE);
+  const recordPageView = request.nextUrl.searchParams.get("view") === "1";
   const visitorId =
     request.cookies.get(VISITOR_COOKIE)?.value ?? crypto.randomUUID();
   const now = Date.now();
 
-  let count: number;
+  let pageViews: number;
   let online: number;
   let storage: "redis" | "memory" = "memory";
 
@@ -65,30 +82,35 @@ export async function GET(request: NextRequest) {
       const redis = new Redis({ url, token });
 
       if (isNewVisitor) {
-        count = await redis.incr(VISITOR_KEY);
-      } else {
-        const storedCount = await redis.get<number>(VISITOR_KEY);
-        count = storedCount ?? (await redis.incr(VISITOR_KEY));
+        await redis.incr(VISITOR_KEY);
       }
 
-      online = await redis.eval<string[], number>(ONLINE_SCRIPT, [ONLINE_KEY], [
-        String(now - ONLINE_WINDOW_MS),
-        String(now),
-        visitorId,
-      ]);
+      [online, pageViews] = await redis.eval<string[], [number, number]>(
+        PRESENCE_SCRIPT,
+        [ONLINE_KEY, PAGE_VIEW_KEY],
+        [
+          String(now - ONLINE_WINDOW_MS),
+          String(now),
+          visitorId,
+          String(PAGE_VIEW_BASELINE),
+          recordPageView ? "1" : "0",
+        ]
+      );
 
       storage = "redis";
     } catch {
-      count = localVisitorCount(isNewVisitor);
+      localVisitorCount(isNewVisitor);
+      pageViews = localPageViewCount(recordPageView);
       online = localOnlineCount(visitorId, now);
     }
   } else {
-    count = localVisitorCount(isNewVisitor);
+    localVisitorCount(isNewVisitor);
+    pageViews = localPageViewCount(recordPageView);
     online = localOnlineCount(visitorId, now);
   }
 
   const response = NextResponse.json({
-    count,
+    pageViews,
     online,
     isNewVisitor,
     storage,

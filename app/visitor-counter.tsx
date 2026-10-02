@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function VisitorCounter() {
   const [stats, setStats] = useState<{
-    total: number;
+    pageViews: number;
     online: number;
   } | null>(null);
   const [unavailable, setUnavailable] = useState(false);
@@ -12,19 +12,24 @@ export default function VisitorCounter() {
   useEffect(() => {
     let cancelled = false;
 
-    const updateStats = () => {
-      fetch("/api/visitors", { cache: "no-store" })
+    const updateStats = (recordPageView = false) => {
+      fetch(`/api/visitors${recordPageView ? "?view=1" : ""}`, {
+        cache: "no-store",
+      })
         .then((res) => {
           if (!res.ok) throw new Error("Visitor stats unavailable");
           return res.json();
         })
-        .then((data: { count?: number; online?: number }) => {
+        .then((data: { pageViews?: number; online?: number }) => {
           if (
             !cancelled &&
-            typeof data.count === "number" &&
+            typeof data.pageViews === "number" &&
             typeof data.online === "number"
           ) {
-            setStats({ total: data.count, online: data.online });
+            setStats({
+              pageViews: data.pageViews,
+              online: data.online,
+            });
             setUnavailable(false);
           }
         })
@@ -37,7 +42,33 @@ export default function VisitorCounter() {
       if (document.visibilityState === "visible") updateStats();
     };
 
-    updateStats();
+    const pageViewKey = "chessgrind:last-page-view";
+    const pagePath = window.location.pathname;
+    const now = Date.now();
+    let recordPageView = true;
+
+    try {
+      const previous = JSON.parse(
+        window.sessionStorage.getItem(pageViewKey) ?? "null"
+      ) as { path?: string; recordedAt?: number } | null;
+
+      recordPageView = !(
+        previous?.path === pagePath &&
+        typeof previous.recordedAt === "number" &&
+        now - previous.recordedAt < 1_500
+      );
+
+      if (recordPageView) {
+        window.sessionStorage.setItem(
+          pageViewKey,
+          JSON.stringify({ path: pagePath, recordedAt: now })
+        );
+      }
+    } catch {
+      // If session storage is unavailable, counting this load is still correct.
+    }
+
+    updateStats(recordPageView);
     const heartbeat = window.setInterval(updateStats, 20_000);
     document.addEventListener("visibilitychange", handleVisibility);
 
@@ -55,7 +86,7 @@ export default function VisitorCounter() {
       aria-live="polite"
       aria-label={
         stats
-          ? `${stats.total} total visitors, ${stats.online} online now`
+          ? `${stats.pageViews} page views, ${stats.online} online now`
           : "Loading visitor stats"
       }
       className="visitor-stats inline-flex shrink-0 items-center overflow-hidden rounded-full border border-[var(--line)] bg-[var(--surface)] text-[11px] font-semibold shadow-[var(--shadow-soft)]"
@@ -86,12 +117,12 @@ export default function VisitorCounter() {
           <span className="h-4 w-px bg-[var(--line-strong)]" />
           <span className="inline-flex items-center gap-1 px-2.5 py-1.5">
             <strong className="tabular-nums text-[var(--text)]">
-              {stats.total.toLocaleString()}
+              {stats.pageViews.toLocaleString()}
             </strong>
             <span className="hidden text-[var(--secondary)] md:inline">
-              total
+              page views
             </span>
-            <span className="text-[var(--secondary)] md:hidden">visits</span>
+            <span className="text-[var(--secondary)] md:hidden">views</span>
           </span>
         </>
       )}
