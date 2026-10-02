@@ -8,6 +8,12 @@ import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import { premiumPieces } from "../premium-pieces";
 import { addToGrindbook } from "@/lib/grindbook";
+import {
+  cloneGameWithHistory,
+  evaluateMaterial,
+  pickAiMove,
+  type AppliedMove,
+} from "@/lib/chess-engine";
 
 type PlayColor = "white" | "black";
 type Difficulty = "easy" | "medium" | "hard";
@@ -23,12 +29,6 @@ type MoveEntry = {
   color: PlayColor;
 };
 
-type AppliedMove = {
-  from: string;
-  to: string;
-  promotion?: string;
-};
-
 type MoveRow = {
   number: number;
   white: string | null;
@@ -40,118 +40,6 @@ const DEPTH_BY_DIFFICULTY: Record<Difficulty, number> = {
   medium: 2,
   hard: 3,
 };
-
-const PIECE_VALUES: Record<string, number> = {
-  p: 100,
-  n: 320,
-  b: 330,
-  r: 500,
-  q: 900,
-  k: 0,
-};
-
-const MATE_SCORE = 100000;
-
-function evaluateBoard(game: Chess): number {
-  if (game.isCheckmate()) {
-    return game.turn() === "w" ? -MATE_SCORE : MATE_SCORE;
-  }
-
-  if (game.isDraw() || game.isStalemate()) {
-    return 0;
-  }
-
-  let score = 0;
-
-  for (const row of game.board()) {
-    for (const square of row) {
-      if (!square) continue;
-
-      const value = PIECE_VALUES[square.type];
-      score += square.color === "w" ? value : -value;
-    }
-  }
-
-  return score;
-}
-
-function minimax(
-  game: Chess,
-  depth: number,
-  alpha: number,
-  beta: number,
-  maximizing: boolean
-): number {
-  if (depth === 0 || game.isGameOver()) {
-    return evaluateBoard(game);
-  }
-
-  const moves = game.moves({ verbose: true });
-
-  if (maximizing) {
-    let best = -Infinity;
-
-    for (const move of moves) {
-      game.move(move);
-      best = Math.max(
-        best,
-        minimax(game, depth - 1, alpha, beta, false)
-      );
-      game.undo();
-
-      alpha = Math.max(alpha, best);
-      if (beta <= alpha) break;
-    }
-
-    return best;
-  }
-
-  let best = Infinity;
-
-  for (const move of moves) {
-    game.move(move);
-    best = Math.min(
-      best,
-      minimax(game, depth - 1, alpha, beta, true)
-    );
-    game.undo();
-
-    beta = Math.min(beta, best);
-    if (beta <= alpha) break;
-  }
-
-  return best;
-}
-
-function pickAiMove(game: Chess, depth: number) {
-  const aiIsWhite = game.turn() === "w";
-  const moves = game.moves({ verbose: true });
-
-  let bestMove = moves[0];
-  let bestScore = aiIsWhite ? -Infinity : Infinity;
-
-  for (const move of moves) {
-    game.move(move);
-    const score = minimax(
-      game,
-      depth - 1,
-      -Infinity,
-      Infinity,
-      !aiIsWhite
-    );
-    game.undo();
-
-    if (aiIsWhite && score > bestScore) {
-      bestScore = score;
-      bestMove = move;
-    } else if (!aiIsWhite && score < bestScore) {
-      bestScore = score;
-      bestMove = move;
-    }
-  }
-
-  return bestMove;
-}
 
 function getChessColor(color: PlayColor) {
   return color === "white" ? "w" : "b";
@@ -251,7 +139,10 @@ export default function PlayPage() {
 
   const gameOver = gameStatus !== "playing";
 
-  function startAiMoveIfNeeded(nextGame: Chess) {
+  function startAiMoveIfNeeded(
+    nextGame: Chess,
+    nextHistory: AppliedMove[]
+  ) {
     const status = getGameStatus(nextGame);
     if (status) {
       setGameStatus(status);
@@ -264,10 +155,11 @@ export default function PlayPage() {
       setIsAiThinking(true);
 
       setTimeout(() => {
-        const aiGame = new Chess(nextGame.fen());
+        const aiGame = cloneGameWithHistory(nextGame);
         const move = pickAiMove(
           aiGame,
-          DEPTH_BY_DIFFICULTY[difficulty]
+          DEPTH_BY_DIFFICULTY[difficulty],
+          nextHistory
         );
 
         if (!move) {
@@ -284,8 +176,8 @@ export default function PlayPage() {
           ...previous,
           { to: move.to, color: aiColor },
         ]);
-        setHistory((previous) => [
-          ...previous,
+        setHistory([
+          ...nextHistory,
           {
             from: move.from,
             to: move.to,
@@ -319,22 +211,24 @@ export default function PlayPage() {
       // AI plays white's opening move.
       const aiFirst = color === "black";
       if (aiFirst) {
-        startAiMoveForColor(fresh, "white");
+        startAiMoveForColor(fresh, "white", []);
       }
     }
   }
 
   function startAiMoveForColor(
     baseGame: Chess,
-    thinkingColor: PlayColor
+    thinkingColor: PlayColor,
+    baseHistory: AppliedMove[]
   ) {
     setIsAiThinking(true);
 
     setTimeout(() => {
-      const aiGame = new Chess(baseGame.fen());
+      const aiGame = cloneGameWithHistory(baseGame);
       const move = pickAiMove(
         aiGame,
-        DEPTH_BY_DIFFICULTY[difficulty]
+        DEPTH_BY_DIFFICULTY[difficulty],
+        baseHistory
       );
 
       if (!move) {
@@ -351,8 +245,8 @@ export default function PlayPage() {
         ...previous,
         { to: move.to, color: thinkingColor },
       ]);
-      setHistory((previous) => [
-        ...previous,
+      setHistory([
+        ...baseHistory,
         {
           from: move.from,
           to: move.to,
@@ -367,7 +261,7 @@ export default function PlayPage() {
     if (gameOver || isAiThinking) return false;
     if (!isPlayersPiece(game, from, playerColor)) return false;
 
-    const gameCopy = new Chess(game.fen());
+    const gameCopy = cloneGameWithHistory(game);
 
     let move;
     try {
@@ -392,16 +286,17 @@ export default function PlayPage() {
       ...previous,
       { to: move.to, color: playerColor },
     ]);
-    setHistory((previous) => [
-      ...previous,
+    const nextHistory = [
+      ...history,
       {
         from: move.from,
         to: move.to,
         promotion: move.promotion,
       },
-    ]);
+    ];
+    setHistory(nextHistory);
 
-    startAiMoveIfNeeded(gameCopy);
+    startAiMoveIfNeeded(gameCopy, nextHistory);
 
     return true;
   }
@@ -642,7 +537,7 @@ export default function PlayPage() {
     statusDetail = "It's the computer's turn.";
   }
 
-  const evaluation = evaluateBoard(game) / 100;
+  const evaluation = evaluateMaterial(game) / 100;
 
   return (
     <main className="min-h-screen">
