@@ -2,26 +2,23 @@
 
 import type { PieceRenderObject } from "react-chessboard";
 
-const SPRITE_POSITIONS: Record<string, [number, number]> = {
-  wP: [0, 0],
-  wR: [1, 0],
-  wN: [2, 0],
-  wB: [3, 0],
-  wQ: [0, 1],
-  wK: [1, 1],
-  bP: [2, 1],
-  bR: [3, 1],
-  bN: [0, 2],
-  bB: [1, 2],
-  bQ: [2, 2],
-  bK: [3, 2],
-};
+const PIECE_TYPES = [
+  "wP",
+  "wR",
+  "wN",
+  "wB",
+  "wQ",
+  "wK",
+  "bP",
+  "bR",
+  "bN",
+  "bB",
+  "bQ",
+  "bK",
+] as const;
 
 export const premiumPieces = Object.fromEntries(
-  Object.entries(SPRITE_POSITIONS).map(([
-    pieceType,
-    [column, row],
-  ]) => {
+  PIECE_TYPES.map((pieceType) => {
     const color = pieceType[0] === "w" ? "white" : "black";
 
     return [
@@ -31,7 +28,7 @@ export const premiumPieces = Object.fromEntries(
           aria-hidden="true"
           className={`cg-piece cg-piece-${color}`}
           style={{
-            backgroundPosition: `${(column / 3) * 100}% ${(row / 2) * 100}%`,
+            backgroundImage: `url("/pieces/luxe-v2/${pieceType}.png")`,
           }}
         />
       ),

@@ -131,13 +131,10 @@ button:focus-visible {
   width: 100%;
   height: auto;
   aspect-ratio: 1;
-  background-image: url("/pieces/chessgrind-luxe-v1.png");
   background-repeat: no-repeat;
-  background-size: 400% 300%;
-  filter: drop-shadow(0 2px 1px rgba(9, 14, 22, 0.22));
+  background-position: center bottom;
+  background-size: 100% 100%;
   pointer-events: none;
-  transform: scale(0.96);
-  transform-origin: center;
 }
 
 .control {
