@@ -556,13 +556,13 @@ export default function PlayPage() {
             ...existing,
             cursor: "pointer",
             boxShadow:
-              "inset 0 0 0 5px rgba(59, 92, 255, 0.28)",
+              "inset 0 0 0 6px rgba(37, 99, 235, 0.88), inset 0 0 18px rgba(96, 165, 250, 0.34)",
           }
         : {
             ...existing,
             cursor: "pointer",
             backgroundImage:
-              "radial-gradient(circle at center, rgba(59, 92, 255, 0.52) 0, rgba(59, 92, 255, 0.52) 12%, transparent 13%)",
+              "radial-gradient(circle at center, #2563eb 0 13%, #93c5fd 14% 18%, transparent 19%)",
           };
     }
   }

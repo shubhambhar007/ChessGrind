@@ -18,7 +18,7 @@ const PIECE_TYPES = [
 ] as const;
 
 export const premiumPieces = Object.fromEntries(
-  PIECE_TYPES.map((pieceType, index) => {
+  PIECE_TYPES.map((pieceType) => {
     const BasePiece = defaultPieces[pieceType];
     const color = pieceType[0] === "w" ? "white" : "black";
     const rank = pieceType[1].toLowerCase();
@@ -32,16 +32,15 @@ export const premiumPieces = Object.fromEntries(
       }) => (
         <span
           className={`cg-piece cg-piece-${color} cg-piece-${rank}`}
-          style={{ "--piece-delay": `${index * -0.17}s` } as React.CSSProperties}
           data-square={props?.square}
         >
           {BasePiece({
             ...props,
-            fill: color === "white" ? "#fff8dc" : "#24133f",
+            fill: color === "white" ? "#f5f0df" : "#252a32",
             svgStyle: {
               ...props?.svgStyle,
-              width: "94%",
-              height: "94%",
+              width: "90%",
+              height: "90%",
             },
           })}
         </span>
