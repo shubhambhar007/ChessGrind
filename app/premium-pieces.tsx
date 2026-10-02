@@ -1,49 +1,39 @@
 "use client";
 
-import { defaultPieces, type PieceRenderObject } from "react-chessboard";
+import type { PieceRenderObject } from "react-chessboard";
 
-const PIECE_TYPES = [
-  "wP",
-  "wR",
-  "wN",
-  "wB",
-  "wQ",
-  "wK",
-  "bP",
-  "bR",
-  "bN",
-  "bB",
-  "bQ",
-  "bK",
-] as const;
+const SPRITE_POSITIONS: Record<string, [number, number]> = {
+  wP: [0, 0],
+  wR: [1, 0],
+  wN: [2, 0],
+  wB: [3, 0],
+  wQ: [0, 1],
+  wK: [1, 1],
+  bP: [2, 1],
+  bR: [3, 1],
+  bN: [0, 2],
+  bB: [1, 2],
+  bQ: [2, 2],
+  bK: [3, 2],
+};
 
 export const premiumPieces = Object.fromEntries(
-  PIECE_TYPES.map((pieceType) => {
-    const BasePiece = defaultPieces[pieceType];
+  Object.entries(SPRITE_POSITIONS).map(([
+    pieceType,
+    [column, row],
+  ]) => {
     const color = pieceType[0] === "w" ? "white" : "black";
-    const rank = pieceType[1].toLowerCase();
 
     return [
       pieceType,
-      (props?: {
-        fill?: string;
-        square?: string;
-        svgStyle?: React.CSSProperties;
-      }) => (
+      () => (
         <span
-          className={`cg-piece cg-piece-${color} cg-piece-${rank}`}
-          data-square={props?.square}
-        >
-          {BasePiece({
-            ...props,
-            fill: color === "white" ? "#f5f0df" : "#252a32",
-            svgStyle: {
-              ...props?.svgStyle,
-              width: "90%",
-              height: "90%",
-            },
-          })}
-        </span>
+          aria-hidden="true"
+          className={`cg-piece cg-piece-${color}`}
+          style={{
+            backgroundPosition: `${(column / 3) * 100}% ${(row / 2) * 100}%`,
+          }}
+        />
       ),
     ];
   })

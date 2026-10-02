@@ -127,50 +127,17 @@ button:focus-visible {
 }
 
 .cg-piece {
-  position: relative;
-  display: grid;
+  display: block;
   width: 100%;
-  height: 100%;
-  place-items: center;
+  height: auto;
+  aspect-ratio: 1;
+  background-image: url("/pieces/chessgrind-luxe-v1.png");
+  background-repeat: no-repeat;
+  background-size: 400% 300%;
+  filter: drop-shadow(0 2px 1px rgba(9, 14, 22, 0.22));
   pointer-events: none;
-}
-
-.cg-piece::after {
-  position: absolute;
-  right: 23%;
-  bottom: 7%;
-  left: 23%;
-  height: 7%;
-  border-radius: 50%;
-  background: rgba(12, 18, 28, 0.28);
-  content: "";
-  filter: blur(2.5px);
-  pointer-events: none;
-}
-
-.cg-piece svg {
-  overflow: visible;
-  position: relative;
-  z-index: 1;
-}
-
-.cg-piece-white svg {
-  filter:
-    drop-shadow(0 -0.8px 0 rgba(255, 255, 255, 0.95))
-    drop-shadow(0 1px 0 rgba(116, 89, 38, 0.4))
-    drop-shadow(0 3px 2px rgba(39, 31, 17, 0.3));
-}
-
-.cg-piece-black svg {
-  filter:
-    drop-shadow(0 -0.8px 0 rgba(255, 255, 255, 0.38))
-    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.82))
-    drop-shadow(0 3px 2px rgba(6, 9, 14, 0.48));
-}
-
-.cg-piece-q svg,
-.cg-piece-k svg {
-  transform: scale(1.025);
+  transform: scale(0.96);
+  transform-origin: center;
 }
 
 .control {
