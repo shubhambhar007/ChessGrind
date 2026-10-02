@@ -6,6 +6,7 @@ import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
+import { premiumPieces } from "../premium-pieces";
 import { addToGrindbook } from "@/lib/grindbook";
 
 type PlayColor = "white" | "black";
@@ -766,6 +767,7 @@ export default function PlayPage() {
                   <div className="overflow-hidden">
                     <Chessboard
                       options={{
+                        pieces: premiumPieces,
                         showNotation: false,
                         position: game.fen(),
                         boardOrientation: playerColor,

@@ -14,6 +14,7 @@ import {
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "./theme-toggle";
 import VisitorCounter from "./visitor-counter";
+import { premiumPieces } from "./premium-pieces";
 import {
   puzzles,
   type PuzzleDifficulty,
@@ -4223,6 +4224,7 @@ export default function Home() {
                   <div className="overflow-hidden">
                     <Chessboard
                       options={{
+                        pieces: premiumPieces,
                         showNotation: false,
 
                     position:

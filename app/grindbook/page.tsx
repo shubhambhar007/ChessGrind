@@ -6,6 +6,7 @@ import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
+import { premiumPieces } from "../premium-pieces";
 import {
   formatDue,
   isDue,
@@ -170,6 +171,7 @@ function ReviewBoard({
         <div className="overflow-hidden border-[6px] border-white shadow-[var(--shadow-board)]">
           <Chessboard
             options={{
+              pieces: premiumPieces,
               showNotation: true,
               position: game.fen(),
               boardOrientation: card.orientation,
