@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "../theme-toggle";
@@ -27,7 +27,7 @@ type GameStatus =
   | "resigned";
 
 type MoveEntry = {
-  to: string;
+  notation: string;
   color: PlayColor;
 };
 
@@ -77,19 +77,19 @@ function buildMoveRows(moveLog: MoveEntry[]): MoveRow[] {
     if (entry.color === "white") {
       const row: MoveRow = {
         number: rows.length + 1,
-        white: entry.to,
+        white: entry.notation,
         black: null,
       };
       rows.push(row);
       pendingWhiteRow = row;
     } else if (pendingWhiteRow) {
-      pendingWhiteRow.black = entry.to;
+      pendingWhiteRow.black = entry.notation;
       pendingWhiteRow = null;
     } else {
       rows.push({
         number: rows.length + 1,
         white: null,
-        black: entry.to,
+        black: entry.notation,
       });
     }
   }
@@ -135,6 +135,16 @@ export default function PlayPage() {
     "moves" | "analysis" | "info"
   >("moves");
   const [savedPosition, setSavedPosition] = useState(false);
+  const [pgnCopied, setPgnCopied] = useState(false);
+  const moveListRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (activeTab !== "moves" || moveLog.length === 0) return;
+    moveListRef.current?.scrollTo({
+      top: moveListRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [activeTab, moveLog.length]);
 
   const aiColor: PlayColor =
     playerColor === "white" ? "black" : "white";
@@ -169,14 +179,14 @@ export default function PlayPage() {
           return;
         }
 
-        aiGame.move(move);
+        const playedMove = aiGame.move(move);
 
         setGame(aiGame);
         setSavedPosition(false);
         setLastMove({ from: move.from, to: move.to });
         setMoveLog((previous) => [
           ...previous,
-          { to: move.to, color: aiColor },
+          { notation: playedMove.san, color: aiColor },
         ]);
         setHistory([
           ...nextHistory,
@@ -238,14 +248,14 @@ export default function PlayPage() {
         return;
       }
 
-      aiGame.move(move);
+      const playedMove = aiGame.move(move);
 
       setGame(aiGame);
       setSavedPosition(false);
       setLastMove({ from: move.from, to: move.to });
       setMoveLog((previous) => [
         ...previous,
-        { to: move.to, color: thinkingColor },
+        { notation: playedMove.san, color: thinkingColor },
       ]);
       setHistory([
         ...baseHistory,
@@ -286,7 +296,7 @@ export default function PlayPage() {
     setSelectedSquare(null);
     setMoveLog((previous) => [
       ...previous,
-      { to: move.to, color: playerColor },
+      { notation: move.san, color: playerColor },
     ]);
     const nextHistory = [
       ...history,
@@ -386,6 +396,8 @@ export default function PlayPage() {
   async function copyPgn() {
     try {
       await navigator.clipboard.writeText(game.pgn());
+      setPgnCopied(true);
+      window.setTimeout(() => setPgnCopied(false), 1600);
     } catch {
       // Clipboard unavailable — ignore.
     }
@@ -486,10 +498,8 @@ export default function PlayPage() {
       : [1, 2, 3, 4, 5, 6, 7, 8];
 
   const moveRows = buildMoveRows(moveLog);
-  const emptyMoveRows: MoveRow[] =
-    moveRows.length === 0
-      ? [{ number: 1, white: null, black: null }]
-      : moveRows;
+  const latestMoveColor =
+    moveLog[moveLog.length - 1]?.color ?? null;
 
   const isCheck = game.inCheck() && !gameOver;
   const isPlayerTurn =
@@ -867,9 +877,11 @@ export default function PlayPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="inline-flex rounded-[10px] bg-black/[0.045] p-[3px]">
+            <div className="relative mt-4 overflow-hidden rounded-[20px] border border-[var(--line)] bg-[var(--surface)] shadow-[0_24px_80px_rgba(0,0,0,0.16)]">
+              <div className="pointer-events-none absolute -right-20 -top-24 h-52 w-52 rounded-full bg-[var(--accent)] opacity-[0.08] blur-3xl" />
+
+              <div className="relative flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line)] px-4 py-4">
+                <div className="inline-flex rounded-[12px] border border-[var(--line)] bg-black/[0.035] p-1">
                   {(
                     [
                       "moves",
@@ -882,12 +894,15 @@ export default function PlayPage() {
                       type="button"
                       onClick={() => setActiveTab(tab)}
                       className={[
-                        "control rounded-[7px] px-3 py-1.5 text-[12px] font-semibold capitalize",
+                        "control relative rounded-[9px] px-2.5 py-2 text-[12px] font-semibold capitalize transition-all",
                         activeTab === tab
-                          ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
-                          : "text-[var(--secondary)]",
+                          ? "bg-[var(--surface)] text-[var(--text)] shadow-[0_5px_18px_rgba(0,0,0,0.1)]"
+                          : "text-[var(--secondary)] hover:text-[var(--text)]",
                       ].join(" ")}
                     >
+                      {activeTab === tab && (
+                        <span className="absolute inset-x-3 -bottom-[5px] h-[2px] rounded-full bg-[var(--accent)] shadow-[0_0_10px_var(--accent)]" />
+                      )}
                       {tab === "info"
                         ? "Game Info"
                         : tab}
@@ -895,112 +910,205 @@ export default function PlayPage() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={copyPgn}
-                    className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+                    disabled={moveLog.length === 0}
+                    className="control inline-flex h-9 items-center gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-2.5 text-[11px] font-semibold text-[var(--secondary)] shadow-sm hover:border-[var(--line-strong)] hover:text-[var(--text)] disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    Copy PGN
+                    {pgnCopied ? (
+                      <svg aria-hidden="true" viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-none stroke-current stroke-[1.8]">
+                        <path d="m4.5 10.3 3.3 3.2 7.7-7.4" />
+                      </svg>
+                    ) : (
+                      <svg aria-hidden="true" viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-none stroke-current stroke-[1.6]">
+                        <rect x="6.5" y="6.5" width="9" height="9" rx="2" />
+                        <path d="M13.5 6.5V5A1.5 1.5 0 0 0 12 3.5H5A1.5 1.5 0 0 0 3.5 5v7A1.5 1.5 0 0 0 5 13.5h1.5" />
+                      </svg>
+                    )}
+                    {pgnCopied ? "Copied" : "Copy PGN"}
                   </button>
                   <button
                     type="button"
                     onClick={() => newGame()}
-                    className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+                    aria-label="Reset game"
+                    title="Reset game"
+                    className="control grid h-9 w-9 place-items-center rounded-[10px] border border-[var(--line)] bg-[var(--surface)] text-[var(--secondary)] shadow-sm hover:border-[var(--line-strong)] hover:text-[var(--text)]"
                   >
-                    Reset
+                    <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4 fill-none stroke-current stroke-[1.7]">
+                      <path d="M15.3 6.2A6.2 6.2 0 1 0 16 12" strokeLinecap="round" />
+                      <path d="M15.5 2.9v3.8h-3.8" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
               {activeTab === "moves" && (
-                <div className="max-h-[160px] overflow-y-auto">
-                  <table className="w-full table-fixed border-collapse text-[13px]">
-                    <thead className="sticky top-0 bg-[var(--surface)]">
-                      <tr>
-                        <th className="w-[28px]" />
-                        <th className="w-[calc(50%-14px)] pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
+                <div className="relative">
+                  {moveRows.length === 0 ? (
+                    <div className="flex min-h-[210px] flex-col items-center justify-center px-6 py-8 text-center">
+                      <div className="relative mb-5 h-14 w-28">
+                        <div className="absolute left-0 top-3 grid h-10 w-10 -rotate-6 place-items-center rounded-[12px] border border-[var(--line)] bg-[var(--surface)] font-mono text-[11px] font-bold text-[var(--tertiary)] shadow-lg">
+                          1.
+                        </div>
+                        <div className="absolute left-9 top-0 z-10 grid h-12 w-12 place-items-center rounded-[14px] border border-[var(--accent)] bg-[var(--accent-soft)] font-mono text-[14px] font-bold text-[var(--accent)] shadow-[0_10px_30px_rgba(59,92,255,0.2)]">
+                          e4
+                        </div>
+                        <div className="absolute right-0 top-3 grid h-10 w-10 rotate-6 place-items-center rounded-[12px] border border-[var(--line)] bg-[var(--surface)] font-mono text-[11px] font-bold text-[var(--tertiary)] shadow-lg">
+                          …
+                        </div>
+                      </div>
+                      <div className="text-[14px] font-semibold tracking-[-0.01em]">
+                        Your game story starts here
+                      </div>
+                      <p className="mt-1 max-w-[270px] text-[12px] leading-5 text-[var(--secondary)]">
+                        Every move, capture and check will appear in this live scorebook.
+                      </p>
+                    </div>
+                  ) : (
+                    <div ref={moveListRef} className="max-h-[256px] overflow-y-auto px-3 py-3">
+                      <div className="sticky top-0 z-10 grid grid-cols-[40px_1fr_1fr] gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--tertiary)] shadow-sm">
+                        <span />
+                        <span className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full border border-black/20 bg-white shadow-sm" />
                           White
-                        </th>
-                        <th className="w-[calc(50%-14px)] pb-2 text-left text-[12px] font-semibold text-[var(--secondary)]">
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-[#161617] ring-1 ring-white/15" />
                           Black
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {emptyMoveRows.map((row) => (
-                        <tr
-                          key={row.number}
-                          className="border-t border-[var(--line)]"
-                        >
-                          <td className="py-1.5 text-[12px] text-[var(--tertiary)]">
-                            {row.number}
-                          </td>
-                          <td className="py-1.5 font-mono">
-                            {row.white ?? (
-                              <span className="text-[var(--tertiary)]">
-                                -
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-1.5 font-mono">
-                            {row.black ?? (
-                              <span className="text-[var(--tertiary)]">
-                                -
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                        </span>
+                      </div>
+
+                      <div className="mt-2 space-y-1">
+                        {moveRows.map((row, index) => {
+                          const isLatestRow = index === moveRows.length - 1;
+                          return (
+                            <div
+                              key={row.number}
+                              className={[
+                                "grid grid-cols-[40px_1fr_1fr] gap-2 rounded-[11px] px-2 py-1.5 transition-colors",
+                                isLatestRow
+                                  ? "bg-[var(--accent-soft)]"
+                                  : index % 2 === 0
+                                    ? "bg-black/[0.025]"
+                                    : "",
+                              ].join(" ")}
+                            >
+                              <div className="flex items-center font-mono text-[11px] font-semibold text-[var(--tertiary)]">
+                                {String(row.number).padStart(2, "0")}
+                              </div>
+                              {(["white", "black"] as const).map((color) => {
+                                const notation = row[color];
+                                const isLatestMove = isLatestRow && latestMoveColor === color;
+                                return (
+                                  <div
+                                    key={color}
+                                    className={[
+                                      "flex min-h-9 items-center rounded-[9px] px-3 font-mono text-[13px] font-bold tracking-[-0.01em]",
+                                      isLatestMove
+                                        ? "bg-[var(--accent)] text-white shadow-[0_7px_20px_rgba(59,92,255,0.28)]"
+                                        : notation
+                                          ? "text-[var(--text)]"
+                                          : "text-[var(--tertiary)]",
+                                    ].join(" ")}
+                                  >
+                                    {notation ?? "—"}
+                                    {isLatestMove && (
+                                      <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_8px_white]" />
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between border-t border-[var(--line)] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--tertiary)]">
+                    <span>{moveLog.length} {moveLog.length === 1 ? "move" : "moves"} played</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                      Live notation
+                    </span>
+                  </div>
                 </div>
               )}
 
               {activeTab === "analysis" && (
-                <div className="text-[13px] text-[var(--secondary)]">
-                  <div className="mb-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--tertiary)]">
-                    Material balance
+                <div className="min-h-[250px] p-6 text-[13px] text-[var(--secondary)]">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--tertiary)]">
+                        Material pulse
+                      </div>
+                      <div className="text-[32px] font-semibold tracking-[-0.04em] text-[var(--text)]">
+                        {evaluation > 0 ? "+" : ""}
+                        {evaluation.toFixed(2)}
+                      </div>
+                    </div>
+                    <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--secondary)]">
+                      {evaluation === 0
+                        ? "Even"
+                        : evaluation > 0
+                          ? "White leads"
+                          : "Black leads"}
+                    </span>
                   </div>
-                  <div className="text-[22px] font-semibold text-[var(--text)]">
-                    {evaluation > 0 ? "+" : ""}
-                    {evaluation.toFixed(2)}
+                  <div className="relative mt-6 h-2 overflow-hidden rounded-full bg-[#161617] shadow-inner">
+                    <div
+                      className="absolute inset-y-0 bg-white transition-all duration-500"
+                      style={{
+                        left: 0,
+                        width: `${Math.max(4, Math.min(96, 50 + evaluation * 4))}%`,
+                      }}
+                    />
+                    <span className="absolute left-1/2 top-1/2 h-4 w-[2px] -translate-x-1/2 -translate-y-1/2 bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]" />
                   </div>
-                  <p className="mt-2">
-                    Positive favors White, negative
-                    favors Black. This is a simple
-                    material count, not a full engine
-                    evaluation.
+                  <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--tertiary)]">
+                    <span>White</span>
+                    <span>Black</span>
+                  </div>
+                  <p className="mt-6 max-w-[360px] leading-5">
+                    A live material snapshot. Positional strength, king safety and tactical threats are not included yet.
                   </p>
                 </div>
               )}
 
               {activeTab === "info" && (
-                <div className="space-y-2 text-[13px] text-[var(--secondary)]">
-                  <div>
-                    Turn:{" "}
-                    <strong className="text-[var(--text)]">
-                      {game.turn() === "w"
-                        ? "White"
-                        : "Black"}
-                    </strong>
-                  </div>
-                  <div>
-                    Moves played:{" "}
-                    <strong className="text-[var(--text)]">
-                      {moveLog.length}
-                    </strong>
-                  </div>
-                  <div>
-                    Status:{" "}
-                    <strong className="text-[var(--text)]">
-                      {gameStatus === "playing"
-                        ? isCheck
-                          ? "Check"
-                          : "In progress"
-                        : gameStatus}
-                    </strong>
-                  </div>
+                <div className="grid min-h-[250px] grid-cols-2 gap-3 p-5">
+                  {[
+                    {
+                      label: "Turn",
+                      value: game.turn() === "w" ? "White" : "Black",
+                    },
+                    { label: "Moves", value: String(moveLog.length) },
+                    {
+                      label: "Status",
+                      value:
+                        gameStatus === "playing"
+                          ? isCheck
+                            ? "Check"
+                            : "In progress"
+                          : gameStatus,
+                    },
+                    { label: "Level", value: difficulty },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="relative overflow-hidden rounded-[14px] border border-[var(--line)] bg-black/[0.025] p-4"
+                    >
+                      <div className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--tertiary)]">
+                        {item.label}
+                      </div>
+                      <div className="mt-2 text-[17px] font-semibold capitalize tracking-[-0.02em] text-[var(--text)]">
+                        {item.value}
+                      </div>
+                      <div className="absolute -bottom-5 -right-5 h-12 w-12 rounded-full bg-[var(--accent)] opacity-[0.07] blur-xl" />
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
