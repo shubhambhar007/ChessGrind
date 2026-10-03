@@ -15,6 +15,7 @@ import { Chessboard } from "react-chessboard";
 import ThemeToggle from "./theme-toggle";
 import VisitorCounter from "./visitor-counter";
 import { premiumPieces } from "./premium-pieces";
+import GrindbookPromo from "./grindbook-promo";
 import {
   puzzles,
   type PuzzleDifficulty,
@@ -3949,6 +3950,8 @@ export default function Home() {
             Play a full game
           </Link>
         </div>
+
+        <GrindbookPromo className="mb-7" />
 
         {sessionMode ===
           "ten" && (

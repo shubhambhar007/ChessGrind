@@ -7,6 +7,7 @@ import { Chessboard } from "react-chessboard";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import { premiumPieces } from "../premium-pieces";
+import GrindbookPromo from "../grindbook-promo";
 import { addToGrindbook } from "@/lib/grindbook";
 import {
   cloneGameWithHistory,
@@ -827,6 +828,8 @@ export default function PlayPage() {
                 Resign
               </button>
             </div>
+
+            <GrindbookPromo compact className="mt-4" />
           </section>
 
           <section>
