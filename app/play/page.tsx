@@ -8,6 +8,7 @@ import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import { premiumPieces } from "../premium-pieces";
 import GrindbookPromo from "../grindbook-promo";
+import PremiumSelect from "../premium-select";
 import { addToGrindbook } from "@/lib/grindbook";
 import {
   cloneGameWithHistory,
@@ -588,56 +589,52 @@ export default function PlayPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <label className="rounded-[10px] border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-2">
-              <span>
-                <span className="block text-[10px] uppercase tracking-[0.1em] text-[var(--tertiary)]">
-                  Difficulty
-                </span>
-                <select
-                  value={difficulty}
-                  disabled={
-                    isAiThinking && moveLog.length > 0
-                  }
-                  onChange={(event) =>
-                    setDifficulty(
-                      event.target.value as Difficulty
-                    )
-                  }
-                  className="block bg-transparent text-[13px] font-semibold text-[var(--text)] outline-none"
-                >
-                  <option value="easy">Easy</option>
-                  <option value="medium">
-                    Medium
-                  </option>
-                  <option value="hard">Hard</option>
-                </select>
-              </span>
-            </label>
+            <PremiumSelect
+              label="Difficulty"
+              value={difficulty}
+              disabled={isAiThinking && moveLog.length > 0}
+              onChange={setDifficulty}
+              options={[
+                {
+                  value: "easy",
+                  label: "Easy",
+                  description: "Quick and forgiving",
+                },
+                {
+                  value: "medium",
+                  label: "Medium",
+                  description: "A balanced challenge",
+                },
+                {
+                  value: "hard",
+                  label: "Hard",
+                  description: "Deeper calculation",
+                },
+              ]}
+            />
 
-            <label className="rounded-[10px] border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-2">
-              <span>
-                <span className="block text-[10px] uppercase tracking-[0.1em] text-[var(--tertiary)]">
-                  Play as
-                </span>
-                <select
-                  value={playerColor}
-                  onChange={(event) =>
-                    newGame(
-                      event.target.value as PlayColor
-                    )
-                  }
-                  className="block bg-transparent text-[13px] font-semibold text-[var(--text)] outline-none"
-                >
-                  <option value="white">White</option>
-                  <option value="black">Black</option>
-                </select>
-              </span>
-            </label>
+            <PremiumSelect
+              label="Play as"
+              value={playerColor}
+              onChange={newGame}
+              options={[
+                {
+                  value: "white",
+                  label: "White",
+                  description: "You make the first move",
+                },
+                {
+                  value: "black",
+                  label: "Black",
+                  description: "Computer moves first",
+                },
+              ]}
+            />
 
             <button
               type="button"
               onClick={() => newGame()}
-              className="control rounded-[10px] border border-[var(--line-strong)] bg-[var(--surface)] px-4 py-2 text-[13px] font-semibold"
+              className="control min-h-[62px] rounded-[14px] border border-[var(--line-strong)] bg-[var(--surface)] px-5 py-2 text-[14px] font-semibold shadow-[var(--shadow-soft)]"
             >
               New Game
             </button>
