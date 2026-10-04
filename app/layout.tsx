@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import GrindbookCloudSync from "./grindbook-cloud-sync";
 import "./globals.css";
 
 const themeScript = `
@@ -48,6 +49,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
+        <GrindbookCloudSync />
         {children}
 
         <Analytics />

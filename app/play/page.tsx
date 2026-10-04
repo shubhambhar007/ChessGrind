@@ -9,6 +9,7 @@ import VisitorCounter from "../visitor-counter";
 import { premiumPieces } from "../premium-pieces";
 import GrindbookPromo from "../grindbook-promo";
 import PremiumSelect from "../premium-select";
+import AccountLink from "../account-link";
 import { addToGrindbook } from "@/lib/grindbook";
 import {
   cloneGameWithHistory,
@@ -581,6 +582,7 @@ export default function PlayPage() {
             >
               Back to puzzles
             </Link>
+            <AccountLink />
             <ThemeToggle />
           </div>
         </div>

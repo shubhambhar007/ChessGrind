@@ -3,6 +3,7 @@
 import Link from "next/link";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
+import AccountLink from "../account-link";
 import {
   useEffect,
   useMemo,
@@ -563,6 +564,8 @@ export default function InsightsPage() {
             >
               Back to puzzles
             </Link>
+
+            <AccountLink />
 
             <ThemeToggle />
           </div>

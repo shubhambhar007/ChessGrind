@@ -6,6 +6,8 @@ import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
+import AccountLink from "../account-link";
+import CloudStatusBadge from "../cloud-status";
 import { premiumPieces } from "../premium-pieces";
 import {
   formatDue,
@@ -348,6 +350,7 @@ export default function GrindbookPage() {
             <Link href="/">Puzzles</Link>
             <Link href="/play">Play</Link>
             <Link href="/insights">Insights</Link>
+            <AccountLink />
             <ThemeToggle />
           </nav>
         </div>
@@ -364,8 +367,11 @@ export default function GrindbookPage() {
             </h1>
             <p className="mt-2 max-w-[620px] text-[15px] leading-6 text-[var(--secondary)]">
               Save the positions that matter. ChessGrind brings them back before
-              you forget them—all on this device.
+              you forget them, on every device.
             </p>
+            <div className="mt-4">
+              <CloudStatusBadge />
+            </div>
           </div>
 
           <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">

@@ -14,6 +14,7 @@ import {
 import { Chessboard } from "react-chessboard";
 import ThemeToggle from "./theme-toggle";
 import VisitorCounter from "./visitor-counter";
+import AccountLink from "./account-link";
 import { premiumPieces } from "./premium-pieces";
 import GrindbookPromo from "./grindbook-promo";
 import {
@@ -3698,6 +3699,8 @@ export default function Home() {
                 Insights
               </Link>
 
+              <AccountLink />
+
               <ThemeToggle />
             </div>
           </div>
@@ -3884,6 +3887,8 @@ export default function Home() {
             >
               Insights
             </Link>
+
+            <AccountLink />
 
             <ThemeToggle />
 

@@ -47,7 +47,7 @@ export const GRINDBOOK_KEY = "chessgrind-grindbook-v1";
 export const GRINDBOOK_UPDATED_EVENT =
   "chessgrind-grindbook-updated";
 
-function isCard(value: unknown): value is GrindbookCard {
+export function isGrindbookCard(value: unknown): value is GrindbookCard {
   if (!value || typeof value !== "object") return false;
 
   const card = value as Partial<GrindbookCard>;
@@ -73,7 +73,7 @@ export function loadGrindbook(): GrindbookCard[] {
 
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isCard);
+    return parsed.filter(isGrindbookCard);
   } catch {
     return [];
   }
