@@ -14,6 +14,11 @@ import {
   loadGrindbook,
   saveGrindbook,
 } from "@/lib/grindbook";
+import {
+  EMPTY_GRINDBOOK_PROGRESS,
+  GRINDBOOK_PROGRESS_KEY,
+  saveGrindbookProgress,
+} from "@/lib/grindbook-progress";
 
 type Mode = "signup" | "login";
 
@@ -93,7 +98,9 @@ export default function AccountPage() {
       });
       window.localStorage.removeItem(LAST_CLOUD_USER_KEY);
       window.localStorage.removeItem(GRINDBOOK_KEY);
+      window.localStorage.removeItem(GRINDBOOK_PROGRESS_KEY);
       saveGrindbook([]);
+      saveGrindbookProgress(EMPTY_GRINDBOOK_PROGRESS);
       setUser(null);
       setMode("login");
       notifyAuthUpdated();

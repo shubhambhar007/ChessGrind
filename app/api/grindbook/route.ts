@@ -3,6 +3,11 @@ import {
   isGrindbookCard,
   type GrindbookCard,
 } from "@/lib/grindbook";
+import {
+  EMPTY_GRINDBOOK_PROGRESS,
+  isGrindbookProgress,
+  type GrindbookProgress,
+} from "@/lib/grindbook-progress";
 import { getRequestUser } from "@/lib/server/auth";
 import { getStore } from "@/lib/server/store";
 
@@ -14,6 +19,7 @@ const MAX_BODY_BYTES = 1_000_000;
 
 type StoredGrindbook = {
   cards: GrindbookCard[];
+  progress?: GrindbookProgress;
   updatedAt: string;
 };
 
@@ -38,6 +44,9 @@ export async function GET(request: NextRequest) {
   const saved = await store.get<StoredGrindbook>(grindbookKey(user.id));
   return NextResponse.json({
     cards: saved?.cards?.filter(isGrindbookCard) ?? [],
+    progress: isGrindbookProgress(saved?.progress)
+      ? saved.progress
+      : EMPTY_GRINDBOOK_PROGRESS,
     updatedAt: saved?.updatedAt ?? null,
   });
 }
@@ -53,9 +62,12 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Grindbook is too large." }, { status: 413 });
   }
 
-  let body: { cards?: unknown };
+  let body: { cards?: unknown; progress?: unknown };
   try {
-    body = (await request.json()) as { cards?: unknown };
+    body = (await request.json()) as {
+      cards?: unknown;
+      progress?: unknown;
+    };
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
@@ -71,6 +83,20 @@ export async function PUT(request: NextRequest) {
     );
   }
 
+  const progress =
+    body.progress === undefined
+      ? EMPTY_GRINDBOOK_PROGRESS
+      : isGrindbookProgress(body.progress)
+        ? body.progress
+        : null;
+
+  if (!progress) {
+    return NextResponse.json(
+      { error: "Invalid Grindbook review progress." },
+      { status: 400 }
+    );
+  }
+
   const store = getStore();
   if (!store) {
     return NextResponse.json(
@@ -82,6 +108,7 @@ export async function PUT(request: NextRequest) {
   const updatedAt = new Date().toISOString();
   await store.set(grindbookKey(user.id), {
     cards: body.cards,
+    progress,
     updatedAt,
   });
 

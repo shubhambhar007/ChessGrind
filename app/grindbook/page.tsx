@@ -19,6 +19,16 @@ import {
   type GrindbookCard,
   type GrindbookRating,
 } from "@/lib/grindbook";
+import {
+  EMPTY_GRINDBOOK_PROGRESS,
+  bestReviewStreak,
+  currentReviewStreak,
+  loadGrindbookProgress,
+  recentReviewDays,
+  recordGrindbookReview,
+  reviewDayKey,
+  type GrindbookProgress,
+} from "@/lib/grindbook-progress";
 
 type View = "review" | "library";
 type AnswerState = "idle" | "correct" | "wrong" | "revealed";
@@ -304,28 +314,51 @@ function ReviewBoard({
 
 export default function GrindbookPage() {
   const [cards, setCards] = useState<GrindbookCard[]>([]);
+  const [reviewProgress, setReviewProgress] =
+    useState<GrindbookProgress>(EMPTY_GRINDBOOK_PROGRESS);
   const [loaded, setLoaded] = useState(false);
   const [view, setView] = useState<View>("review");
 
   useEffect(() => {
     const storedCards = loadGrindbook();
+    const storedProgress = loadGrindbookProgress();
 
     queueMicrotask(() => {
       setCards(storedCards);
+      setReviewProgress(storedProgress);
       setLoaded(true);
     });
   }, []);
 
   const dueCards = useMemo(
-    () => cards.filter((card) => isDue(card)),
+    () =>
+      cards
+        .filter((card) => isDue(card))
+        .sort(
+          (a, b) =>
+            new Date(a.dueAt).getTime() - new Date(b.dueAt).getTime() ||
+            b.lapses - a.lapses
+        ),
     [cards]
   );
   const mastered = cards.filter((card) => card.repetitions >= 4).length;
   const currentCard = dueCards[0];
+  const reviewsToday = reviewProgress.reviewedByDay[reviewDayKey()] ?? 0;
+  const dailyTarget = Math.min(5, reviewsToday + dueCards.length);
+  const goalComplete = dailyTarget === 0 || reviewsToday >= dailyTarget;
+  const displayedReviews = Math.min(reviewsToday, dailyTarget);
+  const goalPercent =
+    dailyTarget === 0
+      ? 100
+      : Math.min(100, Math.round((reviewsToday / dailyTarget) * 100));
+  const currentStreak = currentReviewStreak(reviewProgress);
+  const bestStreak = bestReviewStreak(reviewProgress);
+  const reviewWeek = recentReviewDays(reviewProgress);
 
   function rateCurrent(rating: GrindbookRating) {
     if (!currentCard) return;
     setCards(reviewGrindbookCard(currentCard.id, rating));
+    setReviewProgress(recordGrindbookReview());
   }
 
   function removeCard(id: string) {
@@ -393,22 +426,108 @@ export default function GrindbookPage() {
           </div>
         </div>
 
-        <section className="mt-8 grid grid-cols-3 gap-3">
-          {[
-            ["Due today", loaded ? dueCards.length : "—"],
-            ["Saved", loaded ? cards.length : "—"],
-            ["Mastered", loaded ? mastered : "—"],
-          ].map(([label, value]) => (
-            <div
-              key={label}
-              className="rounded-[15px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]"
-            >
-              <div className="text-[11px] font-semibold uppercase tracking-[0.11em] text-[var(--secondary)]">
-                {label}
+        <section className="mt-8 grid gap-3 lg:grid-cols-[1.35fr_0.65fr]">
+          <div className="relative overflow-hidden rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
+            <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[var(--accent)] opacity-[0.09] blur-3xl" />
+            <div className="relative flex flex-wrap items-start justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_9px_var(--accent)]" />
+                  Daily queue
+                </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="text-[42px] font-semibold tracking-[-0.055em]">
+                    {loaded ? displayedReviews : "—"}
+                  </span>
+                  <span className="text-[16px] font-medium text-[var(--tertiary)]">
+                    / {loaded ? dailyTarget : "—"}
+                  </span>
+                </div>
+                <p className="mt-1 text-[12px] text-[var(--secondary)]">
+                  {goalComplete
+                    ? dueCards.length > 0
+                      ? `Daily target hit. ${dueCards.length} bonus ${dueCards.length === 1 ? "position" : "positions"} still available.`
+                      : reviewsToday > 0
+                      ? "Today’s memory work is locked in."
+                      : "No positions are due today."
+                    : `${dailyTarget - reviewsToday} ${dailyTarget - reviewsToday === 1 ? "position" : "positions"} left in today’s set.`}
+                </p>
               </div>
-              <div className="mt-2 text-[28px] font-semibold">{value}</div>
+
+              <div className="grid grid-cols-3 gap-6 text-right">
+                {[
+                  ["Due", dueCards.length],
+                  ["Saved", cards.length],
+                  ["Mastered", mastered],
+                ].map(([label, value]) => (
+                  <div key={label}>
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--tertiary)]">
+                      {label}
+                    </div>
+                    <div className="mt-1 text-[20px] font-semibold">
+                      {loaded ? value : "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
+
+            <div className="relative mt-6 h-2 overflow-hidden rounded-full bg-black/[0.07]">
+              <div
+                className="h-full rounded-full bg-[var(--accent)] shadow-[0_0_16px_var(--accent)] transition-[width] duration-500"
+                style={{ width: `${loaded ? goalPercent : 0}%` }}
+              />
+            </div>
+            <div className="relative mt-2 flex justify-between text-[9px] font-semibold uppercase tracking-[0.09em] text-[var(--tertiary)]">
+              <span>{reviewProgress.totalReviews} lifetime reviews</span>
+              <span>{goalPercent}%</span>
+            </div>
+          </div>
+
+          <div className="rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--secondary)]">
+                  Review streak
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-[30px]">🔥</span>
+                  <span className="text-[38px] font-semibold tracking-[-0.05em]">
+                    {loaded ? currentStreak : "—"}
+                  </span>
+                  <span className="text-[12px] text-[var(--secondary)]">
+                    {currentStreak === 1 ? "day" : "days"}
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-full bg-[var(--accent-soft)] px-3 py-1.5 text-[10px] font-bold text-[var(--accent)]">
+                BEST {bestStreak}
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-7 gap-2">
+              {reviewWeek.map((day) => (
+                <div key={day.day} className="text-center">
+                  <div
+                    title={`${day.count} ${day.count === 1 ? "review" : "reviews"}`}
+                    className={[
+                      "mx-auto grid h-7 w-7 place-items-center rounded-[8px] border text-[9px] font-bold",
+                      day.count > 0
+                        ? "border-[var(--accent)] bg-[var(--accent)] text-white shadow-[0_5px_14px_rgba(59,92,255,0.28)]"
+                        : day.isToday
+                          ? "border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]"
+                          : "border-[var(--line)] text-[var(--tertiary)]",
+                    ].join(" ")}
+                  >
+                    {day.count > 0 ? day.count : "·"}
+                  </div>
+                  <div className="mt-1.5 text-[9px] font-semibold text-[var(--tertiary)]">
+                    {day.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         {view === "review" && (
@@ -420,7 +539,11 @@ export default function GrindbookPage() {
             ) : currentCard ? (
               <>
                 <div className="mb-4 flex items-center justify-between text-[12px] text-[var(--secondary)]">
-                  <span>Next position</span>
+                  <span>
+                    {reviewsToday >= dailyTarget
+                      ? "Bonus review"
+                      : `Daily set · ${reviewsToday + 1} of ${dailyTarget}`}
+                  </span>
                   <span>{dueCards.length} due</span>
                 </div>
                 <ReviewBoard
@@ -431,13 +554,16 @@ export default function GrindbookPage() {
               </>
             ) : cards.length > 0 ? (
               <div className="rounded-[22px] border border-[var(--line)] bg-[var(--surface)] px-6 py-20 text-center shadow-[var(--shadow-soft)]">
-                <div className="text-[42px]">✓</div>
+                <div className="text-[42px]">{reviewsToday > 0 ? "🔥" : "✓"}</div>
                 <h2 className="mt-4 text-[28px] font-semibold tracking-[-0.035em]">
-                  You’re caught up.
+                  {reviewsToday > 0
+                    ? "Daily grind complete."
+                    : "You’re caught up."}
                 </h2>
                 <p className="mt-2 text-[14px] text-[var(--secondary)]">
-                  Nothing else is due right now. Save useful positions as you
-                  train and play.
+                  {reviewsToday > 0
+                    ? `${reviewsToday} ${reviewsToday === 1 ? "position" : "positions"} reviewed today. Come back tomorrow to keep the streak alive.`
+                    : "Nothing else is due right now. Save useful positions as you train and play."}
                 </p>
                 <Link
                   href="/"

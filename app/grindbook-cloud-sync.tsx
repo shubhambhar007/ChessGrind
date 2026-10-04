@@ -14,6 +14,15 @@ import {
   saveGrindbook,
   type GrindbookCard,
 } from "@/lib/grindbook";
+import {
+  EMPTY_GRINDBOOK_PROGRESS,
+  GRINDBOOK_PROGRESS_KEY,
+  GRINDBOOK_PROGRESS_UPDATED_EVENT,
+  loadGrindbookProgress,
+  mergeGrindbookProgress,
+  saveGrindbookProgress,
+  type GrindbookProgress,
+} from "@/lib/grindbook-progress";
 
 function positionKey(card: GrindbookCard) {
   const position = card.fen.split(" ").slice(0, 4).join(" ");
@@ -48,7 +57,10 @@ export default function GrindbookCloudSync() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    async function pushCards(cards = loadGrindbook()) {
+    async function pushGrindbook(
+      cards = loadGrindbook(),
+      progress = loadGrindbookProgress()
+    ) {
       if (!userIdRef.current) return;
       notifyCloudStatus("syncing");
 
@@ -57,7 +69,7 @@ export default function GrindbookCloudSync() {
           method: "PUT",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cards }),
+          body: JSON.stringify({ cards, progress }),
         });
         if (!response.ok) throw new Error("Sync failed");
         notifyCloudStatus("synced");
@@ -86,7 +98,11 @@ export default function GrindbookCloudSync() {
           if (previousUser) {
             window.localStorage.removeItem(LAST_CLOUD_USER_KEY);
             window.localStorage.removeItem(GRINDBOOK_KEY);
+            window.localStorage.removeItem(GRINDBOOK_PROGRESS_KEY);
             window.dispatchEvent(new Event(GRINDBOOK_UPDATED_EVENT));
+            window.dispatchEvent(
+              new Event(GRINDBOOK_PROGRESS_UPDATED_EVENT)
+            );
           }
           notifyCloudStatus("guest");
           return;
@@ -100,22 +116,30 @@ export default function GrindbookCloudSync() {
 
         const payload = (await cloudResponse.json()) as {
           cards: GrindbookCard[];
+          progress: GrindbookProgress;
         };
         const previousUser = window.localStorage.getItem(LAST_CLOUD_USER_KEY);
         const localCards = loadGrindbook();
+        const localProgress = loadGrindbookProgress();
         const nextCards =
           previousUser === session.user.id
             ? payload.cards
             : mergeCards(localCards, payload.cards);
+        const cloudProgress = payload.progress ?? EMPTY_GRINDBOOK_PROGRESS;
+        const nextProgress =
+          previousUser === session.user.id
+            ? cloudProgress
+            : mergeGrindbookProgress(localProgress, cloudProgress);
 
         userIdRef.current = session.user.id;
         window.localStorage.setItem(LAST_CLOUD_USER_KEY, session.user.id);
         syncingRef.current = true;
         saveGrindbook(nextCards);
+        saveGrindbookProgress(nextProgress);
         syncingRef.current = false;
 
         if (previousUser !== session.user.id) {
-          await pushCards(nextCards);
+          await pushGrindbook(nextCards, nextProgress);
         } else {
           notifyCloudStatus("synced");
         }
@@ -127,17 +151,25 @@ export default function GrindbookCloudSync() {
     function handleLocalUpdate() {
       if (syncingRef.current || !userIdRef.current) return;
       if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => void pushCards(), 450);
+      timerRef.current = setTimeout(() => void pushGrindbook(), 450);
     }
 
     void syncFromCloud();
     window.addEventListener(AUTH_UPDATED_EVENT, syncFromCloud);
     window.addEventListener(GRINDBOOK_UPDATED_EVENT, handleLocalUpdate);
+    window.addEventListener(
+      GRINDBOOK_PROGRESS_UPDATED_EVENT,
+      handleLocalUpdate
+    );
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       window.removeEventListener(AUTH_UPDATED_EVENT, syncFromCloud);
       window.removeEventListener(GRINDBOOK_UPDATED_EVENT, handleLocalUpdate);
+      window.removeEventListener(
+        GRINDBOOK_PROGRESS_UPDATED_EVENT,
+        handleLocalUpdate
+      );
     };
   }, []);
 
