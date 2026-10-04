@@ -12,6 +12,7 @@ import PremiumSelect from "../premium-select";
 import AccountLink from "../account-link";
 import { addToGrindbook } from "@/lib/grindbook";
 import {
+  analyzeMove,
   cloneGameWithHistory,
   evaluateMaterial,
   pickAiMove,
@@ -38,11 +39,25 @@ type MoveRow = {
   black: string | null;
 };
 
+type CapturedMistake = {
+  moveNumber: number;
+  playedSan: string;
+  bestSan: string;
+  centipawnLoss: number;
+};
+
 const DEPTH_BY_DIFFICULTY: Record<Difficulty, number> = {
   easy: 1,
   medium: 2,
   hard: 3,
 };
+
+const GRINDBOOK_MISTAKE_THRESHOLD = 175;
+
+function formatMistakeCost(centipawnLoss: number) {
+  if (centipawnLoss >= 5_000) return "a decisive swing";
+  return `roughly ${(centipawnLoss / 100).toFixed(1)} pawns`;
+}
 
 function getChessColor(color: PlayColor) {
   return color === "white" ? "w" : "b";
@@ -137,6 +152,8 @@ export default function PlayPage() {
   >("moves");
   const [savedPosition, setSavedPosition] = useState(false);
   const [pgnCopied, setPgnCopied] = useState(false);
+  const [capturedMistake, setCapturedMistake] =
+    useState<CapturedMistake | null>(null);
   const moveListRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -219,6 +236,7 @@ export default function PlayPage() {
     setResignedColor(null);
     setActiveTab("moves");
     setSavedPosition(false);
+    setCapturedMistake(null);
 
     if (getChessColor(color) !== "w") {
       // AI plays white's opening move.
@@ -290,6 +308,59 @@ export default function PlayPage() {
     }
 
     if (!move) return false;
+
+    const moveAnalysis = analyzeMove(
+      game,
+      {
+        from: move.from,
+        to: move.to,
+        promotion:
+          move.promotion,
+      },
+      2
+    );
+
+    if (
+      moveAnalysis &&
+      moveAnalysis.centipawnLoss >=
+        GRINDBOOK_MISTAKE_THRESHOLD
+    ) {
+      const moveNumber =
+        Math.floor(
+          history.length / 2
+        ) + 1;
+      const bestUci = `${moveAnalysis.bestMove.from}${moveAnalysis.bestMove.to}${moveAnalysis.bestMove.promotion ?? ""}`;
+      const captured =
+        addToGrindbook({
+          fen: game.fen(),
+          orientation:
+            playerColor,
+          title: `Blunder replay · Move ${moveNumber}`,
+          prompt: `You played ${move.san}. Find the stronger move.`,
+          solutionUci:
+            bestUci,
+          explanation: `${moveAnalysis.bestMove.san} was stronger. Your move cost ${formatMistakeCost(moveAnalysis.centipawnLoss)} by the engine's estimate.`,
+          tags: [
+            "game mistake",
+            "auto captured",
+            difficulty,
+          ],
+          source: "game",
+        });
+
+      if (captured.added) {
+        setCapturedMistake({
+          moveNumber,
+          playedSan: move.san,
+          bestSan:
+            moveAnalysis
+              .bestMove.san,
+          centipawnLoss:
+            moveAnalysis
+              .centipawnLoss,
+        });
+      }
+    }
 
     setGame(gameCopy);
     setSavedPosition(false);
@@ -837,6 +908,42 @@ export default function PlayPage() {
                 Resign
               </button>
             </div>
+
+            {capturedMistake && (
+              <div className="appear relative mt-4 overflow-hidden rounded-[15px] border border-amber-500/30 bg-amber-500/[0.08] p-4 shadow-[var(--shadow-soft)]">
+                <div className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-amber-400 opacity-15 blur-2xl" />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setCapturedMistake(
+                      null
+                    )
+                  }
+                  aria-label="Dismiss mistake capture"
+                  className="control absolute right-3 top-3 grid h-7 w-7 place-items-center rounded-full text-[15px] text-[var(--secondary)] hover:bg-black/[0.05] hover:text-[var(--text)]"
+                >
+                  ×
+                </button>
+                <div className="relative pr-8">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.13em] text-amber-600">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
+                    Mistake captured
+                  </div>
+                  <div className="mt-2 text-[14px] font-semibold">
+                    Move {capturedMistake.moveNumber}: {capturedMistake.playedSan} → {capturedMistake.bestSan}
+                  </div>
+                  <p className="mt-1 text-[12px] leading-5 text-[var(--secondary)]">
+                    Your move cost {formatMistakeCost(capturedMistake.centipawnLoss)}. This position is now waiting in your Grindbook.
+                  </p>
+                  <Link
+                    href="/grindbook"
+                    className="control mt-3 inline-flex text-[11px] font-bold text-amber-600 hover:text-amber-500"
+                  >
+                    Review the position →
+                  </Link>
+                </div>
+              </div>
+            )}
 
             <GrindbookPromo compact className="mt-4" />
           </section>

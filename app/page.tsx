@@ -1847,6 +1847,13 @@ export default function Home() {
   ] = useState(false);
 
   const [
+    mistakeCaptureStatus,
+    setMistakeCaptureStatus,
+  ] = useState<
+    "added" | "existing" | null
+  >(null);
+
+  const [
     progress,
     setProgress,
   ] =
@@ -2409,6 +2416,7 @@ export default function Home() {
     setMoveLog([]);
     setHintLevel(0);
     setSavedToGrindbook(false);
+    setMistakeCaptureStatus(null);
 
     setLastMove(null);
     setWrongMove(null);
@@ -2762,6 +2770,38 @@ export default function Home() {
     ) {
       clearTimeout(
         wrongTimer.current
+      );
+    }
+
+    const expectedMove =
+      puzzle.moves[moveIndex];
+
+    if (expectedMove) {
+      const captured =
+        addToGrindbook({
+          fen: game.fen(),
+          orientation:
+            playerColor,
+          title: `Mistake replay · ${goal}`,
+          prompt: `You tried ${attemptedText}. Find the strongest move instead.`,
+          solutionUci:
+            expectedMove,
+          explanation:
+            getLesson(
+              puzzle.themes
+            ),
+          tags: [
+            ...puzzle.themes,
+            "auto captured",
+          ],
+          source: "puzzle",
+        });
+
+      setSavedToGrindbook(true);
+      setMistakeCaptureStatus(
+        captured.added
+          ? "added"
+          : "existing"
       );
     }
 
@@ -4396,6 +4436,7 @@ export default function Home() {
                     {wrongExplanation ??
                       "That move doesn't work. Try again."}
                   </p>
+
                 </div>
               ) : solved ? (
                 <div className="appear">
@@ -4466,6 +4507,33 @@ export default function Home() {
                 </div>
               )}
             </section>
+
+            {mistakeCaptureStatus && (
+              <div className="appear mt-4 flex items-center justify-between gap-4 rounded-[13px] border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 shadow-[var(--shadow-soft)]">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[var(--accent)] text-[14px] text-white shadow-[0_7px_18px_rgba(59,92,255,0.25)]">
+                    ↻
+                  </span>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-bold text-[var(--accent)]">
+                      {mistakeCaptureStatus ===
+                      "added"
+                        ? "Mistake captured automatically"
+                        : "Mistake already captured"}
+                    </div>
+                    <div className="mt-0.5 text-[10px] text-[var(--secondary)]">
+                      The correct continuation is waiting in your Grindbook.
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  href="/grindbook"
+                  className="control shrink-0 text-[10px] font-bold text-[var(--accent)]"
+                >
+                  Review →
+                </Link>
+              </div>
+            )}
 
             <section className="mt-6 rounded-[16px] border border-[var(--line)] bg-[var(--surface)] p-5">
               <div className="mb-3 text-[13px] font-semibold">

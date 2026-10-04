@@ -6,6 +6,12 @@ export type AppliedMove = {
   promotion?: string;
 };
 
+export type MoveAnalysis = {
+  bestMove: Move;
+  playedMove: Move;
+  centipawnLoss: number;
+};
+
 const PIECE_VALUES: Record<string, number> = {
   p: 100,
   n: 320,
@@ -320,4 +326,64 @@ export function pickAiMove(
   }
 
   return bestMove;
+}
+
+export function analyzeMove(
+  game: Chess,
+  played: AppliedMove,
+  depth = 2
+): MoveAnalysis | null {
+  const playerIsWhite = game.turn() === "w";
+  const moves = orderedMoves(game);
+  if (moves.length === 0) return null;
+
+  let bestMove = moves[0];
+  let bestScore = playerIsWhite ? -Infinity : Infinity;
+  let playedMove: Move | null = null;
+  let playedScore: number | null = null;
+
+  for (const move of moves) {
+    game.move(move);
+    const score = minimax(
+      game,
+      Math.max(0, depth - 1),
+      -Infinity,
+      Infinity,
+      !playerIsWhite
+    );
+    game.undo();
+
+    const isPlayedMove =
+      move.from === played.from &&
+      move.to === played.to &&
+      (move.promotion ?? "") === (played.promotion ?? "");
+
+    if (isPlayedMove) {
+      playedMove = move;
+      playedScore = score;
+    }
+
+    if (
+      (playerIsWhite && score > bestScore) ||
+      (!playerIsWhite && score < bestScore)
+    ) {
+      bestScore = score;
+      bestMove = move;
+    }
+  }
+
+  if (!playedMove || playedScore === null) return null;
+
+  return {
+    bestMove,
+    playedMove,
+    centipawnLoss: Math.max(
+      0,
+      Math.round(
+        playerIsWhite
+          ? bestScore - playedScore
+          : playedScore - bestScore
+      )
+    ),
+  };
 }
