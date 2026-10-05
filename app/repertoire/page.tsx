@@ -9,6 +9,7 @@ import CloudStatusBadge from "../cloud-status";
 import { premiumPieces } from "../premium-pieces";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
+import CelebrationBurst from "../celebration-burst";
 import {
   createRepertoire,
   loadRepertoires,
@@ -38,6 +39,7 @@ export default function RepertoirePage() {
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [celebrationEvent, setCelebrationEvent] = useState(0);
 
   useEffect(() => {
     const stored = loadRepertoires();
@@ -138,13 +140,14 @@ export default function RepertoirePage() {
     const choices = variationsFrom(selected, currentFen);
 
     if (choices.length === 0) {
-      queueMicrotask(() =>
-        setMessage(
-          history.length > 0
-            ? "Line complete — clean work."
-            : "Build at least one line before practicing."
-        )
-      );
+      queueMicrotask(() => {
+        if (history.length > 0) {
+          setMessage("Line complete — clean work.");
+          setCelebrationEvent((event) => event + 1);
+        } else {
+          setMessage("Build at least one line before practicing.");
+        }
+      });
       return;
     }
     if (isOwnerTurn) {
@@ -211,6 +214,11 @@ export default function RepertoirePage() {
 
   return (
     <main className="min-h-screen">
+      <CelebrationBurst
+        eventId={celebrationEvent}
+        title="Line conquered."
+        detail="You recalled the full continuation without leaving your repertoire."
+      />
       <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1180px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
@@ -237,7 +245,7 @@ export default function RepertoirePage() {
             </div>
             <h1 className="mt-2 text-[38px] font-semibold tracking-[-0.05em]">Repertoire Lab</h1>
             <p className="mt-2 max-w-[640px] text-[15px] leading-6 text-[var(--secondary)]">
-              Build the openings you actually want to play, branch by branch. Then let ChessGrind test your moves from either side.
+              Stop guessing in the opening. Save your chosen responses once, then drill them until the moves become automatic.
             </p>
             <div className="mt-4"><CloudStatusBadge /></div>
           </div>
@@ -265,6 +273,13 @@ export default function RepertoirePage() {
             <p className="relative mx-auto mt-2 max-w-[500px] text-[14px] leading-6 text-[var(--secondary)]">
               Pick a side, play the moves on the board, and create as many opponent branches as you need.
             </p>
+            <div className="relative mx-auto mt-6 grid max-w-[620px] gap-2 sm:grid-cols-3">
+              {["Choose your responses", "Remember every branch", "Reach middlegames prepared"].map((benefit, index) => (
+                <div key={benefit} className="rounded-[12px] border border-[var(--line)] bg-black/[0.025] px-3 py-3 text-[11px] font-semibold">
+                  <span className="mr-2 font-mono text-[var(--accent)]">0{index + 1}</span>{benefit}
+                </div>
+              ))}
+            </div>
             <div className="relative mt-7 flex flex-wrap justify-center gap-3">
               <button type="button" onClick={() => addRepertoire("white")} className="control rounded-[12px] bg-[var(--button)] px-6 py-3 text-[13px] font-semibold text-[var(--button-text)]">♙ Build for White</button>
               <button type="button" onClick={() => addRepertoire("black")} className="control rounded-[12px] border border-[var(--line-strong)] px-6 py-3 text-[13px] font-semibold">♟ Build for Black</button>

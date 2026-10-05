@@ -8,6 +8,7 @@ import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import AccountLink from "../account-link";
 import CloudStatusBadge from "../cloud-status";
+import CelebrationBurst from "../celebration-burst";
 import { premiumPieces } from "../premium-pieces";
 import {
   formatDue,
@@ -318,6 +319,7 @@ export default function GrindbookPage() {
     useState<GrindbookProgress>(EMPTY_GRINDBOOK_PROGRESS);
   const [loaded, setLoaded] = useState(false);
   const [view, setView] = useState<View>("review");
+  const [celebrationEvent, setCelebrationEvent] = useState(0);
 
   useEffect(() => {
     const storedCards = loadGrindbook();
@@ -357,8 +359,10 @@ export default function GrindbookPage() {
 
   function rateCurrent(rating: GrindbookRating) {
     if (!currentCard) return;
+    const clearsQueue = dueCards.length === 1;
     setCards(reviewGrindbookCard(currentCard.id, rating));
     setReviewProgress(recordGrindbookReview());
+    if (clearsQueue) setCelebrationEvent((event) => event + 1);
   }
 
   function removeCard(id: string) {
@@ -367,6 +371,11 @@ export default function GrindbookPage() {
 
   return (
     <main className="min-h-screen">
+      <CelebrationBurst
+        eventId={celebrationEvent}
+        title="Daily queue cleared."
+        detail="You showed up, reviewed every due position, and protected your streak."
+      />
       <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
