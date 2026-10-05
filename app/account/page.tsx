@@ -19,6 +19,11 @@ import {
   GRINDBOOK_PROGRESS_KEY,
   saveGrindbookProgress,
 } from "@/lib/grindbook-progress";
+import {
+  LAST_REPERTOIRE_CLOUD_USER_KEY,
+  REPERTOIRE_KEY,
+  saveRepertoires,
+} from "@/lib/repertoire";
 
 type Mode = "signup" | "login";
 
@@ -101,6 +106,9 @@ export default function AccountPage() {
       window.localStorage.removeItem(GRINDBOOK_PROGRESS_KEY);
       saveGrindbook([]);
       saveGrindbookProgress(EMPTY_GRINDBOOK_PROGRESS);
+      window.localStorage.removeItem(LAST_REPERTOIRE_CLOUD_USER_KEY);
+      window.localStorage.removeItem(REPERTOIRE_KEY);
+      saveRepertoires([]);
       setUser(null);
       setMode("login");
       notifyAuthUpdated();
@@ -122,6 +130,12 @@ export default function AccountPage() {
             </div>
           </Link>
           <div className="flex items-center gap-4">
+            <Link
+              href="/repertoire"
+              className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Repertoire
+            </Link>
             <Link
               href="/grindbook"
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
@@ -194,7 +208,7 @@ export default function AccountPage() {
                   <div>
                     <div className="text-[12px] font-semibold">Cloud sync active</div>
                     <div className="mt-0.5 text-[11px] text-[var(--secondary)]">
-                      Your Grindbook is protected.
+                      Your Grindbook and repertoires are protected.
                     </div>
                   </div>
                 </div>
@@ -203,6 +217,12 @@ export default function AccountPage() {
                   className="control mt-8 flex h-12 items-center justify-center rounded-[12px] bg-[var(--button)] text-[13px] font-semibold text-[var(--button-text)]"
                 >
                   Open my Grindbook
+                </Link>
+                <Link
+                  href="/repertoire"
+                  className="control mt-3 flex h-11 items-center justify-center rounded-[11px] border border-[var(--line)] text-[12px] font-semibold"
+                >
+                  Open Repertoire Lab
                 </Link>
                 <button
                   type="button"

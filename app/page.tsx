@@ -3731,6 +3731,12 @@ export default function Home() {
               >
                 Grindbook
               </Link>
+              <Link
+                href="/repertoire"
+                className="text-[12px] font-semibold text-[var(--secondary)]"
+              >
+                Repertoire
+              </Link>
 
               <Link
                 href="/insights"
@@ -3919,6 +3925,12 @@ export default function Home() {
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
             >
               Grindbook
+            </Link>
+            <Link
+              href="/repertoire"
+              className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Repertoire
             </Link>
 
             <Link

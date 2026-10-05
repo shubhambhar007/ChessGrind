@@ -648,6 +648,12 @@ export default function PlayPage() {
               Grindbook
             </Link>
             <Link
+              href="/repertoire"
+              className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Repertoire
+            </Link>
+            <Link
               href="/"
               className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
             >

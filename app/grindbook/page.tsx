@@ -382,6 +382,7 @@ export default function GrindbookPage() {
             <VisitorCounter />
             <Link href="/">Puzzles</Link>
             <Link href="/play">Play</Link>
+            <Link href="/repertoire">Repertoire</Link>
             <Link href="/insights">Insights</Link>
             <AccountLink />
             <ThemeToggle />

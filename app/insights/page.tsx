@@ -557,6 +557,12 @@ export default function InsightsPage() {
             >
               Grindbook
             </Link>
+            <Link
+              href="/repertoire"
+              className="control text-[13px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Repertoire
+            </Link>
 
             <Link
               href="/"
