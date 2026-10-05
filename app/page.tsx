@@ -17,6 +17,7 @@ import VisitorCounter from "./visitor-counter";
 import AccountLink from "./account-link";
 import { premiumPieces } from "./premium-pieces";
 import GrindbookPromo from "./grindbook-promo";
+import CelebrationBurst from "./celebration-burst";
 import {
   puzzles,
   type PuzzleDifficulty,
@@ -1735,6 +1736,16 @@ export default function Home() {
   ] = useState(false);
 
   const [
+    puzzleCelebrationEvent,
+    setPuzzleCelebrationEvent,
+  ] = useState(0);
+
+  const [
+    sessionCelebrationEvent,
+    setSessionCelebrationEvent,
+  ] = useState(0);
+
+  const [
     adaptiveTraining,
     setAdaptiveTraining,
   ] = useState(true);
@@ -2582,6 +2593,9 @@ export default function Home() {
           setSessionComplete(
             true
           );
+          setSessionCelebrationEvent(
+            (event) => event + 1
+          );
         }
 
         return next;
@@ -3004,6 +3018,10 @@ export default function Home() {
 
     setCorrectExplanation(
       explanation ?? null
+    );
+
+    setPuzzleCelebrationEvent(
+      (event) => event + 1
     );
 
     recordPuzzleSolved();
@@ -3710,6 +3728,11 @@ export default function Home() {
   ) {
     return (
       <main className="min-h-screen">
+        <CelebrationBurst
+          eventId={sessionCelebrationEvent}
+          title="Ten puzzles conquered."
+          detail={`Session complete with ${sessionStats.solved} solved. Your next grind is already waiting.`}
+        />
         <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
           <div className="mx-auto flex h-[56px] max-w-[920px] items-center justify-between px-6">
             <div className="flex items-center gap-2.5">
@@ -3905,6 +3928,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <CelebrationBurst
+        eventId={puzzleCelebrationEvent}
+        title="Nice solve!"
+        detail={
+          puzzleWrongMoves === 0 && puzzleHintsUsed === 0
+            ? "Clean. No mistakes, no hints."
+            : "Position converted. Keep the momentum."
+        }
+        variant="mini"
+      />
       <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <div className="flex items-center gap-2.5">
