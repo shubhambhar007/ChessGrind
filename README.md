@@ -131,7 +131,8 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Adaptive puzzle training |
+| `/` | Cinematic product landing page |
+| `/train` | Adaptive puzzle training |
 | `/play` | Full games against the computer |
 | `/grindbook` | Daily spaced review and saved-position library |
 | `/repertoire` | Visual repertoire builder and memory drills |

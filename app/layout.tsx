@@ -30,7 +30,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "ChessGrind",
   description:
-    "Free chess tactics training with adaptive puzzles, hints, sessions, and progress tracking.",
+    "ChessGrind remembers your mistakes and turns them into adaptive puzzles, spaced reviews, opening drills, and personal insights.",
 };
 
 export default function RootLayout({

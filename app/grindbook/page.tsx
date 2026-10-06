@@ -389,7 +389,7 @@ export default function GrindbookPage() {
 
           <nav className="flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
             <VisitorCounter />
-            <Link href="/">Puzzles</Link>
+            <Link href="/train">Puzzles</Link>
             <Link href="/play">Play</Link>
             <Link href="/repertoire">Repertoire</Link>
             <Link href="/insights">Insights</Link>
@@ -576,7 +576,7 @@ export default function GrindbookPage() {
                     : "Nothing else is due right now. Save useful positions as you train and play."}
                 </p>
                 <Link
-                  href="/"
+                  href="/train"
                   className="control mt-6 inline-flex rounded-[11px] bg-[var(--button)] px-6 py-3 text-[13px] font-semibold text-[var(--button-text)]"
                 >
                   Train puzzles
@@ -594,7 +594,7 @@ export default function GrindbookPage() {
                 </p>
                 <div className="mt-6 flex justify-center gap-3">
                   <Link
-                    href="/"
+                    href="/train"
                     className="control rounded-[11px] bg-[var(--button)] px-6 py-3 text-[13px] font-semibold text-[var(--button-text)]"
                   >
                     Find a puzzle

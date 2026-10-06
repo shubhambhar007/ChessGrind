@@ -565,7 +565,7 @@ export default function InsightsPage() {
             </Link>
 
             <Link
-              href="/"
+              href="/train"
               className="control text-[13px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
             >
               Back to puzzles
@@ -984,7 +984,7 @@ export default function InsightsPage() {
             </div>
 
             <Link
-              href="/"
+              href="/train"
               className="control inline-flex min-h-[44px] items-center justify-center rounded-[11px] bg-[var(--button)] px-6 text-[14px] font-semibold text-[var(--button-text)]"
             >
               Continue training

@@ -654,7 +654,7 @@ export default function PlayPage() {
               Repertoire
             </Link>
             <Link
-              href="/"
+              href="/train"
               className="control text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
             >
               Back to puzzles

@@ -227,7 +227,7 @@ export default function RepertoirePage() {
           </Link>
           <nav className="flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
             <VisitorCounter />
-            <Link href="/">Puzzles</Link>
+            <Link href="/train">Puzzles</Link>
             <Link href="/play">Play</Link>
             <Link href="/grindbook">Grindbook</Link>
             <AccountLink />
