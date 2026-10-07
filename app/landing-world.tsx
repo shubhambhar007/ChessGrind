@@ -25,7 +25,7 @@ const SCENES: Scene[] = [
     eyebrow: "Adaptive puzzle training",
     title: "See the move. Feel the pattern.",
     body: "Train on curated tactics with legal-move guidance, progressive hints, and smart selection that leans into your weak spots.",
-    tags: ["120 positions", "Smart Training", "Blue move guides"],
+    tags: ["200 original positions", "Smart Training", "Blue move guides"],
   },
   {
     number: "02",

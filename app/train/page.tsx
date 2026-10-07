@@ -345,15 +345,7 @@ function buildPuzzlePosition(
   const puzzle =
     puzzles[puzzleIndex];
 
-  const game =
-    new Chess(puzzle.fen);
-
-  applyUciMove(
-    game,
-    puzzle.moves[0]
-  );
-
-  return game;
+  return new Chess(puzzle.fen);
 }
 
 function getPlayerChessColor(
@@ -1082,11 +1074,6 @@ function puzzleMatchesColor(
     puzzle.fen
   );
 
-  applyUciMove(
-    game,
-    puzzle.moves[0]
-  );
-
   return (
     game.turn() ===
     (colorPreference === "white"
@@ -1753,7 +1740,7 @@ export default function Home() {
   const [
     moveIndex,
     setMoveIndex,
-  ] = useState(1);
+  ] = useState(0);
 
   const [
     game,
@@ -2398,7 +2385,7 @@ export default function Home() {
       orientation: playerColor,
       title: `${goal} · Puzzle ${puzzle.id}`,
       prompt: "Find the strongest move in this position.",
-      solutionUci: puzzle.moves[1],
+      solutionUci: puzzle.moves[0],
       explanation: getLesson(puzzle.themes),
       tags: puzzle.themes,
       source: "puzzle",
@@ -2422,7 +2409,7 @@ export default function Home() {
     setPuzzleIndex(index);
     setGame(newGame);
 
-    setMoveIndex(1);
+    setMoveIndex(0);
     setSolved(false);
     setMoveLog([]);
     setHintLevel(0);
@@ -2745,7 +2732,7 @@ export default function Home() {
       );
 
     setGame(restarted);
-    setMoveIndex(1);
+    setMoveIndex(0);
     setSolved(false);
     setMoveLog([]);
     setHintLevel(0);
@@ -4780,7 +4767,7 @@ export default function Home() {
               {formatTheme(
                 puzzle.difficulty
               )}{" "}
-              · Lichess{" "}
+              · {puzzle.source}{" "}
               {puzzle.id}
             </div>
           </aside>

@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "puzzles:generate": "node scripts/generate-original-puzzles.mjs",
+    "puzzles:validate": "node scripts/validate-puzzles.mjs"
   },
   "dependencies": {
     "@upstash/redis": "^1.38.4",

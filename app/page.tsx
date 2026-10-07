@@ -34,8 +34,8 @@ export default function LandingPage() {
 
       <section className="cg-landing-proof" aria-label="ChessGrind highlights">
         <div>
-          <strong>120</strong>
-          <span>curated positions</span>
+          <strong>200</strong>
+          <span>original positions</span>
         </div>
         <div>
           <strong>5</strong>

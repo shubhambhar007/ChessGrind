@@ -22,13 +22,13 @@ Grindbook schedules those positions for review
 You recall the move until the pattern becomes automatic
 ```
 
-No Lichess or Chess.com connection is required. Guests can train locally, while an optional first-party ChessGrind account adds private cross-device sync.
+No external chess-service connection is required. Guests can train locally, while an optional first-party ChessGrind account adds private cross-device sync.
 
 ## Features
 
 ### Adaptive puzzle training
 
-- 120 curated tactical positions with ratings and tactical themes
+- 200 ChessGrind Original positions with ratings and tactical themes
 - Endless, guided **Learn**, and focused **10 Puzzle Session** modes
 - Easy, medium, hard, and mixed difficulty filters
 - Train as White, Black, or either side
@@ -166,6 +166,8 @@ npm run dev      # Start the development server
 npm run build    # Create a production build
 npm run start    # Run the production build
 npm run lint     # Run ESLint
+npm run puzzles:validate # Audit all puzzle positions and solution lines
+npm run puzzles:generate # Rebuild the deterministic original library
 ```
 
 ## Enable cloud accounts and persistent visitor statistics
