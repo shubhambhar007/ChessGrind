@@ -1,78 +1,80 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ece9e1;
-  --surface: #f8f6ef;
-  --surface-raised: #fffdf7;
-  --header: #e4e0d6;
-  --button: #252b29;
-  --button-text: #fffdf7;
+  --background: #f1f4f8;
+  --surface: #ffffff;
+  --surface-raised: #f8faff;
+  --header: #ffffff;
+  --button: #182235;
+  --button-text: #ffffff;
 
-  --text: #252522;
-  --secondary: #65645d;
-  --tertiary: #8b887e;
+  --text: #182033;
+  --secondary: #657086;
+  --tertiary: #909aab;
 
-  --line: rgba(56, 51, 42, 0.14);
-  --line-strong: rgba(56, 51, 42, 0.26);
+  --line: rgba(34, 50, 77, 0.1);
+  --line-strong: rgba(34, 50, 77, 0.18);
 
-  --accent: #315a73;
-  --accent-soft: rgba(49, 90, 115, 0.09);
-  --accent-soft-strong: rgba(49, 90, 115, 0.17);
-  --brass: #8d6927;
-  --oxblood: #8d3d37;
+  --accent: #4568e8;
+  --accent-soft: rgba(69, 104, 232, 0.09);
+  --accent-soft-strong: rgba(69, 104, 232, 0.17);
+  --brass: #b17d1d;
+  --oxblood: #9d4542;
 
-  --success: #477252;
+  --success: #368255;
 
   --danger: #d92d20;
   --danger-soft: rgba(217, 45, 32, 0.1);
   --danger-strong: rgba(217, 45, 32, 0.22);
 
-  --board-light: #e9e4d7;
-  --board-dark: #73786d;
+  --board-light: #edf1f7;
+  --board-dark: #7a879a;
 
   --shadow-board:
     0 1px 2px rgba(0, 0, 0, 0.05),
     0 18px 44px rgba(0, 0, 0, 0.09);
 
-  --shadow-soft: 0 1px 0 rgba(255, 255, 255, 0.55);
+  --shadow-soft:
+    0 1px 2px rgba(25, 37, 58, 0.05),
+    0 16px 38px rgba(25, 37, 58, 0.07);
   --font-ui: "Avenir Next", Avenir, "Segoe UI", Helvetica, Arial, sans-serif;
   --font-editorial: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-score: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 :root[data-theme="dark"] {
-  --background: #161816;
-  --surface: #20221f;
-  --surface-raised: #292b27;
-  --header: #121411;
+  --background: #090d14;
+  --surface: #121925;
+  --surface-raised: #182233;
+  --header: #0d121b;
 
-  --text: #ebe7dc;
-  --secondary: #aaa69b;
-  --tertiary: #7f7c73;
+  --text: #f3f6fc;
+  --secondary: #9ca8bc;
+  --tertiary: #667389;
 
-  --line: rgba(235, 231, 220, 0.11);
-  --line-strong: rgba(235, 231, 220, 0.21);
+  --line: rgba(191, 207, 235, 0.09);
+  --line-strong: rgba(191, 207, 235, 0.17);
 
-  --accent: #7fa6ba;
-  --accent-soft: rgba(127, 166, 186, 0.12);
-  --accent-soft-strong: rgba(127, 166, 186, 0.2);
-  --brass: #c8a458;
-  --oxblood: #bd6c63;
+  --accent: #7795ff;
+  --accent-soft: rgba(119, 149, 255, 0.12);
+  --accent-soft-strong: rgba(119, 149, 255, 0.21);
+  --brass: #e0b85e;
+  --oxblood: #d67670;
 
-  --success: #78a982;
+  --success: #6fce91;
   --danger: #d8786f;
   --danger-soft: rgba(216, 120, 111, 0.13);
   --danger-strong: rgba(216, 120, 111, 0.25);
 
-  --button: #d8c391;
-  --button-text: #1b1b17;
+  --button: #f0cc79;
+  --button-text: #18140b;
 
   --shadow-board:
     0 1px 2px rgba(0, 0, 0, 0.28),
     0 18px 44px rgba(0, 0, 0, 0.3);
   --shadow-soft:
-    0 1px 2px rgba(0, 0, 0, 0.22),
-    0 8px 24px rgba(0, 0, 0, 0.18);
+    0 1px 2px rgba(0, 0, 0, 0.28),
+    0 18px 46px rgba(0, 0, 0, 0.24);
 }
 
 * {
@@ -143,32 +145,44 @@ button:focus-visible {
   transform: translateY(1px);
 }
 
-/* PRODUCT INTERIOR — grounded in chess scoresheets and club ledgers. */
+/* PRODUCT INTERIOR — a focused chess broadcast studio. */
 .cg-app-shell {
   position: relative;
   isolation: isolate;
-  background-color: var(--background);
-  background-image: repeating-linear-gradient(
-    0deg,
-    transparent 0,
-    transparent 31px,
-    color-mix(in srgb, var(--line) 42%, transparent) 32px
-  );
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% -10%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 32rem),
+    radial-gradient(circle at -8% 72%, color-mix(in srgb, var(--brass) 8%, transparent), transparent 28rem),
+    var(--background);
+}
+
+.cg-app-shell::before {
+  position: absolute;
+  z-index: -1;
+  top: 118px;
+  right: -180px;
+  width: 420px;
+  height: 420px;
+  border: 1px solid color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: 50%;
+  content: "";
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .cg-app-shell > header {
   position: relative;
   z-index: 40;
   background: var(--header);
-  box-shadow: inset 0 -1px var(--line-strong);
+  box-shadow: inset 0 -1px var(--line-strong), 0 8px 30px rgba(0, 0, 0, 0.07);
 }
 
 .cg-app-shell > header::after {
   position: absolute;
   bottom: -1px;
   left: max(18px, calc((100% - 1240px) / 2));
-  width: 72px;
-  height: 2px;
+  width: 92px;
+  height: 3px;
   content: "";
   background: var(--brass);
 }
@@ -176,9 +190,9 @@ button:focus-visible {
 .cg-app-shell h1,
 .cg-app-shell h2,
 .cg-app-shell h3 {
-  font-family: var(--font-editorial);
-  font-weight: 600;
-  letter-spacing: -0.025em !important;
+  font-family: var(--font-ui);
+  font-weight: 680;
+  letter-spacing: -0.045em !important;
 }
 
 .cg-app-shell h1 {
@@ -195,19 +209,34 @@ button:focus-visible {
 }
 
 .cg-app-shell :where(section, aside)[class*="rounded-"] {
-  border-radius: 4px !important;
+  border-radius: 16px !important;
 }
 
 .cg-app-shell :where(button, a, input, select)[class*="rounded-"] {
-  border-radius: 3px !important;
+  border-radius: 9px !important;
 }
 
 .cg-app-shell div[class*="bg-[var(--surface)]"][class*="rounded-"] {
-  border-radius: 4px !important;
+  border-radius: 14px !important;
 }
 
 .cg-app-shell :where(section, aside)[class*="shadow-"] {
-  box-shadow: 3px 3px 0 color-mix(in srgb, var(--line-strong) 56%, transparent) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+
+.cg-app-shell :where(section, aside)[class*="bg-[var(--surface)]"] {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface-raised) 72%, var(--surface)), var(--surface));
+  box-shadow: inset 0 1px color-mix(in srgb, white 7%, transparent), var(--shadow-soft);
+}
+
+.cg-app-shell .control:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line-strong));
+}
+
+.cg-app-shell .control:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
 }
 
 .cg-app-shell nav a,

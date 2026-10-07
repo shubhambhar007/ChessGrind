@@ -723,7 +723,7 @@ export default function PlayPage() {
             <button
               type="button"
               onClick={() => newGame()}
-              className="control min-h-[62px] rounded-[14px] border border-[var(--line-strong)] bg-[var(--surface)] px-5 py-2 text-[14px] font-semibold shadow-[var(--shadow-soft)]"
+              className="control min-h-[62px] rounded-[14px] border border-[var(--button)] bg-[var(--button)] px-6 py-2 text-[14px] font-semibold text-[var(--button-text)] shadow-[0_14px_32px_color-mix(in_srgb,var(--brass)_18%,transparent)]"
             >
               New Game
             </button>

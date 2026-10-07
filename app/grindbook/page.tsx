@@ -426,7 +426,7 @@ export default function GrindbookPage() {
                 className={[
                   "control rounded-[9px] px-5 py-2 text-[12px] font-semibold capitalize",
                   view === item
-                    ? "bg-[var(--surface)] text-[var(--text)] shadow-sm"
+                    ? "bg-[var(--accent-soft-strong)] text-[var(--text)] shadow-sm"
                     : "text-[var(--secondary)]",
                 ].join(" ")}
               >
