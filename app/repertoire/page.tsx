@@ -213,17 +213,17 @@ export default function RepertoirePage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="cg-app-shell min-h-screen">
       <CelebrationBurst
         eventId={celebrationEvent}
         title="Line conquered."
         detail="You recalled the full continuation without leaving your repertoire."
       />
-      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1180px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="grid h-8 w-8 place-items-center rounded-[9px] bg-[var(--button)] text-[var(--button-text)]">♞</div>
-            <div className="text-[16px] font-semibold tracking-[-0.025em]">ChessGrind</div>
+            <div className="grid h-8 w-8 place-items-center rounded-[9px] bg-[var(--button)] font-mono text-[9px] tracking-tight text-[var(--button-text)]">CG</div>
+            <div className="text-[16px] font-semibold">ChessGrind</div>
           </Link>
           <nav className="flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
             <VisitorCounter />
@@ -239,11 +239,11 @@ export default function RepertoirePage() {
       <div className="mx-auto max-w-[1180px] px-6 pb-20 pt-9">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--accent)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]" />
-              Pro lab · Preview
+            <div className="flex items-center gap-2 text-[10px] font-bold text-[var(--accent)]">
+              <span className="h-1.5 w-6 bg-[var(--brass)]" />
+              Pro lab / Preview
             </div>
-            <h1 className="mt-2 text-[38px] font-semibold tracking-[-0.05em]">Repertoire Lab</h1>
+            <h1 className="mt-2 text-[38px] font-semibold">Repertoire Lab</h1>
             <p className="mt-2 max-w-[640px] text-[15px] leading-6 text-[var(--secondary)]">
               Stop guessing in the opening. Save your chosen responses once, then drill them until the moves become automatic.
             </p>
@@ -267,28 +267,27 @@ export default function RepertoirePage() {
           <div className="py-28 text-center text-[var(--secondary)]">Loading your repertoire…</div>
         ) : repertoires.length === 0 ? (
           <section className="relative mt-10 overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--surface)] px-6 py-20 text-center shadow-[var(--shadow-soft)]">
-            <div className="pointer-events-none absolute left-1/2 top-0 h-52 w-96 -translate-x-1/2 rounded-full bg-[var(--accent)] opacity-[0.09] blur-3xl" />
-            <div className="relative text-[48px]">♜</div>
-            <h2 className="relative mt-4 text-[30px] font-semibold tracking-[-0.04em]">Build your first weapon.</h2>
+            <div className="relative text-[11px] font-semibold text-[var(--brass)]">New repertoire file</div>
+            <h2 className="relative mt-4 text-[30px] font-semibold">Build your first weapon.</h2>
             <p className="relative mx-auto mt-2 max-w-[500px] text-[14px] leading-6 text-[var(--secondary)]">
               Pick a side, play the moves on the board, and create as many opponent branches as you need.
             </p>
             <div className="relative mx-auto mt-6 grid max-w-[620px] gap-2 sm:grid-cols-3">
-              {["Choose your responses", "Remember every branch", "Reach middlegames prepared"].map((benefit, index) => (
+              {["Choose your responses", "Remember every branch", "Reach middlegames prepared"].map((benefit) => (
                 <div key={benefit} className="rounded-[12px] border border-[var(--line)] bg-black/[0.025] px-3 py-3 text-[11px] font-semibold">
-                  <span className="mr-2 font-mono text-[var(--accent)]">0{index + 1}</span>{benefit}
+                  {benefit}
                 </div>
               ))}
             </div>
             <div className="relative mt-7 flex flex-wrap justify-center gap-3">
-              <button type="button" onClick={() => addRepertoire("white")} className="control rounded-[12px] bg-[var(--button)] px-6 py-3 text-[13px] font-semibold text-[var(--button-text)]">♙ Build for White</button>
-              <button type="button" onClick={() => addRepertoire("black")} className="control rounded-[12px] border border-[var(--line-strong)] px-6 py-3 text-[13px] font-semibold">♟ Build for Black</button>
+              <button type="button" onClick={() => addRepertoire("white")} className="control rounded-[12px] bg-[var(--button)] px-6 py-3 text-[13px] font-semibold text-[var(--button-text)]">Build for White</button>
+              <button type="button" onClick={() => addRepertoire("black")} className="control rounded-[12px] border border-[var(--line-strong)] px-6 py-3 text-[13px] font-semibold">Build for Black</button>
             </div>
           </section>
         ) : selected ? (
           <div className="mt-9 grid gap-5 lg:grid-cols-[220px_minmax(0,560px)_1fr] lg:items-start">
             <aside className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-3 shadow-[var(--shadow-soft)]">
-              <div className="px-2 pb-3 pt-1 text-[10px] font-bold uppercase tracking-[0.13em] text-[var(--tertiary)]">Your repertoires</div>
+              <div className="px-2 pb-3 pt-1 text-[10px] font-bold text-[var(--tertiary)]">Your repertoires</div>
               <div className="grid gap-1.5">
                 {repertoires.map((item) => (
                   <button key={item.id} type="button" onClick={() => chooseRepertoire(item.id)} className={`control rounded-[11px] p-3 text-left ${item.id === selected.id ? "bg-[var(--accent-soft)] text-[var(--accent)]" : "hover:bg-black/[0.035]"}`}>
@@ -336,16 +335,16 @@ export default function RepertoirePage() {
             <aside className="rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[var(--shadow-soft)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--accent)]">{mode === "build" ? "Line builder" : "Memory drill"}</div>
+                  <div className="text-[10px] font-bold text-[var(--accent)]">{mode === "build" ? "Line builder" : "Memory drill"}</div>
                   <input
                     key={selected.id}
                     defaultValue={selected.name}
                     onBlur={(event) => setRepertoires(renameRepertoire(repertoires, selected.id, event.target.value))}
-                    className="mt-2 w-full bg-transparent text-[22px] font-semibold tracking-[-0.035em] outline-none"
+                    className="mt-2 w-full bg-transparent text-[22px] font-semibold outline-none"
                     aria-label="Repertoire name"
                   />
                 </div>
-                <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-bold uppercase text-[var(--accent)]">{selected.color}</span>
+                <span className="rounded-full bg-[var(--accent-soft)] px-3 py-1 text-[10px] font-bold text-[var(--accent)]">{selected.color}</span>
               </div>
 
               <div className="mt-5 grid grid-cols-3 gap-2">
@@ -355,21 +354,21 @@ export default function RepertoirePage() {
                   ["Branches", variations.length],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-[11px] bg-black/[0.035] p-3">
-                    <div className="text-[9px] font-bold uppercase tracking-[0.09em] text-[var(--tertiary)]">{label}</div>
+                    <div className="text-[9px] font-bold text-[var(--tertiary)]">{label}</div>
                     <div className="mt-1 text-[18px] font-semibold">{value}</div>
                   </div>
                 ))}
               </div>
 
               <div className="mt-5 rounded-[13px] border border-[var(--line)] bg-black/[0.025] p-4">
-                <div className="text-[10px] font-bold uppercase tracking-[0.11em] text-[var(--tertiary)]">Current line</div>
+                <div className="text-[10px] font-bold text-[var(--tertiary)]">Current line</div>
                 <div className="mt-2 min-h-6 font-mono text-[12px] leading-6">
                   {history.length ? history.map((step) => step.san).join("  ") : "Starting position"}
                 </div>
               </div>
 
               <div className="mt-5">
-                <div className="text-[10px] font-bold uppercase tracking-[0.11em] text-[var(--tertiary)]">Saved continuations</div>
+                <div className="text-[10px] font-bold text-[var(--tertiary)]">Saved continuations</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {variations.length ? variations.map((move) => (
                     <button key={move.id} type="button" onClick={() => followVariation(move)} className="control rounded-[9px] border border-[var(--line-strong)] bg-[var(--surface)] px-3 py-2 font-mono text-[12px] font-bold hover:border-[var(--accent)] hover:text-[var(--accent)]">{move.san}</button>

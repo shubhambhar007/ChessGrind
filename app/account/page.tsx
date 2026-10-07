@@ -118,14 +118,14 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="min-h-screen overflow-hidden">
-      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+    <main className="cg-app-shell min-h-screen overflow-hidden">
+      <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              ♞
+              <span className="font-mono text-[9px] tracking-tight">CG</span>
             </div>
-            <div className="text-[16px] font-semibold tracking-[-0.025em]">
+            <div className="text-[16px] font-semibold">
               ChessGrind
             </div>
           </Link>
@@ -148,45 +148,31 @@ export default function AccountPage() {
       </header>
 
       <div className="relative mx-auto grid max-w-[1040px] gap-14 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div className="pointer-events-none absolute -left-56 top-16 h-96 w-96 rounded-full bg-[var(--accent)] opacity-[0.07] blur-3xl" />
-
         <section className="relative">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.13em] text-[var(--accent)] shadow-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]" />
-            Grindbook Cloud · Beta
+          <div className="border-l-2 border-[var(--brass)] pl-3 text-[11px] font-semibold text-[var(--secondary)]">
+            Grindbook Cloud / Beta
           </div>
-          <h1 className="mt-6 max-w-[560px] text-[46px] font-semibold leading-[1.02] tracking-[-0.055em] sm:text-[58px]">
-            Your mistakes should follow you.
-            <span className="block text-[var(--secondary)]">Not disappear.</span>
+          <h1 className="mt-6 max-w-[560px] text-[46px] font-semibold leading-[1.02] sm:text-[58px]">
+            Your mistakes should follow you—not disappear.
           </h1>
           <p className="mt-6 max-w-[520px] text-[16px] leading-7 text-[var(--secondary)]">
             Create a private ChessGrind account and your Grindbook follows you
             across devices. No social login. No external chess account.
           </p>
 
-          <div className="mt-9 grid max-w-[520px] gap-3 sm:grid-cols-3">
-            {[
-              ["01", "Private by default"],
-              ["02", "Automatic cloud sync"],
-              ["03", "Keep every review"],
-            ].map(([number, label]) => (
+          <div className="mt-9 grid max-w-[520px] border-y border-[var(--line-strong)] sm:grid-cols-3">
+            {["Private by default", "Automatic cloud sync", "Keep every review"].map((label) => (
               <div
-                key={number}
-                className="rounded-[15px] border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[var(--shadow-soft)]"
+                key={label}
+                className="border-b border-[var(--line)] px-3 py-4 text-[12px] font-semibold leading-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
               >
-                <div className="font-mono text-[10px] font-bold text-[var(--accent)]">
-                  {number}
-                </div>
-                <div className="mt-3 text-[12px] font-semibold leading-5">
-                  {label}
-                </div>
+                {label}
               </div>
             ))}
           </div>
         </section>
 
         <section className="relative rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_30px_100px_rgba(0,0,0,0.2)]">
-          <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-[var(--accent)] opacity-[0.11] blur-3xl" />
           <div className="relative rounded-[19px] border border-[var(--line)] bg-black/[0.018] p-6 sm:p-8">
             {!sessionLoaded ? (
               <div className="grid min-h-[420px] place-items-center text-[13px] text-[var(--secondary)]">
@@ -195,16 +181,16 @@ export default function AccountPage() {
             ) : user ? (
               <div className="min-h-[420px]">
                 <div className="grid h-14 w-14 place-items-center rounded-[17px] bg-[var(--accent-soft)] text-[22px] text-[var(--accent)] shadow-[0_12px_32px_rgba(59,92,255,0.18)]">
-                  ♞
+                  {user.handle.slice(0, 1).toUpperCase()}
                 </div>
-                <div className="mt-7 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--tertiary)]">
+                <div className="mt-7 text-[10px] font-bold text-[var(--tertiary)]">
                   Cloud profile
                 </div>
-                <h2 className="mt-2 text-[30px] font-semibold tracking-[-0.04em]">
+                <h2 className="mt-2 text-[30px] font-semibold">
                   @{user.handle}
                 </h2>
-                <div className="mt-6 flex items-center gap-3 rounded-[14px] border border-emerald-500/25 bg-emerald-500/[0.07] p-4">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_9px_rgba(16,185,129,0.85)]" />
+                <div className="mt-6 flex items-center gap-3 rounded-[14px] border border-[var(--line-strong)] bg-[var(--accent-soft)] p-4">
+                  <span className="h-2 w-2 rounded-full bg-[var(--success)]" />
                   <div>
                     <div className="text-[12px] font-semibold">Cloud sync active</div>
                     <div className="mt-0.5 text-[11px] text-[var(--secondary)]">
@@ -256,7 +242,7 @@ export default function AccountPage() {
                   ))}
                 </div>
 
-                <h2 className="mt-7 text-[28px] font-semibold tracking-[-0.04em]">
+                <h2 className="mt-7 text-[28px] font-semibold">
                   {mode === "signup" ? "Claim your Grindbook" : "Welcome back"}
                 </h2>
                 <p className="mt-2 text-[13px] leading-5 text-[var(--secondary)]">
@@ -269,7 +255,7 @@ export default function AccountPage() {
 
                 <form onSubmit={submit} className="mt-7 space-y-4">
                   <label className="block">
-                    <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.13em] text-[var(--tertiary)]">
+                    <span className="mb-2 block text-[10px] font-bold text-[var(--tertiary)]">
                       Handle
                     </span>
                     <div className="flex h-12 items-center rounded-[12px] border border-[var(--line-strong)] bg-[var(--surface)] px-4 focus-within:border-[var(--accent)] focus-within:shadow-[0_0_0_3px_var(--accent-soft)]">
@@ -287,7 +273,7 @@ export default function AccountPage() {
                   </label>
 
                   <label className="block">
-                    <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.13em] text-[var(--tertiary)]">
+                    <span className="mb-2 block text-[10px] font-bold text-[var(--tertiary)]">
                       Passphrase
                     </span>
                     <input

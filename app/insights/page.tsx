@@ -415,7 +415,7 @@ function Stat({
         {label}
       </div>
 
-      <div className="mt-1 text-[27px] font-semibold tracking-[-0.04em] tabular-nums">
+      <div className="mt-1 text-[27px] font-semibold tabular-nums">
         {value}
       </div>
 
@@ -526,11 +526,11 @@ export default function InsightsPage() {
     progress.solved >= 3;
 
   return (
-    <main className="min-h-screen">
+    <main className="cg-app-shell min-h-screen">
 
       {/* HEADER */}
 
-      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[var(--header)]">
 
         <div className="mx-auto flex h-[56px] max-w-[1060px] items-center justify-between px-6">
 
@@ -540,10 +540,10 @@ export default function InsightsPage() {
           >
 
             <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              ♞
+              <span className="font-mono text-[9px] tracking-tight">CG</span>
             </div>
 
-            <div className="text-[16px] font-semibold tracking-[-0.025em]">
+            <div className="text-[16px] font-semibold">
               ChessGrind
             </div>
 
@@ -588,11 +588,11 @@ export default function InsightsPage() {
 
         <section className="max-w-[680px]">
 
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--secondary)]">
+          <div className="text-[11px] font-semibold text-[var(--secondary)]">
             Your training
           </div>
 
-          <h1 className="mt-3 text-[48px] font-semibold leading-[1.02] tracking-[-0.055em]">
+          <h1 className="mt-3 text-[48px] font-semibold leading-[1.02]">
             Insights
           </h1>
 
@@ -654,7 +654,7 @@ export default function InsightsPage() {
 
             <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
 
-              <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+              <div className="text-[11px] font-semibold text-[var(--secondary)]">
                 Training focus
               </div>
 
@@ -667,7 +667,7 @@ export default function InsightsPage() {
               ) : !hasEnoughData ? (
 
                 <>
-                  <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+                  <h2 className="mt-3 text-[25px] font-semibold">
                     Keep solving.
                   </h2>
 
@@ -681,7 +681,7 @@ export default function InsightsPage() {
               ) : weakestTheme ? (
 
                 <>
-                  <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+                  <h2 className="mt-3 text-[25px] font-semibold">
                     Practice{" "}
                     {formatTheme(
                       weakestTheme.theme
@@ -705,7 +705,7 @@ export default function InsightsPage() {
               ) : (
 
                 <>
-                  <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+                  <h2 className="mt-3 text-[25px] font-semibold">
                     Still learning you.
                   </h2>
 
@@ -722,14 +722,14 @@ export default function InsightsPage() {
 
             <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
 
-              <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+              <div className="text-[11px] font-semibold text-[var(--secondary)]">
                 Strongest pattern
               </div>
 
               {strongestTheme ? (
 
                 <>
-                  <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+                  <h2 className="mt-3 text-[25px] font-semibold">
 
                     {formatTheme(
                       strongestTheme.theme
@@ -754,7 +754,7 @@ export default function InsightsPage() {
               ) : (
 
                 <>
-                  <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+                  <h2 className="mt-3 text-[25px] font-semibold">
                     Not enough data yet.
                   </h2>
 
@@ -781,11 +781,11 @@ export default function InsightsPage() {
 
             <div>
 
-              <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+              <div className="text-[11px] font-semibold text-[var(--secondary)]">
                 Tactical breakdown
               </div>
 
-              <h2 className="mt-2 text-[30px] font-semibold tracking-[-0.04em]">
+              <h2 className="mt-2 text-[30px] font-semibold">
                 Patterns
               </h2>
 
@@ -894,11 +894,11 @@ export default function InsightsPage() {
 
         <section className="mt-14">
 
-          <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+          <div className="text-[11px] font-semibold text-[var(--secondary)]">
             Practice history
           </div>
 
-          <h2 className="mt-2 text-[30px] font-semibold tracking-[-0.04em]">
+          <h2 className="mt-2 text-[30px] font-semibold">
             Activity
           </h2>
 
@@ -910,7 +910,7 @@ export default function InsightsPage() {
                 Correct moves
               </div>
 
-              <div className="mt-2 text-[24px] font-semibold tracking-[-0.035em] tabular-nums">
+              <div className="mt-2 text-[24px] font-semibold tabular-nums">
                 {progress.correctMoves}
               </div>
 
@@ -922,7 +922,7 @@ export default function InsightsPage() {
                 Wrong moves
               </div>
 
-              <div className="mt-2 text-[24px] font-semibold tracking-[-0.035em] tabular-nums">
+              <div className="mt-2 text-[24px] font-semibold tabular-nums">
                 {progress.wrongMoves}
               </div>
 
@@ -934,7 +934,7 @@ export default function InsightsPage() {
                 Hints used
               </div>
 
-              <div className="mt-2 text-[24px] font-semibold tracking-[-0.035em] tabular-nums">
+              <div className="mt-2 text-[24px] font-semibold tabular-nums">
                 {progress.hintsUsed}
               </div>
 
@@ -946,7 +946,7 @@ export default function InsightsPage() {
                 Skipped
               </div>
 
-              <div className="mt-2 text-[24px] font-semibold tracking-[-0.035em] tabular-nums">
+              <div className="mt-2 text-[24px] font-semibold tabular-nums">
                 {progress.skipped}
               </div>
 
@@ -973,7 +973,7 @@ export default function InsightsPage() {
 
             <div>
 
-              <h3 className="text-[20px] font-semibold tracking-[-0.025em]">
+              <h3 className="text-[20px] font-semibold">
                 Ready for another one?
               </h3>
 

@@ -480,7 +480,7 @@ export default function PlayPage() {
     const result = addToGrindbook({
       fen: game.fen(),
       orientation: playerColor,
-      title: `AI game · Move ${moveNumber}`,
+      title: `Computer game / Move ${moveNumber}`,
       prompt:
         "Revisit this position. What would you play, and what is your plan?",
       explanation:
@@ -624,17 +624,17 @@ export default function PlayPage() {
   const evaluation = evaluateMaterial(game) / 100;
 
   return (
-    <main className="min-h-screen">
-      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+    <main className="cg-app-shell min-h-screen">
+      <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link
             href="/"
             className="flex items-center gap-2.5"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              ♞
+              <span className="font-mono text-[9px] tracking-tight">CG</span>
             </div>
-            <div className="text-[16px] font-semibold tracking-[-0.025em]">
+            <div className="text-[16px] font-semibold">
               ChessGrind
             </div>
           </Link>
@@ -668,7 +668,7 @@ export default function PlayPage() {
       <div className="mx-auto max-w-[1120px] px-6 pb-16 pt-7">
         <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-[32px] font-semibold tracking-[-0.03em]">
+            <h1 className="text-[32px] font-semibold">
               Play vs Computer
             </h1>
             <p className="mt-1 text-[14px] text-[var(--secondary)]">
@@ -891,7 +891,7 @@ export default function PlayPage() {
                 onClick={saveCurrentPosition}
                 className="control rounded-[10px] border border-[var(--line-strong)] bg-[var(--accent-soft)] px-4 py-2 text-[13px] font-semibold text-[var(--accent)]"
               >
-                {savedPosition ? "Saved ✓" : "Save position"}
+                {savedPosition ? "Position saved" : "Save position"}
               </button>
 
               <button
@@ -931,7 +931,7 @@ export default function PlayPage() {
                   ×
                 </button>
                 <div className="relative pr-8">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.13em] text-amber-600">
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-amber-600">
                     <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.9)]" />
                     Mistake captured
                   </div>
@@ -945,7 +945,7 @@ export default function PlayPage() {
                     href="/grindbook"
                     className="control mt-3 inline-flex text-[11px] font-bold text-amber-600 hover:text-amber-500"
                   >
-                    Review the position →
+                    Review this position
                   </Link>
                 </div>
               </div>
@@ -1074,7 +1074,7 @@ export default function PlayPage() {
                           …
                         </div>
                       </div>
-                      <div className="text-[14px] font-semibold tracking-[-0.01em]">
+                      <div className="text-[14px] font-semibold">
                         Your game story starts here
                       </div>
                       <p className="mt-1 max-w-[270px] text-[12px] leading-5 text-[var(--secondary)]">
@@ -1083,7 +1083,7 @@ export default function PlayPage() {
                     </div>
                   ) : (
                     <div ref={moveListRef} className="max-h-[256px] overflow-y-auto px-3 py-3">
-                      <div className="sticky top-0 z-10 grid grid-cols-[40px_1fr_1fr] gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-2 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--tertiary)] shadow-sm">
+                      <div className="sticky top-0 z-10 grid grid-cols-[40px_1fr_1fr] gap-2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] px-2 py-2 text-[10px] font-bold text-[var(--tertiary)] shadow-sm">
                         <span />
                         <span className="flex items-center gap-2">
                           <span className="h-2 w-2 rounded-full border border-black/20 bg-white shadow-sm" />
@@ -1120,7 +1120,7 @@ export default function PlayPage() {
                                   <div
                                     key={color}
                                     className={[
-                                      "flex min-h-9 items-center rounded-[9px] px-3 font-mono text-[13px] font-bold tracking-[-0.01em]",
+                                      "flex min-h-9 items-center rounded-[9px] px-3 font-mono text-[13px] font-bold",
                                       isLatestMove
                                         ? "bg-[var(--accent)] text-white shadow-[0_7px_20px_rgba(59,92,255,0.28)]"
                                         : notation
@@ -1142,10 +1142,10 @@ export default function PlayPage() {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between border-t border-[var(--line)] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.11em] text-[var(--tertiary)]">
+                  <div className="flex items-center justify-between border-t border-[var(--line)] px-5 py-3 text-[10px] font-semibold text-[var(--tertiary)]">
                     <span>{moveLog.length} {moveLog.length === 1 ? "move" : "moves"} played</span>
                     <span className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" />
                       Live notation
                     </span>
                   </div>
@@ -1156,15 +1156,15 @@ export default function PlayPage() {
                 <div className="min-h-[250px] p-6 text-[13px] text-[var(--secondary)]">
                   <div className="flex items-end justify-between">
                     <div>
-                      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--tertiary)]">
+                      <div className="mb-2 text-[10px] font-bold text-[var(--tertiary)]">
                         Material pulse
                       </div>
-                      <div className="text-[32px] font-semibold tracking-[-0.04em] text-[var(--text)]">
+                      <div className="text-[32px] font-semibold text-[var(--text)]">
                         {evaluation > 0 ? "+" : ""}
                         {evaluation.toFixed(2)}
                       </div>
                     </div>
-                    <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--secondary)]">
+                    <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[10px] font-bold text-[var(--secondary)]">
                       {evaluation === 0
                         ? "Even"
                         : evaluation > 0
@@ -1182,7 +1182,7 @@ export default function PlayPage() {
                     />
                     <span className="absolute left-1/2 top-1/2 h-4 w-[2px] -translate-x-1/2 -translate-y-1/2 bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]" />
                   </div>
-                  <div className="mt-2 flex justify-between text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--tertiary)]">
+                  <div className="mt-2 flex justify-between text-[10px] font-bold text-[var(--tertiary)]">
                     <span>White</span>
                     <span>Black</span>
                   </div>
@@ -1215,10 +1215,10 @@ export default function PlayPage() {
                       key={item.label}
                       className="relative overflow-hidden rounded-[14px] border border-[var(--line)] bg-black/[0.025] p-4"
                     >
-                      <div className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--tertiary)]">
+                      <div className="text-[9px] font-bold text-[var(--tertiary)]">
                         {item.label}
                       </div>
-                      <div className="mt-2 text-[17px] font-semibold capitalize tracking-[-0.02em] text-[var(--text)]">
+                      <div className="mt-2 text-[17px] font-semibold capitalize text-[var(--text)]">
                         {item.value}
                       </div>
                       <div className="absolute -bottom-5 -right-5 h-12 w-12 rounded-full bg-[var(--accent)] opacity-[0.07] blur-xl" />

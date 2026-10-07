@@ -113,10 +113,10 @@ export default function PremiumSelect<T extends string>({
         ].join(" ")}
       >
         <span>
-          <span className="block text-[9px] font-semibold uppercase tracking-[0.16em] text-[var(--tertiary)]">
+          <span className="block text-[9px] font-semibold text-[var(--tertiary)]">
             {label}
           </span>
-          <span className="mt-1 block text-[15px] font-semibold tracking-[-0.01em] text-[var(--text)]">
+          <span className="mt-1 block text-[15px] font-semibold text-[var(--text)]">
             {selectedOption.label}
           </span>
         </span>
@@ -144,7 +144,7 @@ export default function PremiumSelect<T extends string>({
           id={menuId}
           role="listbox"
           aria-label={label}
-          className="appear absolute left-0 top-[calc(100%+8px)] z-50 min-w-[240px] overflow-hidden rounded-[15px] border border-[var(--line-strong)] bg-[color-mix(in_srgb,var(--surface)_96%,var(--background))] p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.24)] backdrop-blur-xl"
+          className="appear absolute left-0 top-[calc(100%+8px)] z-50 min-w-[240px] overflow-hidden rounded-[15px] border border-[var(--line-strong)] bg-[color-mix(in_srgb,var(--surface)_96%,var(--background))] p-1.5 shadow-[0_24px_70px_rgba(0,0,0,0.24)]"
         >
           {options.map((option, index) => {
             const selected = option.value === value;

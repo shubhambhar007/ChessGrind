@@ -1670,7 +1670,7 @@ function PlayerColorIndicator({
         ].join(" ")}
       />
 
-      <span className="text-[12px] font-bold uppercase tracking-[0.13em] text-[var(--text)]">
+      <span className="text-[12px] font-bold text-[var(--text)]">
         You are{" "}
         {isWhite
           ? "White"
@@ -3714,20 +3714,20 @@ export default function Home() {
     sessionComplete
   ) {
     return (
-      <main className="min-h-screen">
+      <main className="cg-app-shell min-h-screen">
         <CelebrationBurst
           eventId={sessionCelebrationEvent}
           title="Ten puzzles conquered."
           detail={`Session complete with ${sessionStats.solved} solved. Your next grind is already waiting.`}
         />
-        <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+        <header className="border-b border-[var(--line)] bg-[var(--header)]">
           <div className="mx-auto flex h-[56px] max-w-[920px] items-center justify-between px-6">
             <Link href="/" className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-                ♞
+                <span className="font-mono text-[9px] tracking-tight">CG</span>
               </div>
 
-              <div className="text-[16px] font-semibold tracking-[-0.025em]">
+              <div className="text-[16px] font-semibold">
                 ChessGrind
               </div>
             </Link>
@@ -3763,11 +3763,11 @@ export default function Home() {
         </header>
 
         <div className="mx-auto max-w-[820px] px-6 pb-20 pt-16">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--success)]">
+          <div className="text-[11px] font-semibold text-[var(--success)]">
             Session complete
           </div>
 
-          <h1 className="mt-3 text-[48px] font-semibold tracking-[-0.055em]">
+          <h1 className="mt-3 text-[48px] font-semibold">
             Nice work.
           </h1>
 
@@ -3781,7 +3781,7 @@ export default function Home() {
                 Solved
               </div>
 
-              <div className="mt-1 text-[30px] font-semibold tracking-[-0.04em]">
+              <div className="mt-1 text-[30px] font-semibold">
                 {sessionStats.solved}/
                 {SESSION_LENGTH}
               </div>
@@ -3792,7 +3792,7 @@ export default function Home() {
                 Accuracy
               </div>
 
-              <div className="mt-1 text-[30px] font-semibold tracking-[-0.04em]">
+              <div className="mt-1 text-[30px] font-semibold">
                 {sessionAccuracy}%
               </div>
             </div>
@@ -3802,7 +3802,7 @@ export default function Home() {
                 Mistakes
               </div>
 
-              <div className="mt-1 text-[30px] font-semibold tracking-[-0.04em]">
+              <div className="mt-1 text-[30px] font-semibold">
                 {sessionStats.wrongMoves}
               </div>
             </div>
@@ -3812,7 +3812,7 @@ export default function Home() {
                 Hints
               </div>
 
-              <div className="mt-1 text-[30px] font-semibold tracking-[-0.04em]">
+              <div className="mt-1 text-[30px] font-semibold">
                 {sessionStats.hintsUsed}
               </div>
             </div>
@@ -3820,11 +3820,11 @@ export default function Home() {
 
           <section className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+              <div className="text-[11px] font-semibold text-[var(--secondary)]">
                 Strongest pattern
               </div>
 
-              <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+              <h2 className="mt-3 text-[25px] font-semibold">
                 {sessionStrongestTheme
                   ? formatTheme(
                       sessionStrongestTheme
@@ -3840,11 +3840,11 @@ export default function Home() {
             </div>
 
             <div className="rounded-[18px] border border-[var(--line)] bg-[var(--surface)] p-6">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+              <div className="text-[11px] font-semibold text-[var(--secondary)]">
                 Needs work
               </div>
 
-              <h2 className="mt-3 text-[25px] font-semibold tracking-[-0.035em]">
+              <h2 className="mt-3 text-[25px] font-semibold">
                 {sessionWeakestTheme
                   ? formatTheme(
                       sessionWeakestTheme
@@ -3914,7 +3914,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="cg-app-shell min-h-screen">
       <CelebrationBurst
         eventId={puzzleCelebrationEvent}
         title="Nice solve!"
@@ -3925,14 +3925,14 @@ export default function Home() {
         }
         variant="mini"
       />
-      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              ♞
+              <span className="font-mono text-[9px] tracking-tight">CG</span>
             </div>
 
-            <div className="text-[16px] font-semibold tracking-[-0.025em]">
+            <div className="text-[16px] font-semibold">
               ChessGrind
             </div>
           </Link>
@@ -4240,7 +4240,7 @@ export default function Home() {
             }
           />
 
-          <h1 className="mt-4 text-[38px] font-semibold leading-[1.04] tracking-[-0.045em]">
+          <h1 className="mt-4 text-[38px] font-semibold leading-[1.04]">
             {goal}
           </h1>
 
@@ -4456,7 +4456,7 @@ export default function Home() {
             <section className="min-h-[112px]">
               {isWrong ? (
                 <div className="wrong-message">
-                  <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--danger)]">
+                  <div className="text-[11px] font-bold text-[var(--danger)]">
                     Incorrect
                   </div>
 
@@ -4472,7 +4472,7 @@ export default function Home() {
                 </div>
               ) : solved ? (
                 <div className="appear">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--success)]">
+                  <div className="text-[11px] font-semibold text-[var(--success)]">
                     Solved
                   </div>
 
@@ -4516,7 +4516,7 @@ export default function Home() {
                       <span className="pulse-dot h-2 w-2 rounded-full bg-[var(--accent)]" />
                     )}
 
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--secondary)]">
+                    <div className="text-[11px] font-semibold text-[var(--secondary)]">
                       {isOpponentMoving
                         ? "Opponent"
                         : `Your move · ${playerColor}`}
@@ -4562,7 +4562,7 @@ export default function Home() {
                   href="/grindbook"
                   className="control shrink-0 text-[10px] font-bold text-[var(--accent)]"
                 >
-                  Review →
+                  Review position
                 </Link>
               </div>
             )}
@@ -4701,7 +4701,7 @@ export default function Home() {
 
             {solved && (
               <section className="appear mt-6 border-t border-[var(--line)] pt-5">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+                <div className="text-[11px] font-semibold text-[var(--secondary)]">
                   Why it works
                 </div>
 
@@ -4721,7 +4721,7 @@ export default function Home() {
                   className="control min-h-[44px] rounded-[11px] border border-[var(--line-strong)] bg-[var(--accent-soft)] px-5 text-[14px] font-semibold text-[var(--accent)]"
                 >
                   {savedToGrindbook
-                    ? "Saved ✓"
+                    ? "Position saved"
                     : "Save to Grindbook"}
                 </button>
 
@@ -4775,9 +4775,9 @@ export default function Home() {
       </div>
 
       {pendingPromotion && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 px-5 backdrop-blur-[3px]">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/20 px-5">
           <div className="appear w-full max-w-[360px] rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.20)]">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[var(--secondary)]">
+            <div className="text-[11px] font-semibold text-[var(--secondary)]">
               Promotion
             </div>
 

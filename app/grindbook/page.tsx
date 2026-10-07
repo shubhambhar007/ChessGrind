@@ -41,7 +41,7 @@ function formatTag(tag: string) {
 }
 
 function sourceLabel(source: GrindbookCard["source"]) {
-  if (source === "game") return "AI game";
+  if (source === "game") return "Computer game";
   return formatTag(source);
 }
 
@@ -229,7 +229,7 @@ function ReviewBoard({
           ))}
         </div>
 
-        <h2 className="mt-5 text-[28px] font-semibold tracking-[-0.035em]">
+        <h2 className="mt-5 text-[28px] font-semibold">
           {card.title}
         </h2>
         <p className="mt-3 text-[15px] leading-6 text-[var(--secondary)]">
@@ -255,7 +255,7 @@ function ReviewBoard({
           <div className="appear mt-7 border-t border-[var(--line)] pt-5">
             <div
               className={[
-                "text-[12px] font-semibold uppercase tracking-[0.12em]",
+                "text-[12px] font-semibold",
                 answer === "correct"
                   ? "text-[var(--success)]"
                   : "text-[var(--danger)]",
@@ -370,19 +370,19 @@ export default function GrindbookPage() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="cg-app-shell min-h-screen">
       <CelebrationBurst
         eventId={celebrationEvent}
         title="Daily queue cleared."
         detail="You showed up, reviewed every due position, and protected your streak."
       />
-      <header className="border-b border-[var(--line)] bg-[var(--header)] backdrop-blur-xl">
+      <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              ♞
+              <span className="font-mono text-[9px] tracking-tight">CG</span>
             </div>
-            <div className="text-[16px] font-semibold tracking-[-0.025em]">
+            <div className="text-[16px] font-semibold">
               ChessGrind
             </div>
           </Link>
@@ -402,10 +402,10 @@ export default function GrindbookPage() {
       <div className="mx-auto max-w-[1120px] px-6 pb-20 pt-9">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
-            <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+            <div className="text-[11px] font-semibold text-[var(--accent)]">
               Your private memory
             </div>
-            <h1 className="mt-2 text-[38px] font-semibold tracking-[-0.045em]">
+            <h1 className="mt-2 text-[38px] font-semibold">
               My Grindbook
             </h1>
             <p className="mt-2 max-w-[620px] text-[15px] leading-6 text-[var(--secondary)]">
@@ -438,15 +438,14 @@ export default function GrindbookPage() {
 
         <section className="mt-8 grid gap-3 lg:grid-cols-[1.35fr_0.65fr]">
           <div className="relative overflow-hidden rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[var(--accent)] opacity-[0.09] blur-3xl" />
             <div className="relative flex flex-wrap items-start justify-between gap-6">
               <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] shadow-[0_0_9px_var(--accent)]" />
+                <div className="flex items-center gap-2 text-[10px] font-bold text-[var(--accent)]">
+                  <span className="h-1.5 w-6 bg-[var(--brass)]" />
                   Daily queue
                 </div>
                 <div className="mt-3 flex items-baseline gap-2">
-                  <span className="text-[42px] font-semibold tracking-[-0.055em]">
+                  <span className="text-[42px] font-semibold">
                     {loaded ? displayedReviews : "—"}
                   </span>
                   <span className="text-[16px] font-medium text-[var(--tertiary)]">
@@ -471,7 +470,7 @@ export default function GrindbookPage() {
                   ["Mastered", mastered],
                 ].map(([label, value]) => (
                   <div key={label}>
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--tertiary)]">
+                    <div className="text-[10px] font-semibold text-[var(--tertiary)]">
                       {label}
                     </div>
                     <div className="mt-1 text-[20px] font-semibold">
@@ -484,11 +483,11 @@ export default function GrindbookPage() {
 
             <div className="relative mt-6 h-2 overflow-hidden rounded-full bg-black/[0.07]">
               <div
-                className="h-full rounded-full bg-[var(--accent)] shadow-[0_0_16px_var(--accent)] transition-[width] duration-500"
+                className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500"
                 style={{ width: `${loaded ? goalPercent : 0}%` }}
               />
             </div>
-            <div className="relative mt-2 flex justify-between text-[9px] font-semibold uppercase tracking-[0.09em] text-[var(--tertiary)]">
+            <div className="relative mt-2 flex justify-between text-[9px] font-semibold text-[var(--tertiary)]">
               <span>{reviewProgress.totalReviews} lifetime reviews</span>
               <span>{goalPercent}%</span>
             </div>
@@ -497,12 +496,11 @@ export default function GrindbookPage() {
           <div className="rounded-[20px] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[var(--shadow-soft)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--secondary)]">
+                <div className="text-[10px] font-bold text-[var(--secondary)]">
                   Review streak
                 </div>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="text-[30px]">🔥</span>
-                  <span className="text-[38px] font-semibold tracking-[-0.05em]">
+                  <span className="text-[38px] font-semibold">
                     {loaded ? currentStreak : "—"}
                   </span>
                   <span className="text-[12px] text-[var(--secondary)]">
@@ -564,8 +562,8 @@ export default function GrindbookPage() {
               </>
             ) : cards.length > 0 ? (
               <div className="rounded-[22px] border border-[var(--line)] bg-[var(--surface)] px-6 py-20 text-center shadow-[var(--shadow-soft)]">
-                <div className="text-[42px]">{reviewsToday > 0 ? "🔥" : "✓"}</div>
-                <h2 className="mt-4 text-[28px] font-semibold tracking-[-0.035em]">
+                <div className="text-[11px] font-semibold text-[var(--brass)]">Review ledger closed</div>
+                <h2 className="mt-4 text-[28px] font-semibold">
                   {reviewsToday > 0
                     ? "Daily grind complete."
                     : "You’re caught up."}
@@ -584,12 +582,12 @@ export default function GrindbookPage() {
               </div>
             ) : (
               <div className="rounded-[22px] border border-[var(--line)] bg-[var(--surface)] px-6 py-20 text-center shadow-[var(--shadow-soft)]">
-                <div className="text-[42px]">♙</div>
-                <h2 className="mt-4 text-[28px] font-semibold tracking-[-0.035em]">
+                <div className="text-[11px] font-semibold text-[var(--brass)]">No entries yet</div>
+                <h2 className="mt-4 text-[28px] font-semibold">
                   Your Grindbook is empty.
                 </h2>
                 <p className="mx-auto mt-2 max-w-[520px] text-[14px] leading-6 text-[var(--secondary)]">
-                  Save a puzzle or a position from an AI game. It will appear
+                  Save a puzzle or a position from a computer game. It will appear
                   here immediately for spaced review.
                 </p>
                 <div className="mt-6 flex justify-center gap-3">
@@ -603,7 +601,7 @@ export default function GrindbookPage() {
                     href="/play"
                     className="control rounded-[11px] border border-[var(--line-strong)] px-6 py-3 text-[13px] font-semibold"
                   >
-                    Play AI
+                    Play computer
                   </Link>
                 </div>
               </div>

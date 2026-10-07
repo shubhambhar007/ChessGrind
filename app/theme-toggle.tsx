@@ -76,11 +76,9 @@ export default function ThemeToggle() {
       title={`Switch to ${
         isDark ? "light" : "dark"
       } mode`}
-      className="control flex h-8 w-8 items-center justify-center text-[17px] text-[var(--secondary)] hover:text-[var(--text)]"
+      className="control flex h-8 w-8 items-center justify-center text-[var(--secondary)] hover:text-[var(--text)]"
     >
-      <span aria-hidden="true">
-        {isDark ? "☀" : "☾"}
-      </span>
+      <span aria-hidden="true" className={`cg-theme-glyph ${isDark ? "is-sun" : "is-moon"}`} />
     </button>
   );
 }
