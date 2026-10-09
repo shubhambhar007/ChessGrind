@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">ChessGrind knight mark</title>
+  <desc id="desc">A gold chess knight held inside a geometric ivory C.</desc>
+  <path
+    d="M397 126C352 82 292 59 228 64C123 72 47 163 55 270C63 377 153 457 260 451C313 448 362 425 398 389"
+    fill="none"
+    stroke="#F1E9DC"
+    stroke-width="70"
+    stroke-linecap="butt"
+    stroke-linejoin="round"
+  />
+  <text
+    x="242"
+    y="371"
+    fill="#D5AA57"
+    font-family="Arial Unicode MS, DejaVu Sans, sans-serif"
+    font-size="294"
+    font-weight="700"
+    text-anchor="middle"
+  >♞</text>
+  <rect x="379" y="222" width="74" height="74" rx="12" fill="#D5AA57" />
+</svg>
