@@ -11,7 +11,7 @@ export default function LandingPage() {
       <header className="cg-landing-nav">
         <div className="cg-landing-nav-inner">
           <Link href="/" className="cg-landing-brand" aria-label="ChessGrind home">
-            <Image className="cg-landing-mark" src="/brand/chessgrind-mark-v2.svg" alt="" width={40} height={40} priority />
+            <Image className="cg-landing-mark" src="/brand/chessgrind-king-knight-emblem.png" alt="" width={52} height={52} unoptimized priority />
             <span className="cg-brand-wordmark"><small>CHESS</small><strong>GRIND</strong></span>
           </Link>
 
@@ -75,7 +75,7 @@ export default function LandingPage() {
 
       <footer className="cg-landing-footer">
         <Link href="/" className="cg-landing-brand">
-          <Image className="cg-landing-mark" src="/brand/chessgrind-mark-v2.svg" alt="" width={40} height={40} />
+          <Image className="cg-landing-mark" src="/brand/chessgrind-king-knight-emblem.png" alt="" width={52} height={52} unoptimized />
           <span className="cg-brand-wordmark"><small>CHESS</small><strong>GRIND</strong></span>
         </Link>
         <p>Play. Notice. Remember. Improve.</p>
