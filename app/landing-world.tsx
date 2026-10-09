@@ -101,6 +101,7 @@ function TrainingBoard() {
     ["wK", "e1"],
     ["wR", "h1"],
   ];
+  const selectedSquare = "f3";
   const legalMoves = ["d4", "e5", "g5", "h4"];
 
   const squarePosition = (square: string) => {
@@ -114,6 +115,13 @@ function TrainingBoard() {
       {Array.from({ length: 64 }, (_, index) => (
         <span key={index} className={(Math.floor(index / 8) + index) % 2 ? "dark" : "light"} />
       ))}
+      <i
+        className="cg-selected-square"
+        style={{
+          left: `${squarePosition(selectedSquare).file * 12.5}%`,
+          top: `${squarePosition(selectedSquare).rank * 12.5}%`,
+        }}
+      />
       {pieces.map(([piece, square]) => {
         const { file, rank } = squarePosition(square);
         return (
@@ -123,7 +131,7 @@ function TrainingBoard() {
             alt=""
             width={86}
             height={86}
-            className={`cg-mini-piece ${square === "f3" ? "is-selected" : ""}`}
+            className={`cg-mini-piece ${square === selectedSquare ? "is-selected" : ""}`}
             style={{ left: `${file * 12.5}%`, top: `${rank * 12.5}%` }}
           />
         );
