@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import AccountLink from "./account-link";
 import LandingWorld from "./landing-world";
@@ -10,8 +11,8 @@ export default function LandingPage() {
       <header className="cg-landing-nav">
         <div className="cg-landing-nav-inner">
           <Link href="/" className="cg-landing-brand" aria-label="ChessGrind home">
-            <span className="cg-landing-mark">♞</span>
-            <span>ChessGrind</span>
+            <Image className="cg-landing-mark" src="/brand/chessgrind-mark-v2.svg" alt="" width={40} height={40} priority />
+            <span className="cg-brand-wordmark"><small>CHESS</small><strong>GRIND</strong></span>
           </Link>
 
           <nav className="cg-landing-links" aria-label="Main navigation">
@@ -74,8 +75,8 @@ export default function LandingPage() {
 
       <footer className="cg-landing-footer">
         <Link href="/" className="cg-landing-brand">
-          <span className="cg-landing-mark">♞</span>
-          <span>ChessGrind</span>
+          <Image className="cg-landing-mark" src="/brand/chessgrind-mark-v2.svg" alt="" width={40} height={40} />
+          <span className="cg-brand-wordmark"><small>CHESS</small><strong>GRIND</strong></span>
         </Link>
         <p>Play. Notice. Remember. Improve.</p>
         <div>
