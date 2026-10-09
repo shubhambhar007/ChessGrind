@@ -68,13 +68,46 @@ function ease(amount: number) {
 
 function TrainingBoard() {
   const pieces = [
-    ["bK", "g8"],
-    ["bQ", "d8"],
     ["bR", "a8"],
-    ["wQ", "h5"],
-    ["wN", "f6"],
-    ["wK", "g1"],
+    ["bB", "c8"],
+    ["bQ", "d8"],
+    ["bK", "e8"],
+    ["bB", "f8"],
+    ["bR", "h8"],
+    ["bP", "a7"],
+    ["bP", "b7"],
+    ["bP", "c7"],
+    ["bP", "d7"],
+    ["bP", "f7"],
+    ["bP", "g7"],
+    ["bP", "h7"],
+    ["bN", "c6"],
+    ["bN", "f6"],
+    ["bP", "e5"],
+    ["wB", "c4"],
+    ["wP", "e4"],
+    ["wN", "f3"],
+    ["wP", "a2"],
+    ["wP", "b2"],
+    ["wP", "c2"],
+    ["wP", "d2"],
+    ["wP", "f2"],
+    ["wP", "g2"],
+    ["wP", "h2"],
+    ["wR", "a1"],
+    ["wN", "b1"],
+    ["wB", "c1"],
+    ["wQ", "d1"],
+    ["wK", "e1"],
+    ["wR", "h1"],
   ];
+  const legalMoves = ["d4", "e5", "g5", "h4"];
+
+  const squarePosition = (square: string) => {
+    const file = square.charCodeAt(0) - 97;
+    const rank = 8 - Number(square[1]);
+    return { file, rank };
+  };
 
   return (
     <div className="cg-mini-board" aria-hidden="true">
@@ -82,8 +115,7 @@ function TrainingBoard() {
         <span key={index} className={(Math.floor(index / 8) + index) % 2 ? "dark" : "light"} />
       ))}
       {pieces.map(([piece, square]) => {
-        const file = square.charCodeAt(0) - 97;
-        const rank = 8 - Number(square[1]);
+        const { file, rank } = squarePosition(square);
         return (
           <Image
             key={`${piece}-${square}`}
@@ -91,14 +123,21 @@ function TrainingBoard() {
             alt=""
             width={86}
             height={86}
-            className="cg-mini-piece"
+            className={`cg-mini-piece ${square === "f3" ? "is-selected" : ""}`}
             style={{ left: `${file * 12.5}%`, top: `${rank * 12.5}%` }}
           />
         );
       })}
-      <i className="cg-move-dot cg-move-dot-one" />
-      <i className="cg-move-dot cg-move-dot-two" />
-      <i className="cg-move-dot cg-move-dot-three" />
+      {legalMoves.map((square) => {
+        const { file, rank } = squarePosition(square);
+        return (
+          <i
+            key={square}
+            className={`cg-move-dot ${square === "e5" ? "is-capture" : ""}`}
+            style={{ left: `${(file + 0.5) * 12.5}%`, top: `${(rank + 0.5) * 12.5}%` }}
+          />
+        );
+      })}
     </div>
   );
 }
