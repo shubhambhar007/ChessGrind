@@ -257,32 +257,29 @@ export default function LandingWorld() {
             <div className={`cg-world-station cg-station-hero ${activeScene === 0 ? "is-active" : ""}`}>
               <div className="cg-hero-halo" />
               <Image
-                src="/pieces/hero/ivory-king-hd.png"
+                src="/pieces/luxe-v2/wK.png"
                 alt=""
-                width={1254}
-                height={1254}
-                sizes="355px"
-                quality={95}
+                width={360}
+                height={360}
+                unoptimized
                 priority
                 className="cg-world-king"
               />
               <Image
-                src="/pieces/hero/black-knight-hd.png"
+                src="/pieces/luxe-v2/bN.png"
                 alt=""
-                width={1254}
-                height={1254}
-                sizes="170px"
-                quality={95}
+                width={170}
+                height={170}
+                unoptimized
                 priority
                 className="cg-world-knight cg-world-knight-one"
               />
               <Image
-                src="/pieces/hero/ivory-knight-hd.png"
+                src="/pieces/luxe-v2/wN.png"
                 alt=""
-                width={1254}
-                height={1254}
-                sizes="150px"
-                quality={95}
+                width={150}
+                height={150}
+                unoptimized
                 priority
                 className="cg-world-knight cg-world-knight-two"
               />
