@@ -10,6 +10,7 @@ import { premiumPieces } from "../premium-pieces";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import CelebrationBurst from "../celebration-burst";
+import BrandLockup from "../brand-lockup";
 import {
   createRepertoire,
   loadRepertoires,
@@ -221,9 +222,8 @@ export default function RepertoirePage() {
       />
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1180px] items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="grid h-8 w-8 place-items-center rounded-[9px] bg-[var(--button)] font-mono text-[9px] tracking-tight text-[var(--button-text)]">CG</div>
-            <div className="text-[16px] font-semibold">ChessGrind</div>
+          <Link href="/" aria-label="ChessGrind home">
+            <BrandLockup priority />
           </Link>
           <nav className="flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
             <VisitorCounter />

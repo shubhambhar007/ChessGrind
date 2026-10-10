@@ -4,6 +4,7 @@ import Link from "next/link";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import AccountLink from "../account-link";
+import BrandLockup from "../brand-lockup";
 import {
   useEffect,
   useMemo,
@@ -536,16 +537,9 @@ export default function InsightsPage() {
 
           <Link
             href="/"
-            className="flex items-center gap-2.5"
+            aria-label="ChessGrind home"
           >
-
-            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              <span className="font-mono text-[9px] tracking-tight">CG</span>
-            </div>
-
-            <div className="text-[16px] font-semibold">
-              ChessGrind
-            </div>
+            <BrandLockup priority />
 
           </Link>
 

@@ -10,6 +10,7 @@ import { premiumPieces } from "../premium-pieces";
 import GrindbookPromo from "../grindbook-promo";
 import PremiumSelect from "../premium-select";
 import AccountLink from "../account-link";
+import BrandLockup from "../brand-lockup";
 import { addToGrindbook } from "@/lib/grindbook";
 import {
   analyzeMove,
@@ -629,14 +630,9 @@ export default function PlayPage() {
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link
             href="/"
-            className="flex items-center gap-2.5"
+            aria-label="ChessGrind home"
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              <span className="font-mono text-[9px] tracking-tight">CG</span>
-            </div>
-            <div className="text-[16px] font-semibold">
-              ChessGrind
-            </div>
+            <BrandLockup priority />
           </Link>
 
           <div className="flex items-center gap-5">

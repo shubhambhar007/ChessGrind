@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import ThemeToggle from "../theme-toggle";
+import BrandLockup from "../brand-lockup";
 import {
   LAST_CLOUD_USER_KEY,
   notifyAuthUpdated,
@@ -121,13 +122,8 @@ export default function AccountPage() {
     <main className="cg-app-shell min-h-screen overflow-hidden">
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-[var(--button)] text-[15px] text-[var(--button-text)]">
-              <span className="font-mono text-[9px] tracking-tight">CG</span>
-            </div>
-            <div className="text-[16px] font-semibold">
-              ChessGrind
-            </div>
+          <Link href="/" aria-label="ChessGrind home">
+            <BrandLockup priority />
           </Link>
           <div className="flex items-center gap-4">
             <Link

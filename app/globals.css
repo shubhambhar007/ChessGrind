@@ -459,6 +459,44 @@ button:focus-visible {
   letter-spacing: 0.055em;
 }
 
+.cg-app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.cg-app-brand-mark {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 9px rgba(0, 0, 0, 0.2));
+}
+
+.cg-app-brand-wordmark {
+  display: grid;
+  align-content: center;
+  line-height: 1;
+}
+
+.cg-app-brand-wordmark small {
+  color: var(--secondary);
+  font-family: var(--font-score);
+  font-size: 5px;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+}
+
+.cg-app-brand-wordmark strong {
+  margin-top: 2px;
+  color: var(--text);
+  font-family: var(--font-editorial);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
 .cg-landing-links {
   display: flex;
   align-items: center;
