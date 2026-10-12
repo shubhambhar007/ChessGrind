@@ -627,7 +627,7 @@ export default function PlayPage() {
   return (
     <main className="cg-app-shell min-h-screen">
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
-        <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
+        <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link
             href="/"
             aria-label="ChessGrind home"
@@ -635,7 +635,7 @@ export default function PlayPage() {
             <BrandLockup priority />
           </Link>
 
-          <div className="flex items-center gap-5">
+          <div className="cg-app-nav flex items-center gap-5">
             <VisitorCounter />
             <Link
               href="/grindbook"
@@ -661,7 +661,7 @@ export default function PlayPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1120px] px-6 pb-16 pt-7">
+      <div className="cg-page-content mx-auto max-w-[1120px] px-6 pb-16 pt-7">
         <div className="mb-7 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-[32px] font-semibold">
@@ -673,7 +673,7 @@ export default function PlayPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="cg-play-controls flex flex-wrap items-center gap-3">
             <PremiumSelect
               label="Difficulty"
               value={difficulty}
@@ -719,7 +719,7 @@ export default function PlayPage() {
             <button
               type="button"
               onClick={() => newGame()}
-              className="control min-h-[62px] rounded-[14px] border border-[var(--button)] bg-[var(--button)] px-6 py-2 text-[14px] font-semibold text-[var(--button-text)] shadow-[0_14px_32px_color-mix(in_srgb,var(--brass)_18%,transparent)]"
+              className="cg-new-game control min-h-[62px] rounded-[14px] border border-[var(--button)] bg-[var(--button)] px-6 py-2 text-[14px] font-semibold text-[var(--button-text)] shadow-[0_14px_32px_color-mix(in_srgb,var(--brass)_18%,transparent)]"
             >
               New Game
             </button>
@@ -741,7 +741,7 @@ export default function PlayPage() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="overflow-hidden border-[6px] border-white">
+                <div className="cg-board-frame overflow-hidden border-[6px] border-white">
                   <div className="overflow-hidden">
                     <Chessboard
                       options={{

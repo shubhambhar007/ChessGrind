@@ -185,7 +185,7 @@ function ReviewBoard({
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,560px)_1fr] lg:items-start">
       <section>
-        <div className="overflow-hidden border-[6px] border-white shadow-[var(--shadow-board)]">
+        <div className="cg-board-frame overflow-hidden border-[6px] border-white shadow-[var(--shadow-board)]">
           <Chessboard
             options={{
               pieces: premiumPieces,
@@ -378,12 +378,12 @@ export default function GrindbookPage() {
         detail="You showed up, reviewed every due position, and protected your streak."
       />
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
-        <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
+        <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home">
             <BrandLockup priority />
           </Link>
 
-          <nav className="flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
+          <nav className="cg-app-nav flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
             <VisitorCounter />
             <Link href="/train">Puzzles</Link>
             <Link href="/play">Play</Link>
@@ -395,7 +395,7 @@ export default function GrindbookPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1120px] px-6 pb-20 pt-9">
+      <div className="cg-page-content mx-auto max-w-[1120px] px-6 pb-20 pt-7 sm:pt-9">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <div className="text-[11px] font-semibold text-[var(--accent)]">
@@ -459,7 +459,7 @@ export default function GrindbookPage() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 gap-6 text-right">
+              <div className="cg-queue-stats grid grid-cols-3 gap-6 text-right">
                 {[
                   ["Due", dueCards.length],
                   ["Saved", cards.length],
@@ -509,7 +509,7 @@ export default function GrindbookPage() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-7 gap-2">
+            <div className="cg-review-week mt-6 grid grid-cols-7 gap-2">
               {reviewWeek.map((day) => (
                 <div key={day.day} className="text-center">
                   <div

@@ -221,11 +221,11 @@ export default function RepertoirePage() {
         detail="You recalled the full continuation without leaving your repertoire."
       />
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
-        <div className="mx-auto flex h-[56px] max-w-[1180px] items-center justify-between px-6">
+        <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1180px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home">
             <BrandLockup priority />
           </Link>
-          <nav className="flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
+          <nav className="cg-app-nav flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]">
             <VisitorCounter />
             <Link href="/train">Puzzles</Link>
             <Link href="/play">Play</Link>
@@ -236,7 +236,7 @@ export default function RepertoirePage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1180px] px-6 pb-20 pt-9">
+      <div className="cg-page-content mx-auto max-w-[1180px] px-6 pb-20 pt-7 sm:pt-9">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <div className="flex items-center gap-2 text-[10px] font-bold text-[var(--accent)]">
@@ -303,7 +303,7 @@ export default function RepertoirePage() {
             </aside>
 
             <section>
-              <div className="overflow-hidden border-[6px] border-white shadow-[var(--shadow-board)]">
+              <div className="cg-board-frame overflow-hidden border-[6px] border-white shadow-[var(--shadow-board)]">
                 <Chessboard
                   options={{
                     pieces: premiumPieces,

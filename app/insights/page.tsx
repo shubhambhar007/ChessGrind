@@ -533,7 +533,7 @@ export default function InsightsPage() {
 
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
 
-        <div className="mx-auto flex h-[56px] max-w-[1060px] items-center justify-between px-6">
+        <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1060px] items-center justify-between px-6">
 
           <Link
             href="/"
@@ -543,7 +543,7 @@ export default function InsightsPage() {
 
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="cg-app-nav flex items-center gap-3">
             <VisitorCounter />
             <Link
               href="/grindbook"
@@ -576,7 +576,7 @@ export default function InsightsPage() {
 
       {/* CONTENT */}
 
-      <div className="mx-auto max-w-[1060px] px-6 pb-20 pt-12">
+      <div className="cg-page-content mx-auto max-w-[1060px] px-6 pb-20 pt-8 sm:pt-12">
 
         {/* HERO */}
 
@@ -586,7 +586,7 @@ export default function InsightsPage() {
             Your training
           </div>
 
-          <h1 className="mt-3 text-[48px] font-semibold leading-[1.02]">
+          <h1 className="mt-3 text-[40px] font-semibold leading-[1.02] sm:text-[48px]">
             Insights
           </h1>
 

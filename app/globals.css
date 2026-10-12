@@ -87,6 +87,8 @@ html {
 
 body {
   margin: 0;
+  max-width: 100%;
+  overflow-x: clip;
   color: var(--text);
 
   background: var(--background);
@@ -1240,7 +1242,141 @@ button:focus-visible {
   .cg-world-copy h1 { font-size: clamp(44px, 6.1vw, 66px); }
 }
 
+@media (min-width: 761px) and (max-width: 900px) {
+  .cg-app-header-inner {
+    height: auto !important;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: 7px 16px;
+    padding-top: 7px;
+    padding-bottom: 9px;
+  }
+
+  .cg-app-nav {
+    order: 2;
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    scrollbar-width: none;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cg-app-nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @media (max-width: 760px) {
+  .cg-app-header-inner {
+    height: auto !important;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: 7px 12px;
+    padding: 7px 16px 9px;
+  }
+
+  .cg-app-header-inner > a:first-child {
+    flex: 0 0 auto;
+  }
+
+  .cg-app-nav {
+    order: 2;
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    gap: 17px !important;
+    overflow-x: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+    scrollbar-width: none;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cg-app-nav::-webkit-scrollbar,
+  .cg-segment-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cg-page-content {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+
+  .cg-app-brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cg-app-brand-wordmark strong {
+    font-size: 14px;
+  }
+
+  .cg-play-controls {
+    display: grid;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .cg-premium-select,
+  .cg-premium-select > button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .cg-premium-select:nth-child(2) > [role="listbox"] {
+    right: 0;
+    left: auto;
+  }
+
+  .cg-premium-select > [role="listbox"] {
+    min-width: min(240px, calc(100vw - 32px));
+  }
+
+  .cg-new-game {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .cg-train-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cg-train-topbar > a {
+    text-align: center;
+  }
+
+  .cg-segment-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cg-board-card {
+    padding: 8px;
+    border-radius: 15px;
+  }
+
+  .cg-board-frame {
+    border-width: 4px;
+  }
+
+  .cg-queue-stats {
+    width: 100%;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .cg-review-week {
+    gap: 4px;
+  }
+
   .cg-landing-nav-inner { width: calc(100% - 28px); height: 62px; }
   .cg-landing-links { display: none; }
   .cg-landing-nav-cta { min-height: 35px; padding: 0 14px; font-size: 10px; }

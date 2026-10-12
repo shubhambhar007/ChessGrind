@@ -95,7 +95,7 @@ export default function PremiumSelect<T extends string>({
   }
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="cg-premium-select relative">
       <button
         ref={triggerRef}
         type="button"

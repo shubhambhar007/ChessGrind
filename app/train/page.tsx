@@ -3722,12 +3722,12 @@ export default function Home() {
           detail={`Session complete with ${sessionStats.solved} solved. Your next grind is already waiting.`}
         />
         <header className="border-b border-[var(--line)] bg-[var(--header)]">
-          <div className="mx-auto flex h-[56px] max-w-[920px] items-center justify-between px-6">
+          <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[920px] items-center justify-between px-6">
             <Link href="/" aria-label="ChessGrind home">
               <BrandLockup priority />
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="cg-app-nav flex items-center gap-3">
               <VisitorCounter />
 
               <Link
@@ -3757,12 +3757,12 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="mx-auto max-w-[820px] px-6 pb-20 pt-16">
+        <div className="cg-page-content mx-auto max-w-[820px] px-6 pb-20 pt-10 sm:pt-16">
           <div className="text-[11px] font-semibold text-[var(--success)]">
             Session complete
           </div>
 
-          <h1 className="mt-3 text-[48px] font-semibold">
+          <h1 className="mt-3 text-[40px] font-semibold sm:text-[48px]">
             Nice work.
           </h1>
 
@@ -3921,12 +3921,12 @@ export default function Home() {
         variant="mini"
       />
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
-        <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
+        <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home">
             <BrandLockup priority />
           </Link>
 
-          <div className="flex items-center gap-5">
+          <div className="cg-app-nav flex items-center gap-5">
             <VisitorCounter />
 
             <Link
@@ -3969,9 +3969,9 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1060px] px-6 pb-16 pt-7">
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
+      <div className="cg-page-content mx-auto max-w-[1060px] px-6 pb-16 pt-7">
+        <div className="cg-train-topbar mb-5 flex items-center justify-between gap-3">
+          <div className="cg-segment-scroll inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
             {SESSION_MODES.map(
               (mode) => {
                 const active =
@@ -4054,7 +4054,7 @@ export default function Home() {
         <section className="mb-9 flex flex-wrap items-center justify-between gap-x-6 gap-y-4 border-b border-[var(--line)] pb-6">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
+              <div className="cg-segment-scroll inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
                 {TRAINING_MODES.map(
                   (mode) => {
                     const active =
@@ -4094,7 +4094,7 @@ export default function Home() {
             </div>
 
             <div>
-              <div className="inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
+              <div className="cg-segment-scroll inline-flex rounded-[12px] bg-black/[0.045] p-[3px]">
                 {COLOR_PREFERENCES.map(
                   (option) => {
                     const active =
@@ -4261,7 +4261,7 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[560px_350px] lg:items-start lg:gap-[48px]">
           <section>
             <div
-              className="flex rounded-[21px] bg-[var(--surface)] p-4"
+              className="cg-board-card flex rounded-[21px] bg-[var(--surface)] p-4"
               style={{
                 boxShadow:
                   "var(--shadow-board)",
@@ -4283,7 +4283,7 @@ export default function Home() {
               <div className="min-w-0 flex-1">
                 <div
                   className={[
-                    "overflow-hidden border-[6px]",
+                    "cg-board-frame overflow-hidden border-[6px]",
 
                     isWrong
                       ? "wrong-shake border-[rgba(217,45,32,0.35)]"

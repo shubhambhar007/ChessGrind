@@ -121,11 +121,11 @@ export default function AccountPage() {
   return (
     <main className="cg-app-shell min-h-screen overflow-hidden">
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
-        <div className="mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
+        <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home">
             <BrandLockup priority />
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="cg-app-nav flex items-center gap-4">
             <Link
               href="/repertoire"
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
@@ -143,12 +143,12 @@ export default function AccountPage() {
         </div>
       </header>
 
-      <div className="relative mx-auto grid max-w-[1040px] gap-14 px-6 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <div className="cg-page-content relative mx-auto grid max-w-[1040px] gap-10 px-6 py-10 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <section className="relative">
           <div className="border-l-2 border-[var(--brass)] pl-3 text-[11px] font-semibold text-[var(--secondary)]">
             Grindbook Cloud / Beta
           </div>
-          <h1 className="mt-6 max-w-[560px] text-[46px] font-semibold leading-[1.02] sm:text-[58px]">
+          <h1 className="mt-6 max-w-[560px] text-[38px] font-semibold leading-[1.02] sm:text-[58px]">
             Your mistakes should follow you—not disappear.
           </h1>
           <p className="mt-6 max-w-[520px] text-[16px] leading-7 text-[var(--secondary)]">
