@@ -206,16 +206,84 @@ function InsightStation() {
   );
 }
 
+function MobileJourney() {
+  const destinations = ["/train", "/play", "/grindbook", "/repertoire"];
+
+  return (
+    <section className="cg-mobile-journey" aria-label="Welcome to ChessGrind">
+      <div className="cg-mobile-hero">
+        <div className="cg-mobile-piece-stage" aria-hidden="true">
+          <div className="cg-mobile-piece-orbit" />
+          <Image
+            src="/pieces/luxe-v2/wK.png"
+            alt=""
+            width={360}
+            height={360}
+            unoptimized
+            priority
+            className="cg-mobile-king"
+          />
+          <Image
+            src="/pieces/luxe-v2/bN.png"
+            alt=""
+            width={170}
+            height={170}
+            unoptimized
+            priority
+            className="cg-mobile-knight cg-mobile-knight-black"
+          />
+          <Image
+            src="/pieces/luxe-v2/wN.png"
+            alt=""
+            width={150}
+            height={150}
+            unoptimized
+            priority
+            className="cg-mobile-knight cg-mobile-knight-white"
+          />
+          <span>THE PERSONAL CHESS GYM</span>
+        </div>
+
+        <div className="cg-mobile-hero-copy">
+          <div className="cg-scene-index"><span>00</span><i /><span>04</span></div>
+          <p className="cg-landing-kicker">{SCENES[0].eyebrow}</p>
+          <h1>{SCENES[0].title}</h1>
+          <p>{SCENES[0].body}</p>
+          <div className="cg-mobile-actions">
+            <Link href="/train" className="cg-primary-cta">Start training <span aria-hidden="true">→</span></Link>
+            <Link href="/play">Play a full game</Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="cg-mobile-feature-list">
+        {SCENES.slice(1).map((scene, index) => (
+          <Link href={destinations[index]} className="cg-mobile-feature" key={scene.number}>
+            <div><span>{scene.number}</span><i /></div>
+            <p>{scene.eyebrow}</p>
+            <h2>{scene.title}</h2>
+            <strong>Explore <span aria-hidden="true">↗</span></strong>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function LandingWorld() {
   const trackRef = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
   const [activeScene, setActiveScene] = useState(0);
 
   useEffect(() => {
+    const mobileQuery = window.matchMedia("(max-width: 760px)");
+    if (mobileQuery.matches) return;
+
     let frame = 0;
 
     const update = () => {
       frame = 0;
+      if (mobileQuery.matches) return;
       const track = trackRef.current;
       if (!track) return;
 
@@ -263,7 +331,9 @@ export default function LandingWorld() {
   } as CSSProperties;
 
   return (
-    <section id="journey" ref={trackRef} className="cg-world-track" style={worldStyle}>
+    <>
+      <MobileJourney />
+      <section id="journey" ref={trackRef} className="cg-world-track" style={worldStyle}>
       <div className="cg-world-sticky">
         <div className="cg-world-glow cg-world-glow-one" />
         <div className="cg-world-glow cg-world-glow-two" />
@@ -362,6 +432,7 @@ export default function LandingWorld() {
         </div>
         <p className="cg-world-signature">PLAY · NOTICE · REMEMBER · IMPROVE</p>
       </div>
-    </section>
+      </section>
+    </>
   );
 }
