@@ -37,6 +37,29 @@ const PRODUCTS = [
   },
 ] as const;
 
+function ProductVisual({ type }: { type: "train" | "play" }) {
+  if (type === "train") {
+    return (
+      <div className="cg-editorial-product-visual cg-editorial-product-visual-train" aria-hidden="true">
+        <Image src="/pieces/luxe-v2/wN.png" alt="" width={362} height={362} unoptimized />
+        <i className="cg-product-move cg-product-move-one" />
+        <i className="cg-product-move cg-product-move-two" />
+        <i className="cg-product-move cg-product-move-three" />
+        <span>GUIDED PATTERN / 01</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="cg-editorial-product-visual cg-editorial-product-visual-play" aria-hidden="true">
+      <Image src="/pieces/luxe-v2/bQ.png" alt="" width={362} height={362} unoptimized className="cg-product-piece-black" />
+      <Image src="/pieces/luxe-v2/wR.png" alt="" width={362} height={362} unoptimized className="cg-product-piece-white" />
+      <div className="cg-product-eval"><i /><strong>+0.8</strong></div>
+      <span>GAME REVIEW / 02</span>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   return (
     <main className="cg-app-shell cg-editorial-landing min-h-screen">
@@ -88,7 +111,9 @@ export default function LandingPage() {
           {PRODUCTS.map((product) => (
             <article key={product.number}>
               <div><span>{product.number}</span><small>{product.name}</small></div><h2>{product.title}</h2>
-              <p>{product.body}</p><Link href={product.href}>{product.action} <span aria-hidden="true">↗</span></Link>
+              <p>{product.body}</p>
+              <ProductVisual type={product.number === "01" ? "train" : "play"} />
+              <Link href={product.href}>{product.action} <span aria-hidden="true">↗</span></Link>
             </article>
           ))}
         </div>
