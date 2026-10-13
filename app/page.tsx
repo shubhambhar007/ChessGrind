@@ -5,35 +5,21 @@ import BrandLockup from "./brand-lockup";
 import ThemeToggle from "./theme-toggle";
 import VisitorCounter from "./visitor-counter";
 
-const BOARD_PIECES = [
-  ["bK", "e8"], ["bQ", "d8"], ["bR", "h8"], ["bP", "d7"],
-  ["bP", "f7"], ["bN", "f6"], ["wB", "c4"], ["wN", "f3"],
-  ["wQ", "d1"], ["wK", "e1"],
-] as const;
-
-function LandingBoard() {
-  const squarePosition = (square: string) => ({
-    file: square.charCodeAt(0) - 97,
-    rank: 8 - Number(square[1]),
-  });
-
+function LandingArtwork() {
   return (
-    <div className="cg-editorial-board" aria-label="Chess position with guided legal moves">
-      {Array.from({ length: 64 }, (_, index) => (
-        <span key={index} className={(Math.floor(index / 8) + index) % 2 ? "dark" : "light"} />
-      ))}
-      <i className="cg-editorial-selected" />
-      {BOARD_PIECES.map(([piece, square]) => {
-        const { file, rank } = squarePosition(square);
-        return (
-          <Image key={`${piece}-${square}`} src={`/pieces/luxe-v2/${piece}.png`} alt="" width={96} height={96}
-            className="cg-editorial-piece" style={{ left: `${file * 12.5}%`, top: `${rank * 12.5}%` }} />
-        );
-      })}
-      {["d4", "e5", "g5", "h4"].map((square) => {
-        const { file, rank } = squarePosition(square);
-        return <i key={square} className="cg-editorial-move" style={{ left: `${(file + 0.5) * 12.5}%`, top: `${(rank + 0.5) * 12.5}%` }} />;
-      })}
+    <div className="cg-editorial-artwork" aria-label="Luxury chess king flanked by two knights">
+      <div className="cg-editorial-artwork-orbit" aria-hidden="true" />
+      <Image src="/pieces/luxe-v2/bN.png" alt="" width={362} height={362} priority unoptimized
+        className="cg-editorial-artwork-knight cg-editorial-artwork-knight-black" />
+      <Image src="/pieces/luxe-v2/wN.png" alt="" width={362} height={362} priority unoptimized
+        className="cg-editorial-artwork-knight cg-editorial-artwork-knight-white" />
+      <Image src="/pieces/luxe-v2/wK.png" alt="" width={362} height={362} priority unoptimized
+        className="cg-editorial-artwork-king" />
+      <div className="cg-editorial-artwork-caption">
+        <span>CHESSGRIND</span>
+        <strong>Build instinct.<br />Move by move.</strong>
+      </div>
+      <div className="cg-editorial-artwork-index" aria-hidden="true">CG / 01</div>
     </div>
   );
 }
@@ -77,10 +63,8 @@ export default function LandingPage() {
           <div className="cg-editorial-trust"><span>No external chess account</span><span>Private by default</span><span>Free to start</span></div>
         </div>
 
-        <div className="cg-editorial-board-panel">
-          <div className="cg-editorial-board-meta"><span>TRAINING POSITION</span><strong>Find the strongest move.</strong></div>
-          <LandingBoard />
-          <div className="cg-editorial-board-foot"><span>Blue dots show every legal move</span><b>YOUR MOVE · WHITE</b></div>
+        <div className="cg-editorial-artwork-panel">
+          <LandingArtwork />
         </div>
       </section>
 
