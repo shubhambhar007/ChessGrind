@@ -431,8 +431,8 @@ button:focus-visible {
   color: var(--text);
   font-size: clamp(64px, 7.1vw, 102px);
   font-weight: 720;
-  letter-spacing: -0.075em !important;
-  line-height: 0.82;
+  letter-spacing: -0.065em !important;
+  line-height: 0.88;
 }
 
 .cg-editorial-hero h1 em {

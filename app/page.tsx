@@ -68,7 +68,7 @@ export default function LandingPage() {
       <section className="cg-editorial-hero">
         <div className="cg-editorial-hero-copy">
           <div className="cg-editorial-overline"><span>01</span> The personal chess gym</div>
-          <h1>Play.<br />Notice.<br /><em>Remember.</em></h1>
+          <h1>Play<br />Notice<br /><em>Remember</em></h1>
           <p>ChessGrind turns the positions you miss into a private training system that brings them back until the pattern sticks.</p>
           <div className="cg-editorial-actions">
             <Link href="/train">Start training <span aria-hidden="true">↗</span></Link>
