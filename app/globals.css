@@ -429,10 +429,10 @@ button:focus-visible {
 .cg-editorial-hero h1 {
   margin: 28px 0 0;
   color: var(--text);
-  font-size: clamp(64px, 7.1vw, 102px);
+  font-size: clamp(58px, 6.4vw, 90px);
   font-weight: 720;
-  letter-spacing: -0.065em !important;
-  line-height: 0.88;
+  letter-spacing: -0.055em !important;
+  line-height: 1.02;
 }
 
 .cg-editorial-hero h1 em {
@@ -661,7 +661,7 @@ button:focus-visible {
   .cg-editorial-final,
   .cg-editorial-footer { width: 100%; border-right: 0; border-left: 0; }
   .cg-editorial-hero-copy { min-height: 570px; padding: 70px 22px 48px; }
-  .cg-editorial-hero h1 { max-width: 100%; font-size: clamp(52px, 16vw, 64px); }
+  .cg-editorial-hero h1 { max-width: 100%; font-size: clamp(48px, 14.5vw, 58px); }
   .cg-editorial-hero-copy > p { max-width: 100%; }
   .cg-editorial-trust span { width: 100%; border-left: 0 !important; border-bottom: 1px solid var(--line); padding-left: 0 !important; }
   .cg-editorial-trust span:last-child { border-bottom: 0; }
