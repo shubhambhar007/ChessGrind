@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import BrandLockup from "../brand-lockup";
 import ThemeToggle from "../theme-toggle";
@@ -33,7 +34,16 @@ export default function FounderPage() {
 
         <aside className="cg-founder-card">
           <div className="cg-founder-card-top"><span>CG / FOUNDER</span><span>001</span></div>
-          <div className="cg-founder-seal" aria-hidden="true"><i>♞</i><strong>F</strong></div>
+          <div className="cg-founder-seal" aria-hidden="true">
+            <Image
+              src="/brand/chessgrind-king-knight-emblem.png"
+              alt=""
+              width={260}
+              height={260}
+              unoptimized
+              className="cg-founder-seal-logo"
+            />
+          </div>
           <p>PLAY · NOTICE · REMEMBER</p>
           <div className="cg-founder-signature"><span>CHESSGRIND</span><strong>Founding player</strong></div>
         </aside>

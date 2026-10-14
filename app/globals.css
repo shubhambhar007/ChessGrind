@@ -921,8 +921,7 @@ button:focus-visible {
 .cg-founder-seal::before,
 .cg-founder-seal::after { content: ""; position: absolute; inset: 13px; border: 1px dashed rgba(224, 184, 94, .24); border-radius: 50%; }
 .cg-founder-seal::after { inset: 34px; border-style: solid; }
-.cg-founder-seal i { position: absolute; font-style: normal; font-size: 152px; opacity: .12; transform: translate(-10px, 8px); }
-.cg-founder-seal strong { color: #e1bd6a; font: 500 112px var(--font-editorial); text-shadow: 0 8px 30px rgba(224, 184, 94, .2); }
+.cg-founder-seal-logo { position: relative; z-index: 1; width: 78%; height: 78%; object-fit: contain; opacity: .82; filter: brightness(1.28) saturate(.72) sepia(.12) drop-shadow(0 12px 30px rgba(224, 184, 94, .2)); }
 .cg-founder-card > p { margin: 0; color: rgba(247, 237, 215, .5); font: 7px var(--font-score); letter-spacing: .22em; text-align: center; }
 .cg-founder-signature { position: absolute; right: 28px; bottom: 28px; left: 28px; display: flex; align-items: end; justify-content: space-between; border-top: 1px solid rgba(224, 184, 94, .25); padding-top: 18px; }
 .cg-founder-signature span { color: #e1bd6a; font: 8px var(--font-score); letter-spacing: .15em; }
@@ -960,7 +959,7 @@ button:focus-visible {
   .cg-founder-copy > p { font-size: 14px; }
   .cg-founder-card { width: calc(100% - 44px); max-width: 380px; margin: 50px auto; }
   .cg-founder-seal { width: 205px; height: 205px; margin-top: 44px; }
-  .cg-founder-seal strong { font-size: 92px; }
+  .cg-founder-seal-logo { width: 76%; height: 76%; }
   .cg-founder-benefits > div:first-child { padding: 58px 22px; }
   .cg-founder-benefit-grid { grid-template-columns: 1fr; }
   .cg-founder-benefit-grid article { min-height: 190px; border-right: 0; border-bottom: 1px solid var(--line) !important; padding: 30px 22px; }
