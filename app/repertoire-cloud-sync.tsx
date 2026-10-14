@@ -46,9 +46,9 @@ export default function RepertoireCloudSync() {
           cache: "no-store",
         });
         const session = (await sessionResponse.json()) as { user: AccountUser | null };
-        if (!session.user) {
+        if (!session.user || session.user.plan !== "founder") {
           userIdRef.current = null;
-          if (window.localStorage.getItem(LAST_REPERTOIRE_CLOUD_USER_KEY)) {
+          if (!session.user && window.localStorage.getItem(LAST_REPERTOIRE_CLOUD_USER_KEY)) {
             window.localStorage.removeItem(LAST_REPERTOIRE_CLOUD_USER_KEY);
             window.localStorage.removeItem(REPERTOIRE_KEY);
             window.dispatchEvent(new Event(REPERTOIRE_UPDATED_EVENT));

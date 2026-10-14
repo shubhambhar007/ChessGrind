@@ -32,6 +32,12 @@ export async function GET(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
   }
+  if (user.plan !== "founder") {
+    return NextResponse.json(
+      { error: "Founder access is required for cloud sync." },
+      { status: 403 }
+    );
+  }
 
   const store = getStore();
   if (!store) {
@@ -55,6 +61,12 @@ export async function PUT(request: NextRequest) {
   const user = await getRequestUser(request);
   if (!user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+  if (user.plan !== "founder") {
+    return NextResponse.json(
+      { error: "Founder access is required for cloud sync." },
+      { status: 403 }
+    );
   }
 
   const contentLength = Number(request.headers.get("content-length") ?? 0);

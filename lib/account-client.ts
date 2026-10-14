@@ -6,6 +6,8 @@ export type AccountUser = {
   id: string;
   handle: string;
   createdAt: string;
+  plan: "free" | "founder";
+  planExpiresAt: string | null;
 };
 
 export type CloudStatus = "guest" | "syncing" | "synced" | "error";

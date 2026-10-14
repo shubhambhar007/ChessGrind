@@ -5,6 +5,7 @@ import {
   checkAuthRateLimit,
   getClientIdentifier,
   startSession,
+  toPublicUser,
 } from "@/lib/server/auth";
 import { getStore } from "@/lib/server/store";
 
@@ -24,9 +25,7 @@ export async function POST(request: NextRequest) {
     await checkAuthRateLimit(store, getClientIdentifier(request, handle));
     const { user } = await authenticateUser(handle, password, store);
 
-    const response = NextResponse.json({
-      user: { id: user.id, handle: user.handle, createdAt: user.createdAt },
-    });
+    const response = NextResponse.json({ user: toPublicUser(user) });
     await startSession(store, user.id, response);
     return response;
   } catch (error) {

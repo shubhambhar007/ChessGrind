@@ -90,12 +90,10 @@ export default function GrindbookCloudSync() {
           user: AccountUser | null;
         };
 
-        if (!session.user) {
+        if (!session.user || session.user.plan !== "founder") {
           userIdRef.current = null;
-          const previousUser = window.localStorage.getItem(
-            LAST_CLOUD_USER_KEY
-          );
-          if (previousUser) {
+          const previousUser = window.localStorage.getItem(LAST_CLOUD_USER_KEY);
+          if (!session.user && previousUser) {
             window.localStorage.removeItem(LAST_CLOUD_USER_KEY);
             window.localStorage.removeItem(GRINDBOOK_KEY);
             window.localStorage.removeItem(GRINDBOOK_PROGRESS_KEY);

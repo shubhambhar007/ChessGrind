@@ -16,6 +16,7 @@ function key(userId: string) {
 export async function GET(request: NextRequest) {
   const user = await getRequestUser(request);
   if (!user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  if (user.plan !== "founder") return NextResponse.json({ error: "Founder access is required for cloud sync." }, { status: 403 });
   const store = getStore();
   if (!store) return NextResponse.json({ error: "Cloud unavailable." }, { status: 503 });
   const saved = await store.get<Repertoire[]>(key(user.id));
@@ -27,6 +28,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   const user = await getRequestUser(request);
   if (!user) return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  if (user.plan !== "founder") return NextResponse.json({ error: "Founder access is required for cloud sync." }, { status: 403 });
   let body: { repertoires?: unknown };
   try {
     body = (await request.json()) as { repertoires?: unknown };

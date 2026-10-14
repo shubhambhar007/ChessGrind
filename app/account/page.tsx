@@ -38,9 +38,21 @@ export default function AccountPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [localCardCount, setLocalCardCount] = useState(0);
+  const [nextPath, setNextPath] = useState("/grindbook");
+  const [founderMessage, setFounderMessage] = useState<"active" | "pending" | "error" | null>(null);
 
   useEffect(() => {
     queueMicrotask(() => setLocalCardCount(loadGrindbook().length));
+    const params = new URLSearchParams(window.location.search);
+    const requestedNext = params.get("next");
+    queueMicrotask(() => {
+      if (requestedNext?.startsWith("/") && !requestedNext.startsWith("//")) {
+        setNextPath(requestedNext);
+      }
+      if (params.get("founder") === "active") setFounderMessage("active");
+      else if (params.get("payment") === "pending") setFounderMessage("pending");
+      else if (params.has("founder")) setFounderMessage("error");
+    });
 
     async function loadSession() {
       try {
@@ -87,7 +99,7 @@ export default function AccountPage() {
 
       setUser(payload.user);
       notifyAuthUpdated();
-      window.setTimeout(() => router.push("/grindbook"), 500);
+      window.setTimeout(() => router.push(nextPath), 500);
     } catch {
       setError("Could not reach ChessGrind. Try again.");
     } finally {
@@ -146,18 +158,18 @@ export default function AccountPage() {
       <div className="cg-page-content relative mx-auto grid max-w-[1040px] gap-10 px-6 py-10 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
         <section className="relative">
           <div className="border-l-2 border-[var(--brass)] pl-3 text-[11px] font-semibold text-[var(--secondary)]">
-            Grindbook Cloud / Beta
+            ChessGrind Account / Private
           </div>
           <h1 className="mt-6 max-w-[560px] text-[38px] font-semibold leading-[1.02] sm:text-[58px]">
             Your mistakes should follow you—not disappear.
           </h1>
           <p className="mt-6 max-w-[520px] text-[16px] leading-7 text-[var(--secondary)]">
-            Create a private ChessGrind account and your Grindbook follows you
-            across devices. No social login. No external chess account.
+            Create a private ChessGrind account to keep your training identity.
+            Founder players also get cloud memory across every device. No social login. No external chess account.
           </p>
 
           <div className="mt-9 grid max-w-[520px] border-y border-[var(--line-strong)] sm:grid-cols-3">
-            {["Private by default", "Automatic cloud sync", "Keep every review"].map((label) => (
+            {["Private by default", "Train free", "Founder cloud memory"].map((label) => (
               <div
                 key={label}
                 className="border-b border-[var(--line)] px-3 py-4 text-[12px] font-semibold leading-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
@@ -176,6 +188,21 @@ export default function AccountPage() {
               </div>
             ) : user ? (
               <div className="min-h-[420px]">
+                {founderMessage === "active" && (
+                  <div className="mb-5 rounded-[12px] border border-[color-mix(in_srgb,var(--success)_35%,transparent)] bg-[color-mix(in_srgb,var(--success)_10%,transparent)] px-4 py-3 text-[12px] font-semibold text-[var(--success)]">
+                    Founder unlocked. Welcome to the first class.
+                  </div>
+                )}
+                {founderMessage === "pending" && (
+                  <div className="mb-5 rounded-[12px] border border-[var(--line-strong)] px-4 py-3 text-[12px] text-[var(--secondary)]">
+                    Sign in to finish attaching your payment.
+                  </div>
+                )}
+                {founderMessage === "error" && (
+                  <div className="mb-5 rounded-[12px] border border-[var(--danger-strong)] bg-[var(--danger-soft)] px-4 py-3 text-[12px] text-[var(--danger)]">
+                    We could not verify that payment yet. No access was changed.
+                  </div>
+                )}
                 <div className="grid h-14 w-14 place-items-center rounded-[17px] bg-[var(--accent-soft)] text-[22px] text-[var(--accent)] shadow-[0_12px_32px_rgba(59,92,255,0.18)]">
                   {user.handle.slice(0, 1).toUpperCase()}
                 </div>
@@ -186,17 +213,27 @@ export default function AccountPage() {
                   @{user.handle}
                 </h2>
                 <div className="mt-6 flex items-center gap-3 rounded-[14px] border border-[var(--line-strong)] bg-[var(--accent-soft)] p-4">
-                  <span className="h-2 w-2 rounded-full bg-[var(--success)]" />
+                  <span className={`h-2 w-2 rounded-full ${user.plan === "founder" ? "bg-[var(--success)]" : "bg-[var(--brass)]"}`} />
                   <div>
-                    <div className="text-[12px] font-semibold">Cloud sync active</div>
+                    <div className="text-[12px] font-semibold">{user.plan === "founder" ? "Founder cloud sync active" : "Free player account"}</div>
                     <div className="mt-0.5 text-[11px] text-[var(--secondary)]">
-                      Your Grindbook and repertoires are protected.
+                      {user.plan === "founder"
+                        ? "Your Grindbook and repertoires are protected."
+                        : "All puzzles and full games are open. Cloud memory is Founder."}
                     </div>
                   </div>
                 </div>
+                {user.plan !== "founder" && (
+                  <Link
+                    href="/founder"
+                    className="control mt-5 flex h-12 items-center justify-center rounded-[12px] bg-[var(--button)] text-[13px] font-semibold text-[var(--button-text)]"
+                  >
+                    Unlock Founder · ₹799/year
+                  </Link>
+                )}
                 <Link
                   href="/grindbook"
-                  className="control mt-8 flex h-12 items-center justify-center rounded-[12px] bg-[var(--button)] text-[13px] font-semibold text-[var(--button-text)]"
+                  className={`control flex h-12 items-center justify-center rounded-[12px] text-[13px] font-semibold ${user.plan === "founder" ? "mt-8 bg-[var(--button)] text-[var(--button-text)]" : "mt-3 border border-[var(--line)]"}`}
                 >
                   Open my Grindbook
                 </Link>
@@ -244,8 +281,8 @@ export default function AccountPage() {
                 <p className="mt-2 text-[13px] leading-5 text-[var(--secondary)]">
                   {mode === "signup"
                     ? localCardCount > 0
-                      ? `${localCardCount} saved ${localCardCount === 1 ? "position" : "positions"} on this device will be moved into your cloud account.`
-                      : "Start a private cloud Grindbook with a unique handle."
+                      ? `${localCardCount} saved ${localCardCount === 1 ? "position stays" : "positions stay"} safely on this device. Founder can sync them later.`
+                      : "Start a private ChessGrind identity with a unique handle."
                     : "Use your ChessGrind handle and passphrase."}
                 </p>
 
@@ -296,7 +333,7 @@ export default function AccountPage() {
                     {submitting
                       ? "Securing your account…"
                       : mode === "signup"
-                        ? "Create & sync Grindbook"
+                        ? "Create free account"
                         : "Sign in to ChessGrind"}
                   </button>
                 </form>

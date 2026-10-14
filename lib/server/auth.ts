@@ -18,17 +18,48 @@ const USER_PREFIX = "chessgrind:account:user:";
 const HANDLE_PREFIX = "chessgrind:account:handle:";
 const SESSION_PREFIX = "chessgrind:account:session:";
 const RATE_PREFIX = "chessgrind:account:rate:";
+const FOUNDER_PURCHASE_PREFIX = "chessgrind:founder:purchase:";
 
 export type PublicUser = {
   id: string;
   handle: string;
   createdAt: string;
+  plan: "free" | "founder";
+  planExpiresAt: string | null;
 };
 
-type StoredUser = PublicUser & {
+type StoredUser = Omit<PublicUser, "plan" | "planExpiresAt"> & {
+  plan?: PublicUser["plan"];
+  planExpiresAt?: string | null;
   passwordHash: string;
   passwordSalt: string;
 };
+
+// Accounts that helped shape ChessGrind before the Founder launch keep cloud
+// access permanently. New accounts can still use every training feature free.
+const FOUNDER_LAUNCH_AT = new Date("2026-10-14T17:21:40.000Z").getTime();
+
+function storedUserHasFounderAccess(user: StoredUser) {
+  if (user.plan === "founder") {
+    return !user.planExpiresAt || new Date(user.planExpiresAt).getTime() > Date.now();
+  }
+
+  return (
+    user.plan === undefined &&
+    new Date(user.createdAt).getTime() <= FOUNDER_LAUNCH_AT
+  );
+}
+
+export function toPublicUser(user: StoredUser): PublicUser {
+  const founder = storedUserHasFounderAccess(user);
+  return {
+    id: user.id,
+    handle: user.handle,
+    createdAt: user.createdAt,
+    plan: founder ? "founder" : "free",
+    planExpiresAt: founder ? (user.planExpiresAt ?? null) : null,
+  };
+}
 
 export class AuthError extends Error {
   constructor(
@@ -94,6 +125,8 @@ export async function createUser(
     id: userId,
     handle: normalized,
     createdAt: new Date().toISOString(),
+    plan: "free",
+    planExpiresAt: null,
     passwordSalt,
     passwordHash,
   };
@@ -202,12 +235,40 @@ export async function getRequestUser(request: NextRequest) {
   const user = await store.get<StoredUser>(`${USER_PREFIX}${userId}`);
   if (!user) return null;
 
-  const publicUser: PublicUser = {
-    id: user.id,
-    handle: user.handle,
-    createdAt: user.createdAt,
+  return toPublicUser(user);
+}
+
+export async function grantFounderAccess(userId: string, purchaseId: string) {
+  const store = getStore();
+  if (!store) throw new AuthError("Cloud accounts are temporarily unavailable.", 503);
+
+  const key = `${USER_PREFIX}${userId}`;
+  const user = await store.get<StoredUser>(key);
+  if (!user) throw new AuthError("Account not found.", 404);
+
+  const purchaseKey = `${FOUNDER_PURCHASE_PREFIX}${purchaseId}`;
+  const claimed = await store.set(purchaseKey, userId, { nx: true });
+  if (!claimed) return toPublicUser(user);
+
+  const currentExpiry = user.planExpiresAt
+    ? new Date(user.planExpiresAt).getTime()
+    : 0;
+  const startsAt = Math.max(Date.now(), currentExpiry);
+  const planExpiresAt = new Date(startsAt);
+  planExpiresAt.setUTCFullYear(planExpiresAt.getUTCFullYear() + 1);
+
+  const updated: StoredUser = {
+    ...user,
+    plan: "founder",
+    planExpiresAt: planExpiresAt.toISOString(),
   };
-  return publicUser;
+  try {
+    await store.set(key, updated);
+  } catch (error) {
+    await store.del(purchaseKey);
+    throw error;
+  }
+  return toPublicUser(updated);
 }
 
 export function getClientIdentifier(request: NextRequest, handle: string) {

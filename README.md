@@ -186,13 +186,24 @@ UPSTASH_REDIS_REST_KV_REST_API_URL=
 UPSTASH_REDIS_REST_KV_REST_API_TOKEN=
 ```
 
+## Enable Founder checkout
+
+Founder uses a unique Razorpay Payment Link per signed-in player and verifies the paid link server-side before enabling one year of cloud access. Add the live Razorpay API credentials in Vercel:
+
+```bash
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+```
+
+Keep `RAZORPAY_KEY_SECRET` server-only. The app creates the ₹799 checkout itself, so no shared payment-link URL is required.
+
 Never commit Redis tokens or other credentials to the repository.
 
 ## Deployment
 
 1. Import the repository into Vercel.
 2. Attach an Upstash Redis store to the project.
-3. Confirm the Redis environment variables are available to Production and Preview.
+3. Confirm the Redis and Razorpay environment variables are available to Production and Preview.
 4. Deploy `main`.
 
 Without Redis, production account and persistent visitor endpoints intentionally report storage as unavailable; the local-first training tools continue to work in the browser.
@@ -200,7 +211,7 @@ Without Redis, production account and persistent visitor endpoints intentionally
 ## Data and privacy model
 
 - Guest Grindbook, repertoire, theme, and training progress live in that browser's local storage.
-- Creating a ChessGrind account merges compatible local training data into the private cloud account.
+- Founder accounts merge compatible local training data into the private cloud account; free accounts remain local-first.
 - ChessGrind does not require an external chess-service account.
 - Account passphrases are never stored directly.
 - Signing out removes the synced account copy from the current browser.

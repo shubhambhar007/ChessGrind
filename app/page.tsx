@@ -68,7 +68,7 @@ export default function LandingPage() {
           <Link href="/" aria-label="ChessGrind home"><BrandLockup priority /></Link>
           <nav className="cg-app-nav flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]" aria-label="Main navigation">
             <VisitorCounter /><a href="#product">How it works</a><Link href="/grindbook">Grindbook</Link>
-            <Link href="/repertoire">Repertoire</Link><AccountLink /><ThemeToggle />
+            <Link href="/repertoire">Repertoire</Link><Link href="/founder" className="cg-founder-nav-link">Founder</Link><AccountLink /><ThemeToggle />
           </nav>
           <Link href="/train" className="cg-editorial-header-cta">Start training <span aria-hidden="true">↗</span></Link>
         </div>
@@ -122,7 +122,7 @@ export default function LandingPage() {
       <section className="cg-editorial-memory">
         <div className="cg-editorial-memory-copy">
           <span>03 · GRINDBOOK</span><h2>Your mistakes should train you twice.</h2>
-          <p>Save a puzzle or game position once. Grindbook schedules it for review, tracks your recall, and keeps the queue synced across your devices.</p>
+          <p>Save a puzzle or game position once. Grindbook schedules it for review and tracks your recall. Founder keeps that memory synced across every device.</p>
           <Link href="/grindbook">Open Grindbook <span aria-hidden="true">↗</span></Link>
         </div>
         <div className="cg-editorial-review-card">
@@ -143,6 +143,12 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="cg-editorial-founder">
+        <div><span>FOUNDING SEASON</span><strong>₹799</strong><small>one year</small></div>
+        <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 225 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
+        <Link href="/founder">See Founder <span aria-hidden="true">↗</span></Link>
+      </section>
+
       <section className="cg-editorial-final">
         <p>225 original positions · no puzzle limit</p><h2>Stop collecting mistakes.<br />Start converting them.</h2>
         <Link href="/train">Start your first grind <span aria-hidden="true">↗</span></Link>
@@ -150,7 +156,7 @@ export default function LandingPage() {
 
       <footer className="cg-editorial-footer">
         <BrandLockup /><p>Play. Notice. Remember. Improve.</p>
-        <nav><Link href="/train">Train</Link><Link href="/play">Play</Link><Link href="/grindbook">Grindbook</Link><Link href="/insights">Insights</Link></nav>
+        <nav><Link href="/train">Train</Link><Link href="/play">Play</Link><Link href="/grindbook">Grindbook</Link><Link href="/insights">Insights</Link><Link href="/founder">Founder</Link></nav>
       </footer>
     </main>
   );
