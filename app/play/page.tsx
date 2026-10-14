@@ -156,6 +156,10 @@ export default function PlayPage() {
   const [capturedMistake, setCapturedMistake] =
     useState<CapturedMistake | null>(null);
   const moveListRef = useRef<HTMLDivElement>(null);
+  const pointerSelectionRef = useRef<{
+    square: string;
+    wasSelected: boolean;
+  } | null>(null);
 
   useEffect(() => {
     if (activeTab !== "moves" || moveLog.length === 0) return;
@@ -388,6 +392,16 @@ export default function PlayPage() {
 
   function handleSquareClick(square: string) {
     if (gameOver || isAiThinking) return;
+
+    const pointerSelection = pointerSelectionRef.current;
+    pointerSelectionRef.current = null;
+
+    if (pointerSelection?.square === square) {
+      if (pointerSelection.wasSelected) {
+        setSelectedSquare(null);
+      }
+      return;
+    }
 
     const clickedOwnPiece = isPlayersPiece(
       game,
@@ -758,6 +772,29 @@ export default function PlayPage() {
                           backgroundColor: BOARD_LIGHT,
                         },
                         squareStyles,
+                        onSquareMouseDown: ({ square }) => {
+                          if (
+                            !square ||
+                            gameOver ||
+                            isAiThinking
+                          ) {
+                            return;
+                          }
+                          if (
+                            isPlayersPiece(
+                              game,
+                              square,
+                              playerColor
+                            )
+                          ) {
+                            pointerSelectionRef.current = {
+                              square,
+                              wasSelected:
+                                selectedSquare === square,
+                            };
+                            setSelectedSquare(square);
+                          }
+                        },
                         canDragPiece: ({ square }) => {
                           if (
                             !square ||
@@ -790,6 +827,9 @@ export default function PlayPage() {
                             setSelectedSquare(square);
                           }
                         },
+                        onPieceDragCancel: () => {
+                          pointerSelectionRef.current = null;
+                        },
                         onSquareClick: ({ square }) => {
                           if (!square) return;
                           handleSquareClick(square);
@@ -804,6 +844,7 @@ export default function PlayPage() {
                           ) {
                             return false;
                           }
+                          pointerSelectionRef.current = null;
                           return handlePieceDrop(
                             sourceSquare,
                             targetSquare

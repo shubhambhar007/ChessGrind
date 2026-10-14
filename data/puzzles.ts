@@ -3544,5 +3544,437 @@ export const puzzles: Puzzle[] = [
     "difficulty": "easy",
     "solutionLength": 2,
     "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0201",
+    "fen": "K1Q5/8/8/8/8/8/5p2/1R5k w - - 0 1",
+    "moves": [
+      "c8h3"
+    ],
+    "rating": 802,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0202",
+    "fen": "8/8/8/4kq2/8/2P5/8/4r1K1 b - - 0 1",
+    "moves": [
+      "f5c2"
+    ],
+    "rating": 998,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0203",
+    "fen": "k7/7p/1R6/7Q/8/1p6/2p5/7K w - - 0 1",
+    "moves": [
+      "h5a5"
+    ],
+    "rating": 832,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0204",
+    "fen": "8/P7/8/4k2P/1r6/6P1/6q1/6K1 b - - 0 1",
+    "moves": [
+      "b4b2"
+    ],
+    "rating": 836,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0205",
+    "fen": "6k1/R7/8/4K3/8/4p2Q/8/8 w - - 0 1",
+    "moves": [
+      "h3c8"
+    ],
+    "rating": 1006,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0206",
+    "fen": "8/7P/4P1q1/k7/8/8/3P4/2K1r3 b - - 0 1",
+    "moves": [
+      "g6b1"
+    ],
+    "rating": 1006,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0207",
+    "fen": "8/kR6/2p5/1N6/8/2K5/8/8 w - - 0 1",
+    "moves": [
+      "b5a7"
+    ],
+    "rating": 781,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0208",
+    "fen": "K1q5/8/8/6P1/2P5/8/1P5r/4k3 b - - 0 1",
+    "moves": [
+      "h2h7"
+    ],
+    "rating": 818,
+    "themes": [
+      "mate",
+      "mateIn1",
+      "backRankMate",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "easy",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0209",
+    "fen": "8/5P2/8/6k1/5p2/8/1K6/8 w - - 0 1",
+    "moves": [
+      "f7f8q"
+    ],
+    "rating": 1259,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0210",
+    "fen": "8/8/3k4/8/6K1/8/1p1P4/8 b - - 0 1",
+    "moves": [
+      "b2b1q"
+    ],
+    "rating": 1298,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0211",
+    "fen": "8/2P1k3/8/8/7p/5K2/8/8 w - - 0 1",
+    "moves": [
+      "c7c8q"
+    ],
+    "rating": 1312,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0212",
+    "fen": "8/4k3/8/7P/8/7K/6p1/8 b - - 0 1",
+    "moves": [
+      "g2g1q"
+    ],
+    "rating": 1254,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0213",
+    "fen": "8/k3P3/8/7p/8/8/8/1K6 w - - 0 1",
+    "moves": [
+      "e7e8q"
+    ],
+    "rating": 1345,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0214",
+    "fen": "8/2k5/8/8/8/4P3/1p6/4K3 b - - 0 1",
+    "moves": [
+      "b2b1q"
+    ],
+    "rating": 1254,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0215",
+    "fen": "8/2P4k/8/3p4/8/8/8/7K w - - 0 1",
+    "moves": [
+      "c7c8q"
+    ],
+    "rating": 1304,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0216",
+    "fen": "8/8/4k3/8/K7/8/1p4P1/8 b - - 0 1",
+    "moves": [
+      "b2b1q"
+    ],
+    "rating": 1363,
+    "themes": [
+      "promotion",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "medium",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0217",
+    "fen": "1k3K2/1q6/8/8/7P/8/8/2R5 w - - 0 1",
+    "moves": [
+      "c1b1"
+    ],
+    "rating": 1895,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0218",
+    "fen": "1r4k1/8/8/8/4P3/8/2Q5/2K5 b - - 0 1",
+    "moves": [
+      "b8c8"
+    ],
+    "rating": 1835,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0219",
+    "fen": "3k4/3q4/7K/6p1/8/8/8/4R3 w - - 0 1",
+    "moves": [
+      "e1d1"
+    ],
+    "rating": 1929,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0220",
+    "fen": "5r2/8/8/3P4/8/1k6/6Q1/6K1 b - - 0 1",
+    "moves": [
+      "f8g8"
+    ],
+    "rating": 1944,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0221",
+    "fen": "1k6/1q6/7P/6K1/8/8/8/2R5 w - - 0 1",
+    "moves": [
+      "c1b1"
+    ],
+    "rating": 1832,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0222",
+    "fen": "1r6/8/8/5P2/8/6k1/2Q5/2K5 b - - 0 1",
+    "moves": [
+      "b8c8"
+    ],
+    "rating": 1943,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0223",
+    "fen": "3k4/3q4/8/8/1K6/2p5/8/4R3 w - - 0 1",
+    "moves": [
+      "e1d1"
+    ],
+    "rating": 1905,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0224",
+    "fen": "3r4/8/8/8/8/2p3k1/4Q3/4K3 b - - 0 1",
+    "moves": [
+      "d8e8"
+    ],
+    "rating": 1924,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
+  },
+  {
+    "id": "CG-0225",
+    "fen": "5k2/5q2/3p4/8/3K4/8/8/6R1 w - - 0 1",
+    "moves": [
+      "g1f1"
+    ],
+    "rating": 1919,
+    "themes": [
+      "pin",
+      "advantage",
+      "endgame",
+      "short"
+    ],
+    "difficulty": "hard",
+    "solutionLength": 1,
+    "source": "ChessGrind Original"
   }
 ];

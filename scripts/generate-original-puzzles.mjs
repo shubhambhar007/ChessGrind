@@ -6,7 +6,8 @@ import { Chess } from "chess.js";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(SCRIPT_DIR, "..");
 const OUTPUT_FILE = path.join(PROJECT_ROOT, "data", "puzzles.ts");
-const TARGET_COUNT = 200;
+const BASELINE_COUNT = 200;
+const TARGET_COUNT = 225;
 const SEED = 0x43484752;
 const MATE_SCORE = 100_000;
 const PIECE_VALUE = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
@@ -564,7 +565,7 @@ async function generate() {
   const accepted = [];
   const seenPositions = new Set();
   const counts = { easy: 0, medium: 0, hard: 0 };
-  const limits = { easy: 68, medium: 68, hard: 64 };
+  const baselineLimits = { easy: 68, medium: 68, hard: 64 };
 
   const authoredSets = [
     ...generateMatePuzzles(28, seenPositions),
@@ -573,13 +574,13 @@ async function generate() {
     ...generatePinPuzzles(30, seenPositions),
   ];
   for (const puzzle of authoredSets) {
-    if (counts[puzzle.difficulty] >= limits[puzzle.difficulty]) continue;
+    if (counts[puzzle.difficulty] >= baselineLimits[puzzle.difficulty]) continue;
     accepted.push(puzzle);
     counts[puzzle.difficulty] += 1;
   }
   console.log(`Seeded ${accepted.length} authored tactical compositions.`);
 
-  for (let gameNumber = 0; gameNumber < 1800 && accepted.length < TARGET_COUNT; gameNumber += 1) {
+  for (let gameNumber = 0; gameNumber < 1800 && accepted.length < BASELINE_COUNT; gameNumber += 1) {
     const game = new Chess();
     const maxPlies = 26 + Math.floor(random() * 34);
     for (let ply = 0; ply < maxPlies && !game.isGameOver(); ply += 1) {
@@ -588,7 +589,7 @@ async function generate() {
       const candidate = createCandidate(sourceFen, setupMove, ply);
       game.move(setupMove);
       if (!candidate || seenPositions.has(candidate.targetFen)) continue;
-      if (counts[candidate.difficulty] >= limits[candidate.difficulty]) continue;
+      if (counts[candidate.difficulty] >= baselineLimits[candidate.difficulty]) continue;
 
       const ordinal = accepted.length + 1;
       const ratingBase = candidate.difficulty === "easy" ? 820 : candidate.difficulty === "medium" ? 1280 : 1680;
@@ -610,6 +611,20 @@ async function generate() {
         console.log(`Accepted ${accepted.length}/${TARGET_COUNT} puzzles...`);
       }
     }
+  }
+
+  if (accepted.length !== BASELINE_COUNT) {
+    throw new Error(`Generated ${accepted.length}/${BASELINE_COUNT} baseline puzzles: ${JSON.stringify(counts)}`);
+  }
+
+  const extensionSets = [
+    ...generateMatePuzzles(8, seenPositions),
+    ...generatePromotionPuzzles(8, seenPositions),
+    ...generatePinPuzzles(9, seenPositions),
+  ];
+  for (const puzzle of extensionSets) {
+    accepted.push(puzzle);
+    counts[puzzle.difficulty] += 1;
   }
 
   if (accepted.length !== TARGET_COUNT) {

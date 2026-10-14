@@ -1873,6 +1873,12 @@ export default function Home() {
       typeof setTimeout
     > | null>(null);
 
+  const pointerSelectionRef =
+    useRef<{
+      square: string;
+      wasSelected: boolean;
+    } | null>(null);
+
   /*
    * Wooden move sound.
    */
@@ -3394,6 +3400,27 @@ export default function Home() {
       return;
     }
 
+    const pointerSelection =
+      pointerSelectionRef.current;
+
+    pointerSelectionRef.current =
+      null;
+
+    if (
+      pointerSelection?.square ===
+      square
+    ) {
+      if (
+        pointerSelection.wasSelected
+      ) {
+        setSelectedSquare(
+          null
+        );
+      }
+
+      return;
+    }
+
     const clickedPiece =
       game.get(
         square as Square
@@ -4317,6 +4344,38 @@ export default function Home() {
 
                     squareStyles,
 
+                    onSquareMouseDown: ({
+                      square,
+                    }) => {
+                      if (
+                        !square ||
+                        solved ||
+                        isOpponentMoving ||
+                        pendingPromotion
+                      ) {
+                        return;
+                      }
+
+                      if (
+                        isPlayersPiece(
+                          game,
+                          square,
+                          playerColor
+                        )
+                      ) {
+                        pointerSelectionRef.current = {
+                          square,
+                          wasSelected:
+                            selectedSquare ===
+                            square,
+                        };
+
+                        setSelectedSquare(
+                          square
+                        );
+                      }
+                    },
+
                     canDragPiece: ({
                       square,
                     }) => {
@@ -4361,6 +4420,11 @@ export default function Home() {
                       }
                     },
 
+                    onPieceDragCancel: () => {
+                      pointerSelectionRef.current =
+                        null;
+                    },
+
                     onSquareClick: ({
                       square,
                     }) => {
@@ -4385,6 +4449,9 @@ export default function Home() {
                       ) {
                         return false;
                       }
+
+                      pointerSelectionRef.current =
+                        null;
 
                       if (
                         sourceSquare ===
