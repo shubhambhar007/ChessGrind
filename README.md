@@ -28,7 +28,7 @@ No external chess-service connection is required. Guests can train locally, whil
 
 ### Adaptive puzzle training
 
-- 400 ChessGrind Original positions with ratings and tactical themes
+- 600 ChessGrind Original positions with ratings and tactical themes
 - Endless, guided **Learn**, and focused **10 Puzzle Session** modes
 - Easy, medium, hard, and mixed difficulty filters
 - Train as White, Black, or either side

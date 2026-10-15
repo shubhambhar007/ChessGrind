@@ -27,7 +27,7 @@ export default function FounderPage() {
         <div className="cg-founder-copy">
           <span>FOUNDING SEASON · 2026</span>
           <h1>Back the grind.<br /><em>Own the year.</em></h1>
-          <p>ChessGrind stays generous: all 400 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
+          <p>ChessGrind stays generous: all 600 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
           <div className="cg-founder-price"><strong><small>$</small>5.90</strong><span>for one year<br />founding price</span></div>
           <FounderCheckout />
         </div>

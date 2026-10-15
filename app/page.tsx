@@ -27,7 +27,7 @@ function LandingArtwork() {
 const PRODUCTS = [
   {
     number: "01", name: "Adaptive training", title: "Your weak spots choose what comes next.",
-    body: "Train on 400 original positions with difficulty modes, progressive hints, legal-move guides, and sessions that adapt to your mistakes.",
+    body: "Train on 600 original positions with difficulty modes, progressive hints, legal-move guides, and sessions that adapt to your mistakes.",
     href: "/train", action: "Start a session",
   },
   {
@@ -145,12 +145,12 @@ export default function LandingPage() {
 
       <section className="cg-editorial-founder">
         <div><span>FOUNDING SEASON</span><strong>$5.90</strong><small>one year</small></div>
-        <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 400 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
+        <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 600 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
         <Link href="/founder">See Founder <span aria-hidden="true">↗</span></Link>
       </section>
 
       <section className="cg-editorial-final">
-        <p>400 original positions · no puzzle limit</p><h2>Stop collecting mistakes.<br />Start converting them.</h2>
+        <p>600 original positions · no puzzle limit</p><h2>Stop collecting mistakes.<br />Start converting them.</h2>
         <Link href="/train">Start your first grind <span aria-hidden="true">↗</span></Link>
       </section>
 
