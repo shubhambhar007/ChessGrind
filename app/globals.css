@@ -910,6 +910,9 @@ button:focus-visible {
 .cg-founder-price strong small { margin-right: 3px; color: var(--brass); font-size: 24px; vertical-align: top; }
 .cg-founder-price span { border-left: 1px solid var(--line-strong); padding-left: 18px; color: var(--secondary); font: 10px/1.6 var(--font-score); text-transform: uppercase; }
 .cg-founder-checkout { margin-top: 26px; }
+.cg-founder-checkout label { display: block; margin-bottom: 7px; color: var(--tertiary); font: 9px var(--font-score); letter-spacing: .12em; text-transform: uppercase; }
+.cg-founder-checkout input { display: block; width: min(100%, 360px); min-height: 46px; margin-bottom: 10px; border: 1px solid var(--line-strong); border-radius: 9px; padding: 0 13px; color: var(--text); background: color-mix(in srgb, var(--surface) 92%, transparent); font-size: 13px; outline: none; }
+.cg-founder-checkout input:focus { border-color: var(--brass); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brass) 16%, transparent); }
 .cg-founder-checkout button { display: inline-flex; min-width: 245px; min-height: 52px; align-items: center; justify-content: space-between; gap: 28px; border: 0; border-radius: 10px; padding: 0 20px; color: var(--button-text); background: var(--button); font-size: 13px; font-weight: 750; cursor: pointer; box-shadow: 0 16px 40px color-mix(in srgb, var(--button) 22%, transparent); }
 .cg-founder-checkout button:disabled { cursor: wait; opacity: .68; }
 .cg-founder-checkout > p { margin: 11px 0 0; color: var(--tertiary); font: 9px var(--font-score); }

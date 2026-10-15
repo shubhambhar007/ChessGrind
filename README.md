@@ -28,7 +28,7 @@ No external chess-service connection is required. Guests can train locally, whil
 
 ### Adaptive puzzle training
 
-- 225 ChessGrind Original positions with ratings and tactical themes
+- 300 ChessGrind Original positions with ratings and tactical themes
 - Endless, guided **Learn**, and focused **10 Puzzle Session** modes
 - Easy, medium, hard, and mixed difficulty filters
 - Train as White, Black, or either side
@@ -188,14 +188,17 @@ UPSTASH_REDIS_REST_KV_REST_API_TOKEN=
 
 ## Enable Founder checkout
 
-Founder uses a unique Razorpay Payment Link per signed-in player and verifies the paid link server-side before enabling one year of cloud access. Add the live Razorpay API credentials in Vercel:
+Founder uses a fresh Dodo Payments checkout session for each signed-in player. Access is granted only after a signed `payment.succeeded` webhook confirms the $5.90 USD product. Create a one-time `$5.90` product in Dodo Payments, then add these values in Vercel:
 
 ```bash
-RAZORPAY_KEY_ID=
-RAZORPAY_KEY_SECRET=
+DODO_PAYMENTS_API_KEY=
+DODO_FOUNDER_PRODUCT_ID=
+DODO_PAYMENTS_WEBHOOK_KEY=
+# Use test_mode while testing; omit or set live_mode for production.
+DODO_PAYMENTS_ENVIRONMENT=test_mode
 ```
 
-Keep `RAZORPAY_KEY_SECRET` server-only. The app creates the ₹799 checkout itself, so no shared payment-link URL is required.
+Register `https://your-domain.example/api/webhooks/dodo` as the Dodo webhook endpoint and subscribe it to `payment.succeeded`. Keep all three credentials server-only. The checkout binds the purchase to the signed-in ChessGrind user through signed payment metadata and validates the product, amount, currency, and payment ID before granting a year of Founder access.
 
 Never commit Redis tokens or other credentials to the repository.
 
@@ -203,7 +206,7 @@ Never commit Redis tokens or other credentials to the repository.
 
 1. Import the repository into Vercel.
 2. Attach an Upstash Redis store to the project.
-3. Confirm the Redis and Razorpay environment variables are available to Production and Preview.
+3. Confirm the Redis and Dodo Payments environment variables are available to Production and Preview.
 4. Deploy `main`.
 
 Without Redis, production account and persistent visitor endpoints intentionally report storage as unavailable; the local-first training tools continue to work in the browser.

@@ -7,7 +7,7 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(SCRIPT_DIR, "..");
 const OUTPUT_FILE = path.join(PROJECT_ROOT, "data", "puzzles.ts");
 const BASELINE_COUNT = 200;
-const TARGET_COUNT = 225;
+const TARGET_COUNT = 300;
 const SEED = 0x43484752;
 const MATE_SCORE = 100_000;
 const PIECE_VALUE = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
@@ -621,6 +621,9 @@ async function generate() {
     ...generateMatePuzzles(8, seenPositions),
     ...generatePromotionPuzzles(8, seenPositions),
     ...generatePinPuzzles(9, seenPositions),
+    ...generateMatePuzzles(25, seenPositions),
+    ...generatePromotionPuzzles(25, seenPositions),
+    ...generatePinPuzzles(25, seenPositions),
   ];
   for (const puzzle of extensionSets) {
     accepted.push(puzzle);

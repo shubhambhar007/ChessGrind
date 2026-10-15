@@ -24,6 +24,7 @@ import {
   type PuzzleDifficulty,
 } from "@/data/puzzles";
 import { addToGrindbook } from "@/lib/grindbook";
+import { applyLegalMoveMarkers } from "@/lib/chessboard-markers";
 
 type MoveLog = {
   text: string;
@@ -3631,46 +3632,10 @@ export default function Home() {
     !solved &&
     !isOpponentMoving
   ) {
-    for (
-      const move of
+    applyLegalMoveMarkers(
+      squareStyles,
       legalMoves
-    ) {
-      const target =
-        move.to;
-
-      const existing =
-        squareStyles[
-          target
-        ] || {};
-
-      if (
-        move.captured
-      ) {
-        squareStyles[
-          target
-        ] = {
-          ...existing,
-
-          cursor:
-            "pointer",
-
-          boxShadow:
-            "inset 0 0 0 6px rgba(37, 99, 235, 0.88), inset 0 0 18px rgba(96, 165, 250, 0.34)",
-        };
-      } else {
-        squareStyles[
-          target
-        ] = {
-          ...existing,
-
-          cursor:
-            "pointer",
-
-          backgroundImage:
-            "radial-gradient(circle at center, #2563eb 0 13%, #93c5fd 14% 18%, transparent 19%)",
-        };
-      }
-    }
+    );
   }
 
   for (

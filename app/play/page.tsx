@@ -19,6 +19,7 @@ import {
   pickAiMove,
   type AppliedMove,
 } from "@/lib/chess-engine";
+import { applyLegalMoveMarkers } from "@/lib/chessboard-markers";
 
 type PlayColor = "white" | "black";
 type Difficulty = "easy" | "medium" | "hard";
@@ -544,23 +545,7 @@ export default function PlayPage() {
   }
 
   if (showLegalMoves && selectedSquare && !gameOver) {
-    for (const move of legalMoves) {
-      const existing = squareStyles[move.to] || {};
-
-      squareStyles[move.to] = move.captured
-        ? {
-            ...existing,
-            cursor: "pointer",
-            boxShadow:
-              "inset 0 0 0 6px rgba(37, 99, 235, 0.88), inset 0 0 18px rgba(96, 165, 250, 0.34)",
-          }
-        : {
-            ...existing,
-            cursor: "pointer",
-            backgroundImage:
-              "radial-gradient(circle at center, #2563eb 0 13%, #93c5fd 14% 18%, transparent 19%)",
-          };
-    }
+    applyLegalMoveMarkers(squareStyles, legalMoves);
   }
 
   const arrows =

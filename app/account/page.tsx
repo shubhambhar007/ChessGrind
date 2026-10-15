@@ -39,7 +39,7 @@ export default function AccountPage() {
   const [submitting, setSubmitting] = useState(false);
   const [localCardCount, setLocalCardCount] = useState(0);
   const [nextPath, setNextPath] = useState("/grindbook");
-  const [founderMessage, setFounderMessage] = useState<"active" | "pending" | "error" | null>(null);
+  const [founderMessage, setFounderMessage] = useState<"active" | "pending" | "processing" | "error" | null>(null);
 
   useEffect(() => {
     queueMicrotask(() => setLocalCardCount(loadGrindbook().length));
@@ -50,6 +50,7 @@ export default function AccountPage() {
         setNextPath(requestedNext);
       }
       if (params.get("founder") === "active") setFounderMessage("active");
+      else if (params.get("founder") === "processing") setFounderMessage("processing");
       else if (params.get("payment") === "pending") setFounderMessage("pending");
       else if (params.has("founder")) setFounderMessage("error");
     });
@@ -71,6 +72,38 @@ export default function AccountPage() {
 
     void loadSession();
   }, []);
+
+  useEffect(() => {
+    if (founderMessage !== "processing" || user?.plan === "founder") return;
+
+    let attempts = 0;
+    const timer = window.setInterval(async () => {
+      attempts += 1;
+      try {
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        const payload = (await response.json()) as { user: AccountUser | null };
+        if (payload.user?.plan === "founder") {
+          setUser(payload.user);
+          setFounderMessage("active");
+          notifyAuthUpdated();
+          window.clearInterval(timer);
+        } else if (attempts >= 10) {
+          setFounderMessage("pending");
+          window.clearInterval(timer);
+        }
+      } catch {
+        if (attempts >= 10) {
+          setFounderMessage("pending");
+          window.clearInterval(timer);
+        }
+      }
+    }, 1200);
+
+    return () => window.clearInterval(timer);
+  }, [founderMessage, user?.plan]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -198,6 +231,11 @@ export default function AccountPage() {
                     Sign in to finish attaching your payment.
                   </div>
                 )}
+                {founderMessage === "processing" && (
+                  <div className="mb-5 rounded-[12px] border border-[var(--line-strong)] px-4 py-3 text-[12px] text-[var(--secondary)]">
+                    Payment received. Attaching Founder to your account…
+                  </div>
+                )}
                 {founderMessage === "error" && (
                   <div className="mb-5 rounded-[12px] border border-[var(--danger-strong)] bg-[var(--danger-soft)] px-4 py-3 text-[12px] text-[var(--danger)]">
                     We could not verify that payment yet. No access was changed.
@@ -228,7 +266,7 @@ export default function AccountPage() {
                     href="/founder"
                     className="control mt-5 flex h-12 items-center justify-center rounded-[12px] bg-[var(--button)] text-[13px] font-semibold text-[var(--button-text)]"
                   >
-                    Unlock Founder · ₹799/year
+                    Unlock Founder · $5.90/year
                   </Link>
                 )}
                 <Link

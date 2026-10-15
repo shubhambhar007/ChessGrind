@@ -7,6 +7,7 @@ export default function FounderCheckout() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
 
   async function startCheckout() {
     setLoading(true);
@@ -15,6 +16,8 @@ export default function FounderCheckout() {
       const response = await fetch("/api/founder/checkout", {
         method: "POST",
         credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
       });
       const payload = (await response.json()) as {
         checkoutUrl?: string;
@@ -43,11 +46,22 @@ export default function FounderCheckout() {
 
   return (
     <div className="cg-founder-checkout">
+      <label htmlFor="founder-email">Receipt email</label>
+      <input
+        id="founder-email"
+        type="email"
+        inputMode="email"
+        autoComplete="email"
+        placeholder="you@example.com"
+        value={email}
+        onChange={(event) => setEmail(event.target.value)}
+        required
+      />
       <button type="button" onClick={startCheckout} disabled={loading}>
         {loading ? "Opening secure checkout…" : "Become a Founder"}
         <span aria-hidden="true">↗</span>
       </button>
-      <p>One payment · one year · processed securely by Razorpay</p>
+      <p>One payment · one year · secure checkout by Dodo Payments</p>
       {error && <div role="alert">{error}</div>}
     </div>
   );

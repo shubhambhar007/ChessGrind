@@ -1,10 +1,11 @@
+import DodoPayments from "dodopayments";
 import { NextRequest, NextResponse } from "next/server";
 import { getRequestUser } from "@/lib/server/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const FOUNDER_PRICE_PAISE = 79_900;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: NextRequest) {
   const user = await getRequestUser(request);
@@ -15,53 +16,70 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ alreadyFounder: true });
   }
 
-  const keyId = process.env.RAZORPAY_KEY_ID;
-  const keySecret = process.env.RAZORPAY_KEY_SECRET;
-  if (!keyId || !keySecret) {
+  let email = "";
+  try {
+    const body = (await request.json()) as { email?: unknown };
+    email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  } catch {
+    return NextResponse.json({ error: "Enter a valid receipt email." }, { status: 400 });
+  }
+
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) {
+    return NextResponse.json({ error: "Enter a valid receipt email." }, { status: 400 });
+  }
+
+  const apiKey = process.env.DODO_PAYMENTS_API_KEY;
+  const productId = process.env.DODO_FOUNDER_PRODUCT_ID;
+  if (!apiKey || !productId) {
     return NextResponse.json(
       { error: "Founder checkout is being connected. Try again shortly." },
       { status: 503 }
     );
   }
 
-  const referenceId = `cg-${user.id.slice(0, 12)}-${Date.now().toString(36)}`;
-  const response = await fetch("https://api.razorpay.com/v1/payment_links", {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString("base64")}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      amount: FOUNDER_PRICE_PAISE,
-      currency: "INR",
-      accept_partial: false,
-      reference_id: referenceId,
-      description: "ChessGrind Founder — one year",
-      customer: { name: user.handle },
-      notify: { sms: false, email: false },
-      reminder_enable: false,
-      callback_url: `${request.nextUrl.origin}/api/founder/confirm`,
-      callback_method: "get",
-      notes: {
+  try {
+    const dodo = new DodoPayments({
+      bearerToken: apiKey,
+      environment:
+        process.env.DODO_PAYMENTS_ENVIRONMENT === "test_mode"
+          ? "test_mode"
+          : "live_mode",
+    });
+    const session = await dodo.checkoutSessions.create({
+      product_cart: [{ product_id: productId, quantity: 1 }],
+      customer: { email, name: user.handle },
+      billing_currency: "USD",
+      return_url: `${request.nextUrl.origin}/account?founder=processing`,
+      cancel_url: `${request.nextUrl.origin}/founder?checkout=cancelled`,
+      metadata: {
         chessgrind_user_id: user.id,
         chessgrind_handle: user.handle,
         chessgrind_plan: "founder-year",
       },
-    }),
-    cache: "no-store",
-  });
+      customization: { theme: "dark", show_order_details: true },
+      feature_flags: {
+        allow_currency_selection: false,
+        allow_customer_editing_email: true,
+        allow_customer_editing_name: true,
+        allow_discount_code: false,
+        allow_phone_number_collection: false,
+        allow_tax_id: false,
+        redirect_immediately: true,
+        single_page: true,
+      },
+      short_link: true,
+    });
 
-  const payload = (await response.json()) as {
-    short_url?: string;
-    error?: { description?: string };
-  };
-  if (!response.ok || !payload.short_url) {
-    console.error("Razorpay payment link creation failed", response.status, payload.error);
+    if (!session.checkout_url) {
+      throw new Error("Dodo checkout session did not return a URL.");
+    }
+
+    return NextResponse.json({ checkoutUrl: session.checkout_url });
+  } catch (error) {
+    console.error("Dodo checkout session creation failed", error);
     return NextResponse.json(
       { error: "Could not open checkout. Please try again." },
       { status: 502 }
     );
   }
-
-  return NextResponse.json({ checkoutUrl: payload.short_url });
 }
