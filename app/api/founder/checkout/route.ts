@@ -45,6 +45,27 @@ export async function POST(request: NextRequest) {
           ? "test_mode"
           : "live_mode",
     });
+    const founderProduct = await dodo.products.retrieve(productId);
+    const founderPrice = founderProduct.price;
+    const discountBasisPoints =
+      founderPrice.discount_bps ?? (founderPrice.discount ?? 0) * 100;
+    const effectivePrice =
+      founderPrice.type === "one_time_price"
+        ? Math.round(founderPrice.price * (10_000 - discountBasisPoints) / 10_000)
+        : null;
+
+    if (
+      founderPrice.type !== "one_time_price" ||
+      founderPrice.currency !== "USD" ||
+      effectivePrice !== 499
+    ) {
+      console.warn("Founder checkout paused because the Dodo product price is not $4.99 USD.");
+      return NextResponse.json(
+        { error: "Founder checkout is updating to $4.99. Try again shortly." },
+        { status: 503 }
+      );
+    }
+
     const session = await dodo.checkoutSessions.create({
       product_cart: [{ product_id: productId, quantity: 1 }],
       customer: { email, name: user.handle },
