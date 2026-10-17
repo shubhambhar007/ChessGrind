@@ -3947,15 +3947,19 @@ export default function Home() {
 
             <span className="h-4 w-px bg-[var(--line-strong)]" />
 
-            <span className="text-[12px] font-medium text-[var(--secondary)]">
-              {sessionMode ===
-              "ten"
-                ? `${Math.min(
-                    sessionStats.completed +
-                      1,
-                    SESSION_LENGTH
-                  )} of ${SESSION_LENGTH}`
-                : `${availablePuzzleCount} puzzles`}
+            <span className="cg-puzzle-library-count text-[12px] font-medium text-[var(--secondary)]">
+              {sessionMode === "ten" ? (
+                <>
+                  {Math.min(sessionStats.completed + 1, SESSION_LENGTH)} of {SESSION_LENGTH}
+                  <i aria-hidden="true">·</i>
+                </>
+              ) : availablePuzzleCount !== puzzles.length ? (
+                <>
+                  {availablePuzzleCount} selected
+                  <i aria-hidden="true">·</i>
+                </>
+              ) : null}
+              <strong>{puzzles.length}</strong> total puzzles
             </span>
           </div>
         </div>
@@ -4001,12 +4005,18 @@ export default function Home() {
             )}
           </div>
 
-          <Link
-            href="/play"
-            className="control rounded-[10px] border border-[var(--line-strong)] px-4 py-2 text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
-          >
-            Play a full game
-          </Link>
+          <div className="cg-train-topbar-actions">
+            <span className="cg-train-library-total">
+              <strong>{puzzles.length}</strong>
+              <small>total puzzles</small>
+            </span>
+            <Link
+              href="/play"
+              className="control rounded-[10px] border border-[var(--line-strong)] px-4 py-2 text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Play a full game
+            </Link>
+          </div>
         </div>
 
         <GrindbookPromo className="mb-7" />

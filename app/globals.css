@@ -808,9 +808,15 @@ button:focus-visible {
 .cg-founder-nav-link { color: var(--brass) !important; }
 .cg-editorial-founder { display: grid; width: min(100% - 48px, 1180px); min-height: 310px; margin: 0 auto; align-items: stretch; grid-template-columns: .62fr 1.2fr .58fr; border: 1px solid var(--line-strong); border-bottom: 0; }
 .cg-editorial-founder > div { display: flex; justify-content: center; flex-direction: column; padding: 42px; border-right: 1px solid var(--line-strong); }
-.cg-editorial-founder > div:first-child span { color: var(--brass); font: 700 9px var(--font-score); letter-spacing: .13em; }
-.cg-editorial-founder > div:first-child strong { margin-top: 22px; font-size: 58px; line-height: 1; letter-spacing: -.06em; }
-.cg-editorial-founder > div:first-child small { margin-top: 6px; color: var(--tertiary); font: 9px var(--font-score); text-transform: uppercase; }
+.cg-editorial-founder-offer { position: relative; overflow: hidden; background: radial-gradient(circle at 17% 18%, color-mix(in srgb, var(--brass) 20%, transparent), transparent 45%); }
+.cg-editorial-founder-offer::after { position: absolute; right: -44px; bottom: -70px; width: 150px; height: 150px; border: 1px solid color-mix(in srgb, var(--brass) 24%, transparent); border-radius: 50%; content: ""; }
+.cg-editorial-founder-offer > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cg-editorial-founder-offer > div span { color: var(--brass); font: 700 9px var(--font-score); letter-spacing: .13em; }
+.cg-editorial-founder-offer mark,
+.cg-founder-price mark { border: 1px solid color-mix(in srgb, var(--brass) 55%, transparent); border-radius: 999px; padding: 6px 9px; color: var(--brass); background: color-mix(in srgb, var(--brass) 11%, transparent); font: 800 8px var(--font-score); letter-spacing: .1em; white-space: nowrap; }
+.cg-editorial-founder-offer del { width: fit-content; margin-top: 28px; color: var(--tertiary); font: 11px var(--font-score); text-decoration-color: var(--danger); text-decoration-thickness: 1.5px; }
+.cg-editorial-founder-offer > strong { position: relative; z-index: 1; margin-top: 3px; color: var(--brass); font-size: 68px; line-height: .92; letter-spacing: -.065em; text-shadow: 0 12px 34px color-mix(in srgb, var(--brass) 22%, transparent); }
+.cg-editorial-founder-offer > small { position: relative; z-index: 1; margin-top: 12px; color: var(--tertiary); font: 8px var(--font-score); letter-spacing: .07em; text-transform: uppercase; }
 .cg-editorial-founder h2 { margin: 0; font-size: clamp(34px, 3.5vw, 50px); line-height: .96; }
 .cg-editorial-founder p { max-width: 550px; margin: 20px 0 0; color: var(--secondary); font-size: 12px; line-height: 1.65; }
 .cg-editorial-founder > a { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--button-text); background: var(--button); font-size: 12px; font-weight: 750; }
@@ -905,10 +911,21 @@ button:focus-visible {
 .cg-founder-copy h1 { margin: 24px 0 0; font-size: clamp(54px, 6.6vw, 88px); font-weight: 650; line-height: .9; letter-spacing: -.055em; }
 .cg-founder-copy h1 em { color: var(--accent); font-family: var(--font-editorial); font-weight: 500; }
 .cg-founder-copy > p { max-width: 600px; margin: 30px 0 0; color: var(--secondary); font-size: 15px; line-height: 1.72; }
-.cg-founder-price { display: flex; align-items: center; gap: 18px; margin-top: 34px; }
-.cg-founder-price strong { font-size: 58px; line-height: 1; letter-spacing: -.06em; }
+.cg-founder-price { display: flex; align-items: flex-end; gap: 20px; margin-top: 34px; }
+.cg-founder-price-stack { display: grid; gap: 11px; }
+.cg-founder-price-stack mark { width: fit-content; }
+.cg-founder-price-stack > div { display: flex; align-items: flex-end; gap: 12px; }
+.cg-founder-price-stack del { margin-bottom: 8px; color: var(--tertiary); font: 11px var(--font-score); text-decoration-color: var(--danger); text-decoration-thickness: 1.5px; }
+.cg-founder-price strong { color: var(--brass); font-size: 66px; line-height: .86; letter-spacing: -.065em; text-shadow: 0 12px 34px color-mix(in srgb, var(--brass) 20%, transparent); }
 .cg-founder-price strong small { margin-right: 3px; color: var(--brass); font-size: 24px; vertical-align: top; }
-.cg-founder-price span { border-left: 1px solid var(--line-strong); padding-left: 18px; color: var(--secondary); font: 10px/1.6 var(--font-score); text-transform: uppercase; }
+.cg-founder-price > span { margin-bottom: 4px; border-left: 1px solid var(--line-strong); padding-left: 18px; color: var(--secondary); font: 9px/1.65 var(--font-score); text-transform: uppercase; }
+.cg-puzzle-library-count { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.cg-puzzle-library-count i { color: var(--tertiary); font-style: normal; }
+.cg-puzzle-library-count strong { color: var(--accent); font-weight: 800; }
+.cg-train-topbar-actions { display: flex; align-items: stretch; gap: 10px; }
+.cg-train-library-total { display: inline-flex; min-width: 112px; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 12px; background: color-mix(in srgb, var(--accent) 5%, var(--surface)); }
+.cg-train-library-total strong { color: var(--accent); font-size: 15px; font-weight: 800; line-height: 1; }
+.cg-train-library-total small { color: var(--secondary); font: 8px var(--font-score); letter-spacing: .06em; text-transform: uppercase; }
 .cg-founder-checkout { margin-top: 26px; }
 .cg-founder-checkout label { display: block; margin-bottom: 7px; color: var(--tertiary); font: 9px var(--font-score); letter-spacing: .12em; text-transform: uppercase; }
 .cg-founder-checkout input { display: block; width: min(100%, 360px); min-height: 46px; margin-bottom: 10px; border: 1px solid var(--line-strong); border-radius: 9px; padding: 0 13px; color: var(--text); background: color-mix(in srgb, var(--surface) 92%, transparent); font-size: 13px; outline: none; }
@@ -1957,7 +1974,12 @@ button:focus-visible {
     flex-direction: column;
   }
 
-  .cg-train-topbar > a {
+  .cg-train-topbar-actions {
+    display: grid;
+    grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr);
+  }
+
+  .cg-train-topbar-actions > a {
     text-align: center;
   }
 

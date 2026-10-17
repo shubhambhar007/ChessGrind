@@ -188,7 +188,7 @@ UPSTASH_REDIS_REST_KV_REST_API_TOKEN=
 
 ## Enable Founder checkout
 
-Founder uses a fresh Dodo Payments checkout session for each signed-in player. Access is granted only after a signed `payment.succeeded` webhook confirms the $5.90 USD product. Create a one-time `$5.90` product in Dodo Payments, then add these values in Vercel:
+Founder uses a fresh Dodo Payments checkout session for each signed-in player. Access is granted only after a signed `payment.succeeded` webhook confirms the $4.99 USD product. Create a one-time `$4.99` product in Dodo Payments, then add these values in Vercel:
 
 ```bash
 DODO_PAYMENTS_API_KEY=

@@ -144,7 +144,12 @@ export default function LandingPage() {
       </section>
 
       <section className="cg-editorial-founder">
-        <div><span>FOUNDING SEASON</span><strong>$5.90</strong><small>one year</small></div>
+        <div className="cg-editorial-founder-offer">
+          <div><span>FOUNDING SEASON</span><mark>51% OFF</mark></div>
+          <del>$10.18</del>
+          <strong>$4.99</strong>
+          <small>one year · limited founder price</small>
+        </div>
         <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 800 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
         <Link href="/founder">See Founder <span aria-hidden="true">↗</span></Link>
       </section>

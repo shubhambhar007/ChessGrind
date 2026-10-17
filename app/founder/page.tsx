@@ -28,7 +28,13 @@ export default function FounderPage() {
           <span>FOUNDING SEASON · 2026</span>
           <h1>Back the grind.<br /><em>Own the year.</em></h1>
           <p>ChessGrind stays generous: all 800 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
-          <div className="cg-founder-price"><strong><small>$</small>5.90</strong><span>for one year<br />founding price</span></div>
+          <div className="cg-founder-price">
+            <div className="cg-founder-price-stack">
+              <mark>51% OFF</mark>
+              <div><del>$10.18</del><strong><small>$</small>4.99</strong></div>
+            </div>
+            <span>for one year<br />limited founder price</span>
+          </div>
           <FounderCheckout />
         </div>
 

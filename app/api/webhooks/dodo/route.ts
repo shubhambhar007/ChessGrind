@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     typeof userId !== "string" ||
     !isFounderPurchase ||
     payment.currency !== "USD" ||
-    payment.total_amount < 590 ||
+    payment.total_amount < 499 ||
     !/^pay_[A-Za-z0-9]+$/.test(payment.payment_id)
   ) {
     console.error("Rejected mismatched Dodo Founder payment", payment.payment_id);

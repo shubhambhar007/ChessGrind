@@ -266,7 +266,7 @@ export default function AccountPage() {
                     href="/founder"
                     className="control mt-5 flex h-12 items-center justify-center rounded-[12px] bg-[var(--button)] text-[13px] font-semibold text-[var(--button-text)]"
                   >
-                    Unlock Founder · $5.90/year
+                    Unlock Founder · $4.99/year
                   </Link>
                 )}
                 <Link
