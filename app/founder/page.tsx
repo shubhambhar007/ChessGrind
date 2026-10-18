@@ -12,7 +12,7 @@ const BENEFITS = [
 ] as const;
 
 const PLAN_COMPARISON = [
-  ["Original puzzle library", "800 positions", "800 positions"],
+  ["Original puzzle library", "1,000 positions", "1,000 positions"],
   ["Puzzle sessions + full games", "Unlimited", "Unlimited"],
   ["Hints + blue move guides", "Included", "Included"],
   ["Grindbook + repertoire", "This device", "Every device"],
@@ -37,7 +37,7 @@ export default function FounderPage() {
         <div className="cg-founder-copy">
           <span>FOUNDING SEASON · 2026</span>
           <h1>Back the grind.<br /><em>Own the year.</em></h1>
-          <p>ChessGrind stays generous: all 800 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
+          <p>ChessGrind stays generous: all 1,000 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
           <div id="join-founder" className="cg-founder-price">
             <div className="cg-founder-price-stack">
               <mark>51% OFF</mark>

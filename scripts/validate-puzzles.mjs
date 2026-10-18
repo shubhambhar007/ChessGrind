@@ -5,7 +5,7 @@ const source = await fs.readFile(new URL("../data/puzzles.ts", import.meta.url),
 const match = source.match(/export const puzzles: Puzzle\[] = ([\s\S]+);\s*$/);
 if (!match) throw new Error("Could not read the generated puzzle array.");
 const puzzles = JSON.parse(match[1]);
-if (puzzles.length !== 800) throw new Error(`Expected 800 puzzles, found ${puzzles.length}.`);
+if (puzzles.length !== 1000) throw new Error(`Expected 1000 puzzles, found ${puzzles.length}.`);
 
 const ids = new Set();
 const positions = new Set();

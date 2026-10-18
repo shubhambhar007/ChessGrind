@@ -27,7 +27,7 @@ function LandingArtwork() {
 const PRODUCTS = [
   {
     number: "01", name: "Adaptive training", title: "Your weak spots choose what comes next.",
-    body: "Train on 800 original positions with difficulty modes, progressive hints, legal-move guides, and sessions that adapt to your mistakes.",
+    body: "Train on 1,000 original positions with difficulty modes, progressive hints, legal-move guides, and sessions that adapt to your mistakes.",
     href: "/train", action: "Start a session",
   },
   {
@@ -38,7 +38,7 @@ const PRODUCTS = [
 ] as const;
 
 const LANDING_PLAN_COMPARISON = [
-  ["Original puzzle library", "800 positions", "800 positions"],
+  ["Original puzzle library", "1,000 positions", "1,000 positions"],
   ["Sessions, games + hints", "Unlimited", "Unlimited"],
   ["Grindbook + repertoire", "This device", "Every device"],
   ["Progress backup", "Local only", "Private cloud sync"],
@@ -159,7 +159,7 @@ export default function LandingPage() {
           <strong>$4.99</strong>
           <small>one year · limited founder price</small>
         </div>
-        <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 800 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
+        <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 1,000 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
         <Link href="/founder">Full Founder page <span aria-hidden="true">↗</span></Link>
       </section>
 
@@ -195,7 +195,7 @@ export default function LandingPage() {
       </section>
 
       <section className="cg-editorial-final">
-        <p>800 original positions · no puzzle limit</p><h2>Stop collecting mistakes.<br />Start converting them.</h2>
+        <p>1,000 original positions · no puzzle limit</p><h2>Stop collecting mistakes.<br />Start converting them.</h2>
         <Link href="/train">Start your first grind <span aria-hidden="true">↗</span></Link>
       </section>
 
