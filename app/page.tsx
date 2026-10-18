@@ -37,6 +37,15 @@ const PRODUCTS = [
   },
 ] as const;
 
+const LANDING_PLAN_COMPARISON = [
+  ["Original puzzle library", "800 positions", "800 positions"],
+  ["Sessions, games + hints", "Unlimited", "Unlimited"],
+  ["Grindbook + repertoire", "This device", "Every device"],
+  ["Progress backup", "Local only", "Private cloud sync"],
+  ["Founder status", "—", "Included"],
+  ["Product feedback", "Community", "Direct founder line"],
+] as const;
+
 function ProductVisual({ type }: { type: "train" | "play" }) {
   if (type === "train") {
     return (
@@ -151,7 +160,38 @@ export default function LandingPage() {
           <small>one year · limited founder price</small>
         </div>
         <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 800 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
-        <Link href="/founder">See Founder <span aria-hidden="true">↗</span></Link>
+        <Link href="/founder">Full Founder page <span aria-hidden="true">↗</span></Link>
+      </section>
+
+      <section className="cg-editorial-comparison" aria-labelledby="landing-plan-title">
+        <div className="cg-editorial-comparison-copy">
+          <span>FREE VS FOUNDER</span>
+          <h2 id="landing-plan-title">Free chess.<br />Paid memory.</h2>
+          <p>No puzzle paywall. Founder is for players who want their Grindbook, repertoire, and progress remembered across every device.</p>
+          <Link href="/founder">See everything Founder includes <span aria-hidden="true">↗</span></Link>
+        </div>
+
+        <div className="cg-founder-comparison-table cg-editorial-comparison-table">
+          <table>
+            <colgroup><col /><col /><col /></colgroup>
+            <thead>
+              <tr>
+                <th scope="col">What you get</th>
+                <th scope="col"><span>Free</span><strong>$0</strong></th>
+                <th scope="col"><span>Founder</span><strong>$4.99</strong><small>51% off · one year</small></th>
+              </tr>
+            </thead>
+            <tbody>
+              {LANDING_PLAN_COMPARISON.map(([feature, free, founder]) => (
+                <tr key={feature}>
+                  <th scope="row">{feature}</th>
+                  <td>{free}</td>
+                  <td>{founder}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section className="cg-editorial-final">
