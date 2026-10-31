@@ -436,6 +436,24 @@ button:focus-visible {
 
 /* EDITORIAL LANDING */
 
+:root[data-theme="dark"] .cg-editorial-landing {
+  --background: #080c14;
+  --surface: #101827;
+  --surface-raised: #151f31;
+  --header: #0b111d;
+  --text: #f4f7fc;
+  --secondary: #a6b0c2;
+  --tertiary: #78859a;
+  --line: rgba(166, 176, 194, 0.12);
+  --line-strong: rgba(166, 176, 194, 0.22);
+  --accent: #7795ff;
+  --accent-soft: rgba(119, 149, 255, 0.13);
+  --accent-soft-strong: rgba(119, 149, 255, 0.22);
+  --brass: #c8a96b;
+  --button: #7795ff;
+  --button-text: #07101f;
+}
+
 .cg-editorial-landing {
   overflow: clip;
   background: var(--background);
@@ -484,6 +502,17 @@ button:focus-visible {
   font-size: 12px;
   font-weight: 720;
   text-decoration: none;
+  transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+:root[data-theme="dark"] .cg-editorial-header-cta:hover,
+:root[data-theme="dark"] .cg-editorial-actions a:first-child:hover,
+:root[data-theme="dark"] .cg-editorial-memory-copy > a:hover,
+:root[data-theme="dark"] .cg-editorial-final > a:hover,
+:root[data-theme="dark"] .cg-editorial-founder > a:hover {
+  background: #8fa8ff;
+  box-shadow: 0 12px 32px rgba(119, 149, 255, 0.24);
+  transform: translateY(-1px);
 }
 
 .cg-editorial-hero {
