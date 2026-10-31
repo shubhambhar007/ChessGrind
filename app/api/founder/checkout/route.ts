@@ -57,11 +57,11 @@ export async function POST(request: NextRequest) {
     if (
       founderPrice.type !== "one_time_price" ||
       founderPrice.currency !== "USD" ||
-      effectivePrice !== 499
+      effectivePrice !== 399
     ) {
-      console.warn("Founder checkout paused because the Dodo product price is not $4.99 USD.");
+      console.warn("Founder checkout paused because the Dodo product price is not $3.99 USD.");
       return NextResponse.json(
-        { error: "Founder checkout is updating to $4.99. Try again shortly." },
+        { error: "Founder checkout is updating to $3.99. Try again shortly." },
         { status: 503 }
       );
     }

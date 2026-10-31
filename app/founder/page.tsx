@@ -40,8 +40,8 @@ export default function FounderPage() {
           <p>ChessGrind stays generous: all 1,000 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
           <div id="join-founder" className="cg-founder-price">
             <div className="cg-founder-price-stack">
-              <mark>51% OFF</mark>
-              <div><del>$10.18</del><strong><small>$</small>4.99</strong></div>
+              <mark>61% OFF</mark>
+              <div><del>$10.18</del><strong><small>$</small>3.99</strong></div>
             </div>
             <span>for one year<br />limited founder price</span>
           </div>
@@ -79,7 +79,7 @@ export default function FounderPage() {
               <tr>
                 <th scope="col">What you get</th>
                 <th scope="col"><span>Free</span><strong>$0</strong></th>
-                <th scope="col"><span>Founder</span><strong>$4.99</strong><small>51% off · one year</small></th>
+                <th scope="col"><span>Founder</span><strong>$3.99</strong><small>61% off · one year</small></th>
               </tr>
             </thead>
             <tbody>
