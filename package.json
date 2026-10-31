@@ -9,6 +9,8 @@
     "lint": "eslint",
     "puzzles:generate": "node scripts/generate-original-puzzles.mjs",
     "puzzles:validate": "node scripts/validate-puzzles.mjs",
+    "openings:generate": "node scripts/generate-opening-drills.mjs",
+    "openings:validate": "node scripts/validate-opening-drills.mjs",
     "moves:validate": "node scripts/validate-move-guides.mjs"
   },
   "dependencies": {

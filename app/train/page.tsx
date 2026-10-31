@@ -3723,6 +3723,12 @@ export default function Home() {
               <VisitorCounter />
 
               <Link
+                href="/openings"
+                className="text-[12px] font-semibold text-[var(--secondary)]"
+              >
+                Opening Lab
+              </Link>
+              <Link
                 href="/grindbook"
                 className="text-[12px] font-semibold text-[var(--secondary)]"
               >
@@ -3921,6 +3927,12 @@ export default function Home() {
           <div className="cg-app-nav flex items-center gap-5">
             <VisitorCounter />
 
+            <Link
+              href="/openings"
+              className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"
+            >
+              Opening Lab
+            </Link>
             <Link
               href="/grindbook"
               className="text-[12px] font-semibold text-[var(--secondary)] hover:text-[var(--text)]"

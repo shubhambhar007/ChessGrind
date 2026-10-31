@@ -76,7 +76,7 @@ export default function LandingPage() {
         <div className="cg-app-header-inner mx-auto flex h-[64px] max-w-[1180px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home"><BrandLockup priority /></Link>
           <nav className="cg-app-nav flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]" aria-label="Main navigation">
-            <VisitorCounter /><a href="#product">How it works</a><Link href="/grindbook">Grindbook</Link>
+            <VisitorCounter /><a href="#product">How it works</a><Link href="/openings">Opening Lab</Link><Link href="/grindbook">Grindbook</Link>
             <Link href="/repertoire">Repertoire</Link><Link href="/founder" className="cg-founder-nav-link">Founder</Link><AccountLink /><ThemeToggle />
           </nav>
           <Link href="/train" className="cg-editorial-header-cta">Start training <span aria-hidden="true">↗</span></Link>
@@ -142,11 +142,13 @@ export default function LandingPage() {
       </section>
 
       <section className="cg-editorial-lab">
-        <div className="cg-editorial-band"><span>REPERTOIRE + INSIGHTS</span><strong>Make the work visible.</strong></div>
+        <div className="cg-editorial-band"><span>OPENINGS + REPERTOIRE + INSIGHTS</span><strong>Make the work visible.</strong></div>
         <div className="cg-editorial-lab-grid">
-          <article><span>04 · REPERTOIRE</span><h2>Build your lines.<br />Drill your response.</h2>
-            <p>Map opening branches and practise them until the reply is automatic.</p><Link href="/repertoire">Open the lab ↗</Link></article>
-          <article><span>05 · INSIGHTS</span><h2>Know what is actually getting better.</h2>
+          <article><span>04 · OPENING LAB</span><h2>Don&apos;t memorize.<br />Build the response.</h2>
+            <p>Train 200 original drills across nine opening families. Every miss can return through Grindbook.</p><Link href="/openings">Train openings ↗</Link></article>
+          <article><span>05 · REPERTOIRE</span><h2>Map your lines.<br />Keep them yours.</h2>
+            <p>Build personal white and black repertoires, branch by branch.</p><Link href="/repertoire">Build repertoire ↗</Link></article>
+          <article><span>06 · INSIGHTS</span><h2>Know what is actually getting better.</h2>
             <div className="cg-editorial-bars"><p><span>Forks</span><i style={{ width: "88%" }} /></p><p><span>Pins</span><i style={{ width: "72%" }} /></p><p><span>Deflection</span><i style={{ width: "48%" }} /></p></div>
             <Link href="/insights">View insights ↗</Link></article>
         </div>

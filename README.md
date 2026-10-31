@@ -83,6 +83,16 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 
 ![Repertoire Lab](docs/screenshots/repertoire-lab.png)
 
+### Opening Lab
+
+- 200 ChessGrind Original drills across nine opening families
+- Italian, Ruy López, Queen's Gambit, London, Sicilian, French, Caro-Kann, King's Indian, and Scandinavian packs
+- Filter by opening and train from either the White or Black side
+- Four-to-six-ply response lines with opening ideas and common-mistake coaching
+- Full legal-move blue dots and premium pieces on every position
+- Wrong responses can be captured as opening cards in Grindbook
+- Deterministic local generation and replay validation with `chess.js`; no external chess account or puzzle source
+
 ### Training Insights
 
 - Total puzzles solved, accuracy, current streak, and best streak
@@ -133,6 +143,7 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 | --- | --- |
 | `/` | Cinematic product landing page |
 | `/train` | Adaptive puzzle training |
+| `/openings` | 200 guided, opening-specific response drills |
 | `/play` | Full games against the computer |
 | `/grindbook` | Daily spaced review and saved-position library |
 | `/repertoire` | Visual repertoire builder and memory drills |
@@ -168,6 +179,8 @@ npm run start    # Run the production build
 npm run lint     # Run ESLint
 npm run puzzles:validate # Audit all puzzle positions and solution lines
 npm run puzzles:generate # Rebuild the deterministic original library
+npm run openings:validate # Replay-check all 200 opening drills
+npm run openings:generate # Rebuild the original opening library
 ```
 
 ## Enable cloud accounts and persistent visitor statistics
