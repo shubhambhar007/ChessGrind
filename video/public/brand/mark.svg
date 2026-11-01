@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">ChessGrind knight seal</title>
+  <desc id="desc">A refined chess knight enclosed by two fine circular rules.</desc>
+  <circle cx="48" cy="48" r="42" fill="none" stroke="#CDA85F" stroke-width="1.6" />
+  <circle cx="48" cy="48" r="36" fill="none" stroke="#CDA85F" stroke-width="0.65" opacity="0.48" />
+  <text
+    x="48"
+    y="70"
+    fill="#CDA85F"
+    font-family="Iowan Old Style, Palatino Linotype, Georgia, serif"
+    font-size="61"
+    font-weight="400"
+    text-anchor="middle"
+  >♞</text>
+  <circle cx="48" cy="7" r="2.4" fill="#F0DDAE" />
+</svg>

@@ -1,0 +1,222 @@
+{
+  "landing": {
+    "title": "ChessGrind",
+    "copy": "CHESS\nGRIND\n2\nonline\n916\npage views\nHow it works\nOpening Lab\nGrindbook\nRepertoire\nFounder\nSave progress\nStart training\n↗\n01\nTHE PERSONAL CHESS GYM\nPlay\nNotice\nRemember\n\nChessGrind turns the positions you miss into a private training system that brings them back until the pattern sticks.\n\nStart training\n↗\nPlay a full game\nNO EXTERNAL CHESS ACCOUNT\nPRIVATE BY DEFAULT\nFREE TO START\nCHESSGRIND\nBuild instinct.\nMove by move.\nCG / 01\nABOUT\nOne loop.\nEvery part connected.\n01\nTrain\n\nSolve original positions with guidance when you need it.\n\n02\nPlay\n\nTurn complete games into positions worth keeping.\n\n03\nRemember\n\nGrindbook resurfaces the moments that matter.\n\n04\nImprove\n\nInsights show which patterns are actually changing.\n\nTRAIN + PLAY\nBuild the pattern first.\n01\nADAPTIVE TRAINING\nYour weak spots choose what comes next.\n\nTrain on 1,000 original positions with difficulty modes, progressive hints, legal-move guides, and sessions that adapt to your mistakes.\n\nGUIDED PATTERN / 01\nStart a session\n↗\n02\nPLAY VS COMPUTER\nA full game that leaves something useful behind.\n\nPlay a position-aware opponent, review the move ledger, inspect key moments, and save any position worth seeing again.\n\n+0.8\nGAME REVIEW / 02\nPlay a game\n↗\n03 · GRINDBOOK\nYour mistakes should train you twice.\n\nSave a puzzle or game position once. Grindbook schedules it for review and tracks your recall. Founder keeps that memory synced across every device.\n\nOpen Grindbook\n↗\nDUE TODAY\n7\nBack-rank pattern\n\nLast reviewed 3 days ago\n\nAgain\nHard\nGot it\nOPENINGS + REPERTOIRE + INSIGHTS\nMake the work visible.\n04 · OPENING LAB\nDon't memorize.\nBuild the response.\n\nTrain 200 original drills across nine opening families. Every miss can return through Grindbook.\n\nTrain openings ↗\n05 · REPERTOIRE\nMap your lines.\nKeep them yours.\n\nBuild",
+    "block": {
+      "x": 0,
+      "y": 0,
+      "width": 1600,
+      "height": 4958.75
+    },
+    "blockStyle": {
+      "background": "rgb(8, 12, 20) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "0px solid rgb(243, 246, 252)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "color": "rgb(243, 246, 252)",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif"
+    },
+    "headline": {
+      "text": "Play\nNotice\nRemember",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif",
+      "fontSize": "90px",
+      "fontWeight": "720",
+      "lineHeight": "91.8px",
+      "color": "rgb(244, 247, 252)"
+    },
+    "header": {
+      "height": 74,
+      "background": "rgb(11, 17, 29) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "0px solid rgb(243, 246, 252)"
+    },
+    "cssVars": {
+      "--background": "#090d14",
+      "--surface": "#121925",
+      "--surface-raised": "#182233",
+      "--header": "#0d121b",
+      "--text": "#f3f6fc",
+      "--secondary": "#9ca8bc",
+      "--tertiary": "#667389",
+      "--accent": "#7795ff",
+      "--brass": "#e0b85e",
+      "--board-light": "#e7eff9",
+      "--board-dark": "#7087a7"
+    }
+  },
+  "train": {
+    "title": "ChessGrind",
+    "copy": "8\n7\n6\n5\n4\n3\n2\n1\na\nb\nc\nd\ne\nf\ng\nh",
+    "block": {
+      "x": 294,
+      "y": 430.015625,
+      "width": 560,
+      "height": 570.125
+    },
+    "blockStyle": {
+      "background": "rgb(18, 25, 37) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "0px solid rgb(243, 246, 252)",
+      "borderRadius": "14px",
+      "boxShadow": "rgba(0, 0, 0, 0.28) 0px 1px 2px 0px, rgba(0, 0, 0, 0.3) 0px 18px 44px 0px",
+      "color": "rgb(243, 246, 252)",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif"
+    },
+    "headline": {
+      "text": "Mate in 1",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif",
+      "fontSize": "38px",
+      "fontWeight": "680",
+      "lineHeight": "39.52px",
+      "color": "rgb(243, 246, 252)"
+    },
+    "header": {
+      "height": 57,
+      "background": "rgb(13, 18, 27) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": ""
+    },
+    "cssVars": {
+      "--background": "#090d14",
+      "--surface": "#121925",
+      "--surface-raised": "#182233",
+      "--header": "#0d121b",
+      "--text": "#f3f6fc",
+      "--secondary": "#9ca8bc",
+      "--tertiary": "#667389",
+      "--accent": "#7795ff",
+      "--brass": "#e0b85e",
+      "--board-light": "#e7eff9",
+      "--board-dark": "#7087a7"
+    }
+  },
+  "grindbook": {
+    "title": "ChessGrind",
+    "copy": "Your private memory\nMy Grindbook\n\nSave the positions that matter. ChessGrind brings them back before you forget them, on every device.\n\nSaved on this device\nReview\nLibrary\nDaily queue\n0\n/ 0\n\nNo positions are due today.\n\nDue\n0\nSaved\n0\nMastered\n0\n0 lifetime reviews\n100%\nReview streak\n0\ndays\nBEST 0\n·\nM\n·\nT\n·\nW\n·\nT\n·\nF\n·\nS\n·\nS\nNo entries yet\nYour Grindbook is empty.\n\nSave a puzzle or a position from a computer game. It will appear here immediately for spaced review.\n\nFind a puzzle\nPlay computer",
+    "block": {
+      "x": 240,
+      "y": 56,
+      "width": 1120,
+      "height": 944
+    },
+    "blockStyle": {
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "0px solid rgb(243, 246, 252)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "color": "rgb(243, 246, 252)",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif"
+    },
+    "headline": {
+      "text": "My Grindbook",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif",
+      "fontSize": "38px",
+      "fontWeight": "680",
+      "lineHeight": "57px",
+      "color": "rgb(243, 246, 252)"
+    },
+    "header": {
+      "height": 57,
+      "background": "rgb(13, 18, 27) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": ""
+    },
+    "cssVars": {
+      "--background": "#090d14",
+      "--surface": "#121925",
+      "--surface-raised": "#182233",
+      "--header": "#0d121b",
+      "--text": "#f3f6fc",
+      "--secondary": "#9ca8bc",
+      "--tertiary": "#667389",
+      "--accent": "#7795ff",
+      "--brass": "#e0b85e",
+      "--board-light": "#e7eff9",
+      "--board-dark": "#7087a7"
+    }
+  },
+  "openings": {
+    "title": "ChessGrind",
+    "copy": "CG-OPEN-001\nYOU ARE BLACK\n1\n2\n3\n4\n5\n6\n7\nh\n8\ng\nf\ne\nd\nc\nb\na\nITALIAN GAME\nLine 1 · 1/200\nFind the repertoire move.\nTHE IDEA\n\nDevelop quickly, fight for d4, and castle before starting an attack.\n\nCOMMON MISS\n\nDo not launch a kingside attack while your centre and king are unfinished.\n\nSave to Grindbook\nNext drill →",
+    "block": {
+      "x": 264,
+      "y": 356.015625,
+      "width": 1072,
+      "height": 645
+    },
+    "blockStyle": {
+      "background": "rgb(18, 25, 37) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "1px solid rgba(191, 207, 235, 0.17)",
+      "borderRadius": "0px",
+      "boxShadow": "rgba(0, 0, 0, 0.28) 0px 1px 2px 0px, rgba(0, 0, 0, 0.24) 0px 18px 46px 0px",
+      "color": "rgb(243, 246, 252)",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif"
+    },
+    "headline": {
+      "text": "Don't memorize openings.\nBuild the response.",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif",
+      "fontSize": "66px",
+      "fontWeight": "680",
+      "lineHeight": "64.68px",
+      "color": "rgb(243, 246, 252)"
+    },
+    "header": {
+      "height": 57,
+      "background": "rgb(13, 18, 27) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": ""
+    },
+    "cssVars": {
+      "--background": "#090d14",
+      "--surface": "#121925",
+      "--surface-raised": "#182233",
+      "--header": "#0d121b",
+      "--text": "#f3f6fc",
+      "--secondary": "#9ca8bc",
+      "--tertiary": "#667389",
+      "--accent": "#7795ff",
+      "--brass": "#e0b85e",
+      "--board-light": "#e7eff9",
+      "--board-dark": "#7087a7"
+    }
+  },
+  "insights": {
+    "title": "ChessGrind",
+    "copy": "Your training\nInsights\n\nSee where your tactical game is improving and where ChessGrind should challenge you next.\n\nSolved\n0\nAccuracy\n100%\nCurrent streak\n0\nBest streak\n0\nTraining focus\nKeep solving.\n\nSolve a few more puzzles and ChessGrind will start identifying your tactical weaknesses.\n\nStrongest pattern\nNot enough data yet.\n\nOnce you have seen the same kinds of tactics a few times, your strengths will appear here.\n\nTactical breakdown\nPatterns\nPerformance considers mistakes and hints\nNo tactical history yet. Solve some puzzles first and your breakdown will appear here.\nPractice history\nActivity\nCorrect moves\n0\nWrong moves\n0\nHints used\n0\nSkipped\n0\nClean move rate: 100%\nReady for another one?\n\nSmart Training will use these insights automatically.\n\nContinue training",
+    "block": {
+      "x": 270,
+      "y": 0,
+      "width": 1060,
+      "height": 1346.453125
+    },
+    "blockStyle": {
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "0px solid rgb(243, 246, 252)",
+      "borderRadius": "0px",
+      "boxShadow": "none",
+      "color": "rgb(243, 246, 252)",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif"
+    },
+    "headline": {
+      "text": "Insights",
+      "fontFamily": "\"Avenir Next\", Avenir, \"Segoe UI\", Helvetica, Arial, sans-serif",
+      "fontSize": "48px",
+      "fontWeight": "680",
+      "lineHeight": "48.96px",
+      "color": "rgb(243, 246, 252)"
+    },
+    "header": {
+      "height": 57,
+      "background": "rgb(13, 18, 27) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": ""
+    },
+    "cssVars": {
+      "--background": "#090d14",
+      "--surface": "#121925",
+      "--surface-raised": "#182233",
+      "--header": "#0d121b",
+      "--text": "#f3f6fc",
+      "--secondary": "#9ca8bc",
+      "--tertiary": "#667389",
+      "--accent": "#7795ff",
+      "--brass": "#e0b85e",
+      "--board-light": "#e7eff9",
+      "--board-dark": "#7087a7"
+    }
+  }
+}

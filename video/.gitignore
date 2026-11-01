@@ -1,0 +1,7 @@
+node_modules/
+out/
+.venv/
+music-candidates/
+.env
+.env.local
+.DS_Store
