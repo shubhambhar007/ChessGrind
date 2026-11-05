@@ -371,7 +371,11 @@ export default function GrindbookPage() {
   }
 
   return (
-    <main className="cg-app-shell min-h-screen">
+    <main
+      className="cg-app-shell min-h-screen"
+      data-testid="grindbook-app"
+      data-ready={loaded ? "true" : "false"}
+    >
       <CelebrationBurst
         eventId={celebrationEvent}
         title="Daily queue cleared."

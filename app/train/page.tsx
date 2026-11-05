@@ -3907,7 +3907,11 @@ export default function Home() {
   }
 
   return (
-    <main className="cg-app-shell min-h-screen">
+    <main
+      className="cg-app-shell min-h-screen"
+      data-testid="training-app"
+      data-ready={progressLoaded ? "true" : "false"}
+    >
       <CelebrationBurst
         eventId={puzzleCelebrationEvent}
         title="Nice solve!"
@@ -4304,7 +4308,10 @@ export default function Home() {
                       : "border-white",
                   ].join(" ")}
                 >
-                  <div className="overflow-hidden">
+                  <div
+                    className="overflow-hidden"
+                    data-testid="training-board"
+                  >
                     <Chessboard
                       options={{
                         pieces: premiumPieces,

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm run puzzles:validate && npm run openings:validate",
+    "prebuild": "npm run test:data",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -12,7 +12,10 @@
     "puzzles:validate": "node scripts/validate-puzzles.mjs",
     "openings:generate": "node scripts/generate-opening-drills.mjs",
     "openings:validate": "node scripts/validate-opening-drills.mjs",
-    "moves:validate": "node scripts/validate-move-guides.mjs"
+    "moves:validate": "tsx scripts/validate-move-guides.mjs",
+    "test:data": "npm run puzzles:validate && npm run openings:validate && npm run moves:validate",
+    "test:critical": "playwright test",
+    "test:critical:headed": "playwright test --headed"
   },
   "dependencies": {
     "@upstash/redis": "^1.38.4",
@@ -27,6 +30,7 @@
     "standardwebhooks": "^1.1.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -34,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5"
   }
 }
