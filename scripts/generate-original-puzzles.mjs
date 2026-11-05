@@ -1,16 +1,27 @@
+import { spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
+import readline from "node:readline";
 import { fileURLToPath } from "node:url";
 import { Chess } from "chess.js";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(SCRIPT_DIR, "..");
 const OUTPUT_FILE = path.join(PROJECT_ROOT, "data", "puzzles.ts");
-const BASELINE_COUNT = 200;
 const TARGET_COUNT = 1000;
 const SEED = 0x43484752;
-const MATE_SCORE = 100_000;
+const STOCKFISH_PATH = process.env.STOCKFISH_PATH;
+const PRELIMINARY_NODES = Number(process.env.PUZZLE_PRELIMINARY_NODES ?? 8_000);
+const VERIFICATION_NODES = Number(process.env.PUZZLE_VERIFICATION_NODES ?? 30_000);
+const MIN_PRELIMINARY_GAP = 120;
+const MIN_VERIFIED_GAP = 90;
 const PIECE_VALUE = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 0 };
+
+if (!STOCKFISH_PATH) {
+  throw new Error(
+    "Set STOCKFISH_PATH to an official Stockfish binary before generating puzzles."
+  );
+}
 
 function seededRandom(seed) {
   let state = seed >>> 0;
@@ -25,213 +36,138 @@ function seededRandom(seed) {
 
 const random = seededRandom(SEED);
 
-function uci(move) {
-  return `${move.from}${move.to}${move.promotion ?? ""}`;
+function scoreValue(score) {
+  if (!score) return null;
+  if (score.type === "cp") return score.value;
+  return score.value > 0
+    ? 100_000 - Math.min(score.value, 999) * 100
+    : -100_000 - Math.max(score.value, -999) * 100;
 }
 
-function material(game, perspective) {
-  let score = 0;
-  for (const row of game.board()) {
-    for (const piece of row) {
-      if (!piece) continue;
-      score += (piece.color === perspective ? 1 : -1) * PIECE_VALUE[piece.type];
-    }
-  }
-  return score;
+function puzzleKey(fen) {
+  return fen.split(" ").slice(0, 4).join(" ");
 }
 
-function evaluate(game, perspective) {
-  if (game.isCheckmate()) return game.turn() === perspective ? -MATE_SCORE : MATE_SCORE;
-  if (game.isDraw() || game.isStalemate()) return 0;
-  let score = material(game, perspective);
-  if (game.inCheck()) score += game.turn() === perspective ? -38 : 38;
-  return score;
-}
-
-function movePriority(move) {
-  const capture = move.captured
-    ? PIECE_VALUE[move.captured] * 12 - PIECE_VALUE[move.piece]
-    : 0;
-  const promotion = move.promotion ? PIECE_VALUE[move.promotion] : 0;
-  const check = move.san.includes("+") || move.san.includes("#") ? 700 : 0;
-  return capture + promotion + check;
-}
-
-function orderedMoves(game) {
-  return game.moves({ verbose: true }).sort((a, b) => movePriority(b) - movePriority(a));
-}
-
-function scoreRootMove(game, move, perspective) {
-  game.move(move);
-  if (game.isCheckmate()) {
-    game.undo();
-    return MATE_SCORE;
-  }
-
-  const replies = orderedMoves(game);
-  let worstReply = Infinity;
-  for (const reply of replies) {
-    game.move(reply);
-    const replyScore = evaluate(game, perspective);
-    game.undo();
-    worstReply = Math.min(worstReply, replyScore);
-  }
-  const score = replies.length ? worstReply : evaluate(game, perspective);
-  game.undo();
-  return score;
-}
-
-function rankedRootMoves(game) {
-  const perspective = game.turn();
-  const moves = orderedMoves(game);
-  const forcing = moves.filter((move) =>
-    move.captured || move.promotion || move.san.includes("+") || move.san.includes("#")
-  );
-  const comparisonMoves = [
-    ...forcing.slice(0, 10),
-    ...moves.filter((move) => !forcing.some((forcingMove) => uci(forcingMove) === uci(move))).slice(0, 3),
-  ];
-  return comparisonMoves
-    .map((move) => ({ move, score: scoreRootMove(game, move, perspective) }))
-    .sort((a, b) => b.score - a.score);
-}
-
-function chooseWorstReply(game, perspective) {
-  const replies = orderedMoves(game);
-  let selected = null;
-  let selectedScore = Infinity;
-  for (const reply of replies) {
-    game.move(reply);
-    const score = evaluate(game, perspective);
-    game.undo();
-    if (score < selectedScore) {
-      selected = reply;
-      selectedScore = score;
-    }
-  }
-  return selected;
-}
-
-function chooseBestFollowUp(game, perspective) {
-  const moves = orderedMoves(game);
-  let selected = null;
-  let selectedScore = -Infinity;
-  for (const move of moves) {
-    game.move(move);
-    const score = evaluate(game, perspective);
-    game.undo();
-    if (score > selectedScore) {
-      selected = move;
-      selectedScore = score;
-    }
-  }
-  return selected;
-}
-
-function squareToCoords(square) {
-  return [square.charCodeAt(0) - 97, Number(square[1]) - 1];
-}
-
-function coordsToSquare(file, rank) {
-  if (file < 0 || file > 7 || rank < 0 || rank > 7) return null;
-  return `${String.fromCharCode(97 + file)}${rank + 1}`;
-}
-
-function attackedTargetsByMovedPiece(game, move, color) {
-  const [file, rank] = squareToCoords(move.to);
-  const targets = [];
-  const addTarget = (targetFile, targetRank) => {
-    const square = coordsToSquare(targetFile, targetRank);
-    if (!square) return false;
-    const occupant = game.get(square);
-    if (occupant && occupant.color !== color && occupant.type !== "p") targets.push(occupant.type);
-    return Boolean(occupant);
+function parseInfo(line) {
+  const multipvMatch = line.match(/\bmultipv (\d+)\b/);
+  const scoreMatch = line.match(/\bscore (cp|mate) (-?\d+)\b/);
+  const pvMatch = line.match(/\bpv ([a-h][1-8][a-h][1-8][qrbn]?)(?:\s|$)/);
+  const depthMatch = line.match(/\bdepth (\d+)\b/);
+  if (!multipvMatch || !scoreMatch || !pvMatch) return null;
+  return {
+    multipv: Number(multipvMatch[1]),
+    score: { type: scoreMatch[1], value: Number(scoreMatch[2]) },
+    move: pvMatch[1],
+    depth: Number(depthMatch?.[1] ?? 0),
   };
-
-  if (move.piece === "n") {
-    for (const [df, dr] of [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]) {
-      addTarget(file + df, rank + dr);
-    }
-  }
-
-  if (move.piece === "p") {
-    const direction = color === "w" ? 1 : -1;
-    addTarget(file - 1, rank + direction);
-    addTarget(file + 1, rank + direction);
-  }
-
-  const directions = [];
-  if (["b", "q"].includes(move.piece)) directions.push([1, 1], [1, -1], [-1, 1], [-1, -1]);
-  if (["r", "q"].includes(move.piece)) directions.push([1, 0], [-1, 0], [0, 1], [0, -1]);
-  for (const [df, dr] of directions) {
-    for (let step = 1; step < 8; step += 1) {
-      if (addTarget(file + df * step, rank + dr * step)) break;
-    }
-  }
-  return targets;
 }
 
-function matePattern(game) {
-  const kingColor = game.turn();
-  let kingSquare = null;
+class Stockfish {
+  constructor(binary) {
+    this.process = spawn(binary, [], { stdio: ["pipe", "pipe", "inherit"] });
+    this.lines = readline.createInterface({ input: this.process.stdout });
+    this.waiters = [];
+    this.analysis = null;
+    this.lines.on("line", (line) => {
+      if (this.analysis) {
+        const info = parseInfo(line);
+        if (info) this.analysis.info.set(info.multipv, info);
+        if (line.startsWith("bestmove ")) {
+          const result = {
+            bestMove: line.split(/\s+/)[1],
+            principal: this.analysis.info.get(1) ?? null,
+            second: this.analysis.info.get(2) ?? null,
+          };
+          const resolve = this.analysis.resolve;
+          this.analysis = null;
+          resolve(result);
+        }
+      }
+      for (const waiter of [...this.waiters]) {
+        if (!line.includes(waiter.token)) continue;
+        this.waiters.splice(this.waiters.indexOf(waiter), 1);
+        waiter.resolve(line);
+      }
+    });
+  }
+
+  send(command) {
+    this.process.stdin.write(`${command}\n`);
+  }
+
+  waitFor(token) {
+    return new Promise((resolve) => this.waiters.push({ token, resolve }));
+  }
+
+  async init() {
+    this.send("uci");
+    await this.waitFor("uciok");
+    this.send("setoption name Threads value 2");
+    this.send("setoption name Hash value 128");
+    this.send("setoption name MultiPV value 2");
+    this.send("isready");
+    await this.waitFor("readyok");
+  }
+
+  analyze(fen, nodes) {
+    if (this.analysis) throw new Error("Stockfish requests must be sequential.");
+    return new Promise((resolve) => {
+      this.analysis = { info: new Map(), resolve };
+      this.send(`position fen ${fen}`);
+      this.send(`go nodes ${nodes}`);
+    });
+  }
+
+  close() {
+    this.send("quit");
+  }
+}
+
+function opposite(color) {
+  return color === "w" ? "b" : "w";
+}
+
+function findKing(game, color) {
   for (const row of game.board()) {
     for (const piece of row) {
-      if (piece?.type === "k" && piece.color === kingColor) kingSquare = piece.square;
+      if (piece?.type === "k" && piece.color === color) return piece.square;
     }
   }
-  if (!kingSquare) return [];
-  const [, rank] = squareToCoords(kingSquare);
-  const themes = [];
-  if (rank === 0 || rank === 7) themes.push("backRankMate");
-  const [file] = squareToCoords(kingSquare);
-  let ownNeighbors = 0;
-  for (let df = -1; df <= 1; df += 1) {
-    for (let dr = -1; dr <= 1; dr += 1) {
-      if (!df && !dr) continue;
-      const square = coordsToSquare(file + df, rank + dr);
-      if (square && game.get(square)?.color === kingColor) ownNeighbors += 1;
-    }
+  return null;
+}
+
+function assertLegalTrainingPosition(fen) {
+  const game = new Chess(fen);
+  const movingColor = game.turn();
+  const waitingKing = findKing(game, opposite(movingColor));
+  if (!waitingKing) throw new Error(`Missing non-moving king: ${fen}`);
+  if (game.isAttacked(waitingKing, movingColor)) {
+    throw new Error(`Non-moving king is already attacked: ${fen}`);
   }
-  if (ownNeighbors >= 3) themes.push("smotheredMate");
-  return themes;
+  if (game.isGameOver()) throw new Error(`Terminal training position: ${fen}`);
+  return game;
 }
 
-function classifyThemes(targetGame, bestMove, ply) {
-  const game = new Chess(targetGame.fen());
-  const mover = game.turn();
-  const capturedValue = bestMove.captured ? PIECE_VALUE[bestMove.captured] : 0;
-  game.move(bestMove);
-  const themes = [];
-
-  if (game.isCheckmate()) themes.push("mate", "mateIn1", ...matePattern(game));
-  if (bestMove.promotion) themes.push("promotion");
-  if (attackedTargetsByMovedPiece(game, bestMove, mover).length >= 2) themes.push("fork");
-  if (capturedValue >= 500) themes.push("hangingPiece");
-  else if (capturedValue > 0) themes.push("capturingDefender");
-  if (game.inCheck() && !game.isCheckmate()) themes.push("exposedKing");
-  if (themes.length === 0) themes.push("advantage");
-  else if (!themes.some((theme) => theme.startsWith("mate"))) themes.push("advantage");
-
-  const pieceCount = game.board().flat().filter(Boolean).length;
-  themes.push(ply < 18 ? "opening" : pieceCount <= 12 ? "endgame" : "middlegame");
-  themes.push("short");
-  return [...new Set(themes)];
+function moveFromUci(game, moveText) {
+  return game.move({
+    from: moveText.slice(0, 2),
+    to: moveText.slice(2, 4),
+    promotion: moveText.slice(4, 5) || undefined,
+  });
 }
 
-function classifyDifficulty(best, second, line, themes) {
-  const gap = best.score - second.score;
-  if (themes.includes("mateIn1") || gap >= 700 || PIECE_VALUE[best.move.captured] >= 900) return "easy";
-  if (gap >= 280 || line.length <= 3 || best.move.san.includes("+")) return "medium";
-  return "hard";
+function materialCount(game) {
+  return game.board().flat().filter(Boolean).length;
 }
 
 function weightedRandomMove(game, ply) {
   const moves = game.moves({ verbose: true });
   const weighted = moves.map((move) => {
     let weight = 1;
-    if (move.captured) weight += 2.8;
-    if (move.san.includes("+")) weight += 1.8;
-    if (move.flags.includes("k") || move.flags.includes("q")) weight += 2.4;
+    if (move.captured) weight += 3 + PIECE_VALUE[move.captured] / 250;
+    if (move.san.includes("+")) weight += 2.5;
+    if (move.san.includes("#")) weight += 20;
+    if (move.promotion) weight += 8;
     if (ply < 14 && ["n", "b"].includes(move.piece)) weight += 1.5;
     if (ply < 12 && move.piece === "q" && !move.captured) weight *= 0.25;
     if (ply < 10 && move.piece === "r" && !move.captured) weight *= 0.35;
@@ -245,420 +181,163 @@ function weightedRandomMove(game, ply) {
   return weighted.at(-1).move;
 }
 
-function createCandidate(sourceFen, setupMove, ply) {
-  const target = new Chess(sourceFen);
-  const appliedSetup = target.move(setupMove);
-  if (!appliedSetup || target.isGameOver()) return null;
-
-  const forcingMoves = target.moves({ verbose: true }).filter((move) =>
-    move.captured || move.promotion || move.san.includes("+") || move.san.includes("#")
-  );
-  if (forcingMoves.length === 0) return null;
-
-  const baseline = evaluate(target, target.turn());
-  if (baseline > 750) return null;
-  const ranked = rankedRootMoves(target);
-  if (ranked.length < 2) return null;
-  const [best, second] = ranked;
-  const gap = best.score - second.score;
-  if (gap < 120 || best.score - baseline < 140) return null;
-  if (!forcingMoves.some((move) => uci(move) === uci(best.move))) return null;
-
-  const perspective = target.turn();
-  const line = [uci(best.move)];
-  target.move(best.move);
-  if (!target.isGameOver()) {
-    const reply = chooseWorstReply(target, perspective);
-    if (!reply) return null;
-    target.move(reply);
-    line.push(uci(reply));
-    if (!target.isGameOver()) {
-      const followUp = chooseBestFollowUp(target, perspective);
-      if (!followUp) return null;
-      target.move(followUp);
-      line.push(uci(followUp));
+function collectReachableCandidates(target = 18_000) {
+  const candidates = [];
+  const seen = new Set();
+  for (let gameNumber = 0; gameNumber < 4_000 && candidates.length < target; gameNumber += 1) {
+    const game = new Chess();
+    const maxPlies = 42 + Math.floor(random() * 38);
+    for (let ply = 0; ply < maxPlies && !game.isGameOver(); ply += 1) {
+      if (ply >= 10 && materialCount(game) >= 7) {
+        const key = puzzleKey(game.fen());
+        if (!seen.has(key)) {
+          assertLegalTrainingPosition(game.fen());
+          seen.add(key);
+          candidates.push({ fen: game.fen(), ply });
+        }
+      }
+      game.move(weightedRandomMove(game, ply));
     }
   }
-
-  const targetPosition = new Chess(sourceFen);
-  targetPosition.move(setupMove);
-  const themes = classifyThemes(targetPosition, best.move, ply);
-  const difficulty = classifyDifficulty(best, second, line, themes);
-  return {
-    fen: targetPosition.fen(),
-    targetFen: targetPosition.fen().split(" ").slice(0, 4).join(" "),
-    moves: line,
-    themes,
-    difficulty,
-    gap,
-  };
+  return candidates;
 }
 
-function validatePuzzle(puzzle) {
-  const game = new Chess(puzzle.fen);
-  for (const moveText of puzzle.moves) {
-    const move = game.move({
-      from: moveText.slice(0, 2),
-      to: moveText.slice(2, 4),
-      promotion: moveText.slice(4, 5) || undefined,
-    });
-    if (!move) throw new Error(`${puzzle.id}: illegal move ${moveText}`);
+function attackedMajorPieces(game, mover) {
+  const attacked = [];
+  for (const row of game.board()) {
+    for (const piece of row) {
+      if (!piece || piece.color === mover || !["q", "r"].includes(piece.type)) continue;
+      if (game.isAttacked(piece.square, mover)) attacked.push(piece.type);
+    }
   }
-  if (puzzle.solutionLength !== Math.ceil(puzzle.moves.length / 2)) {
-    throw new Error(`${puzzle.id}: incorrect solution length`);
+  return attacked;
+}
+
+function classifyThemes(gameBefore, move, ply) {
+  const game = new Chess(gameBefore.fen());
+  const mover = game.turn();
+  const captured = move.captured;
+  game.move(move);
+  const themes = [];
+  if (game.isCheckmate()) themes.push("mate", "mateIn1");
+  if (move.promotion) themes.push("promotion");
+  if (attackedMajorPieces(game, mover).length >= 2) themes.push("fork");
+  if (captured === "q" || captured === "r") themes.push("hangingPiece");
+  else if (captured) themes.push("capturingDefender");
+  if (game.inCheck() && !game.isCheckmate()) themes.push("exposedKing");
+  if (!themes.length || !themes.some((theme) => theme.startsWith("mate"))) {
+    themes.push("advantage");
   }
+  const pieces = materialCount(game);
+  themes.push(ply < 18 ? "opening" : pieces <= 12 ? "endgame" : "middlegame");
+  themes.push("engineVerified", "short");
+  return [...new Set(themes)];
+}
+
+function classifyDifficulty(gap, move, themes) {
+  if (themes.includes("mateIn1") || move.captured === "q" || gap >= 500) return "easy";
+  if (gap >= 230) return "medium";
+  return "hard";
+}
+
+function ratingFor(difficulty) {
+  const base = difficulty === "easy" ? 850 : difficulty === "medium" ? 1300 : 1700;
+  return base + Math.floor(random() * 260);
+}
+
+function isForcing(move, gap) {
+  return Boolean(
+    move.captured || move.promotion || move.san.includes("+") || move.san.includes("#") || gap >= 260
+  );
+}
+
+function resultGap(result) {
+  if (!result.principal || !result.second) return null;
+  const best = scoreValue(result.principal.score);
+  const second = scoreValue(result.second.score);
+  if (best == null || second == null) return null;
+  return best - second;
+}
+
+async function verifyCandidate(engine, candidate) {
+  const game = assertLegalTrainingPosition(candidate.fen);
+  const first = await engine.analyze(candidate.fen, PRELIMINARY_NODES);
+  const firstGap = resultGap(first);
+  if (!first.principal || first.bestMove === "(none)" || firstGap == null) return null;
+  if (first.principal.move !== first.bestMove || firstGap < MIN_PRELIMINARY_GAP) return null;
+  if (game.get(first.bestMove.slice(2, 4))?.type === "k") return null;
+  const firstMove = moveFromUci(game, first.bestMove);
+  if (!firstMove || !isForcing(firstMove, firstGap)) return null;
+
+  const verified = await engine.analyze(candidate.fen, VERIFICATION_NODES);
+  const verifiedGap = resultGap(verified);
+  if (!verified.principal || verifiedGap == null) return null;
+  if (verified.bestMove !== first.bestMove || verified.principal.move !== first.bestMove) return null;
+  if (verifiedGap < MIN_VERIFIED_GAP) return null;
+
+  const replay = assertLegalTrainingPosition(candidate.fen);
+  const move = moveFromUci(replay, verified.bestMove);
+  if (!move) return null;
+  const themes = classifyThemes(assertLegalTrainingPosition(candidate.fen), move, candidate.ply);
+  const difficulty = classifyDifficulty(verifiedGap, move, themes);
+  return {
+    id: "",
+    fen: candidate.fen,
+    moves: [verified.bestMove],
+    rating: ratingFor(difficulty),
+    themes,
+    difficulty,
+    solutionLength: 1,
+    source: "ChessGrind Original",
+    verification: {
+      engine: "Stockfish 19",
+      nodes: VERIFICATION_NODES,
+      scoreGap: Math.round(verifiedGap),
+    },
+  };
 }
 
 function renderFile(puzzles) {
-  return `/*\n * CHESSGRIND ORIGINAL PUZZLES\n *\n * Generated deterministically by scripts/generate-original-puzzles.mjs.\n * Every position is locally authored or generated, and every complete\n * solution line is replay-validated with chess.js. No external puzzle\n * database, game ID, or chess-service account is used.\n *\n * Run: npm run puzzles:generate\n */\n\nexport type PuzzleDifficulty = "easy" | "medium" | "hard";\n\nexport type Puzzle = {\n  id: string;\n  fen: string;\n  moves: string[];\n  rating: number;\n  themes: string[];\n  difficulty: PuzzleDifficulty;\n  solutionLength: number;\n  source: "ChessGrind Original";\n};\n\nexport const puzzles: Puzzle[] = ${JSON.stringify(puzzles, null, 2)};\n`;
-}
-
-function boardFen(pieces, turn) {
-  const ranks = [];
-  for (let rank = 7; rank >= 0; rank -= 1) {
-    let empty = 0;
-    let row = "";
-    for (let file = 0; file < 8; file += 1) {
-      const piece = pieces.get(coordsToSquare(file, rank));
-      if (!piece) {
-        empty += 1;
-        continue;
-      }
-      if (empty) row += String(empty);
-      empty = 0;
-      row += piece;
-    }
-    if (empty) row += String(empty);
-    ranks.push(row);
-  }
-  return `${ranks.join("/")} ${turn} - - 0 1`;
-}
-
-function randomChoice(values) {
-  return values[Math.floor(random() * values.length)];
-}
-
-function randomEmptySquare(pieces, predicate = () => true) {
-  const candidates = [];
-  for (let file = 0; file < 8; file += 1) {
-    for (let rank = 0; rank < 8; rank += 1) {
-      const square = coordsToSquare(file, rank);
-      if (!pieces.has(square) && predicate(file, rank)) candidates.push(square);
-    }
-  }
-  return candidates.length ? randomChoice(candidates) : null;
-}
-
-function kingsSeparated(first, second) {
-  const [af, ar] = squareToCoords(first);
-  const [bf, br] = squareToCoords(second);
-  return Math.max(Math.abs(af - bf), Math.abs(ar - br)) > 1;
-}
-
-function makeOriginalPuzzle(fen, moves, themes, difficulty, rating) {
-  return {
-    id: "",
-    fen,
-    moves,
-    rating,
-    themes: [...new Set([...themes, "short"])],
-    difficulty,
-    solutionLength: Math.ceil(moves.length / 2),
-    source: "ChessGrind Original",
-  };
-}
-
-function generateMatePuzzles(targetCount, seenPositions) {
-  const puzzles = [];
-  for (let attempt = 0; attempt < 120_000 && puzzles.length < targetCount; attempt += 1) {
-    const solver = puzzles.length % 2 === 0 ? "w" : "b";
-    const enemy = solver === "w" ? "b" : "w";
-    const pieces = new Map();
-    const enemyKing = randomEmptySquare(pieces, (_file, rank) => rank <= 1 || rank >= 6);
-    pieces.set(enemyKing, enemy === "w" ? "K" : "k");
-    const solverKing = randomEmptySquare(pieces, () => true);
-    if (!solverKing || !kingsSeparated(enemyKing, solverKing)) continue;
-    pieces.set(solverKing, solver === "w" ? "K" : "k");
-
-    const attackers = random() < 0.5 ? ["q", "r"] : ["r", random() < 0.5 ? "b" : "n"];
-    for (const type of attackers) {
-      const square = randomEmptySquare(pieces);
-      if (square) pieces.set(square, solver === "w" ? type.toUpperCase() : type);
-    }
-    const blockerCount = 1 + Math.floor(random() * 3);
-    for (let index = 0; index < blockerCount; index += 1) {
-      const square = randomEmptySquare(pieces, (_file, rank) => rank > 0 && rank < 7);
-      if (square) pieces.set(square, enemy === "w" ? "P" : "p");
-    }
-
-    let game;
-    try {
-      game = new Chess(boardFen(pieces, solver));
-    } catch {
-      continue;
-    }
-    if (game.inCheck() || game.isGameOver()) continue;
-    const mates = game.moves({ verbose: true }).filter((move) => {
-      game.move(move);
-      const isMate = game.isCheckmate();
-      game.undo();
-      return isMate;
-    });
-    if (mates.length !== 1) continue;
-    const key = game.fen().split(" ").slice(0, 4).join(" ");
-    if (seenPositions.has(key)) continue;
-    const move = mates[0];
-    game.move(move);
-    const patterns = matePattern(game);
-    game.undo();
-    puzzles.push(makeOriginalPuzzle(game.fen(), [uci(move)], ["mate", "mateIn1", ...patterns, "endgame"], "easy", 780 + Math.floor(random() * 260)));
-    seenPositions.add(key);
-  }
-  return puzzles;
-}
-
-function generatePromotionPuzzles(targetCount, seenPositions) {
-  const puzzles = [];
-  for (let attempt = 0; attempt < 20_000 && puzzles.length < targetCount; attempt += 1) {
-    const solver = puzzles.length % 2 === 0 ? "w" : "b";
-    const pieces = new Map();
-    const pawnFile = 1 + Math.floor(random() * 6);
-    const pawnRank = solver === "w" ? 6 : 1;
-    const pawnSquare = coordsToSquare(pawnFile, pawnRank);
-    const promotionSquare = coordsToSquare(pawnFile, solver === "w" ? 7 : 0);
-    pieces.set(pawnSquare, solver === "w" ? "P" : "p");
-    const ownKing = randomEmptySquare(pieces, (_file, rank) => solver === "w" ? rank <= 2 : rank >= 5);
-    pieces.set(ownKing, solver === "w" ? "K" : "k");
-    const enemyKing = randomEmptySquare(pieces, (file, rank) => {
-      if (solver === "w" ? rank < 4 : rank > 3) return false;
-      return kingsSeparated(ownKing, coordsToSquare(file, rank)) && coordsToSquare(file, rank) !== promotionSquare;
-    });
-    if (!enemyKing) continue;
-    pieces.set(enemyKing, solver === "w" ? "k" : "K");
-    const extraSquare = randomEmptySquare(pieces, (_file, rank) => rank > 0 && rank < 7);
-    if (extraSquare) pieces.set(extraSquare, solver === "w" ? "p" : "P");
-
-    let game;
-    try {
-      game = new Chess(boardFen(pieces, solver));
-    } catch {
-      continue;
-    }
-    if (game.inCheck() || game.isGameOver()) continue;
-    const queenPromotion = `${pawnSquare}${promotionSquare}q`;
-    if (!game.moves({ verbose: true }).some((move) => uci(move) === queenPromotion)) continue;
-    const key = game.fen().split(" ").slice(0, 4).join(" ");
-    if (seenPositions.has(key)) continue;
-    puzzles.push(makeOriginalPuzzle(game.fen(), [queenPromotion], ["promotion", "advantage", "endgame"], "medium", 1180 + Math.floor(random() * 300)));
-    seenPositions.add(key);
-  }
-  return puzzles;
-}
-
-function generateForkPuzzles(targetCount, seenPositions) {
-  const puzzles = [];
-  for (let attempt = 0; attempt < 80_000 && puzzles.length < targetCount; attempt += 1) {
-    const solver = puzzles.length % 2 === 0 ? "w" : "b";
-    const enemy = solver === "w" ? "b" : "w";
-    const pieces = new Map();
-    const knightSquare = randomEmptySquare(pieces, (file, rank) => file >= 1 && file <= 6 && rank >= 1 && rank <= 6);
-    pieces.set(knightSquare, solver === "w" ? "N" : "n");
-    const ownKing = randomEmptySquare(pieces);
-    pieces.set(ownKing, solver === "w" ? "K" : "k");
-    const enemyKing = randomEmptySquare(pieces, (file, rank) => kingsSeparated(ownKing, coordsToSquare(file, rank)));
-    if (!enemyKing) continue;
-    pieces.set(enemyKing, enemy === "w" ? "K" : "k");
-
-    const tempFen = boardFen(pieces, solver);
-    let temp;
-    try {
-      temp = new Chess(tempFen);
-    } catch {
-      continue;
-    }
-    if (temp.inCheck()) continue;
-    const knightMoves = temp.moves({ verbose: true }).filter((move) => move.from === knightSquare);
-    if (!knightMoves.length) continue;
-    const intended = randomChoice(knightMoves);
-    const [targetFile, targetRank] = squareToCoords(intended.to);
-    const attackSquares = [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]
-      .map(([df, dr]) => coordsToSquare(targetFile + df, targetRank + dr))
-      .filter((square) => square && !pieces.has(square));
-    if (attackSquares.length < 2) continue;
-    const firstTarget = randomChoice(attackSquares);
-    const remaining = attackSquares.filter((square) => square !== firstTarget);
-    const secondTarget = randomChoice(remaining);
-    pieces.set(firstTarget, enemy === "w" ? "Q" : "q");
-    pieces.set(secondTarget, enemy === "w" ? "R" : "r");
-
-    let game;
-    try {
-      game = new Chess(boardFen(pieces, solver));
-    } catch {
-      continue;
-    }
-    if (game.inCheck() || game.isGameOver()) continue;
-    const forkMoves = game.moves({ verbose: true }).filter((move) => {
-      if (move.piece !== "n") return false;
-      game.move(move);
-      const isFork = attackedTargetsByMovedPiece(game, move, solver).filter((piece) => piece === "q" || piece === "r").length >= 2;
-      game.undo();
-      return isFork;
-    });
-    if (forkMoves.length !== 1 || uci(forkMoves[0]) !== uci(intended)) continue;
-    const key = game.fen().split(" ").slice(0, 4).join(" ");
-    if (seenPositions.has(key)) continue;
-    const difficulty = puzzles.length % 2 === 0 ? "hard" : "medium";
-    const rating = difficulty === "hard" ? 1680 + Math.floor(random() * 260) : 1320 + Math.floor(random() * 260);
-    puzzles.push(makeOriginalPuzzle(game.fen(), [uci(forkMoves[0])], ["fork", "advantage", "middlegame"], difficulty, rating));
-    seenPositions.add(key);
-  }
-  return puzzles;
-}
-
-function generatePinPuzzles(targetCount, seenPositions) {
-  const puzzles = [];
-  for (let index = 0; index < targetCount * 8 && puzzles.length < targetCount; index += 1) {
-    const solver = puzzles.length % 2 === 0 ? "w" : "b";
-    const enemy = solver === "w" ? "b" : "w";
-    const targetFile = 1 + (index % 6);
-    const startFile = targetFile === 1 || index % 2 === 0 ? targetFile + 1 : targetFile - 1;
-    const rookRank = solver === "w" ? 0 : 7;
-    const pinnedRank = solver === "w" ? 6 : 1;
-    const kingRank = solver === "w" ? 7 : 0;
-    const pieces = new Map();
-    const rookSquare = coordsToSquare(startFile, rookRank);
-    const targetSquare = coordsToSquare(targetFile, rookRank);
-    pieces.set(rookSquare, solver === "w" ? "R" : "r");
-    pieces.set(coordsToSquare(targetFile, pinnedRank), enemy === "w" ? "Q" : "q");
-    pieces.set(coordsToSquare(targetFile, kingRank), enemy === "w" ? "K" : "k");
-
-    const ownKing = randomEmptySquare(pieces, (file, rank) => {
-      if (coordsToSquare(file, rank) === targetSquare) return false;
-      return Math.abs(file - targetFile) >= 2;
-    });
-    if (!ownKing) continue;
-    pieces.set(ownKing, solver === "w" ? "K" : "k");
-    const accentPawn = randomEmptySquare(pieces, (file, rank) =>
-      file !== targetFile && rank > 1 && rank < 6
-    );
-    if (accentPawn) pieces.set(accentPawn, index % 3 === 0 ? (solver === "w" ? "P" : "p") : (enemy === "w" ? "P" : "p"));
-
-    let game;
-    try {
-      game = new Chess(boardFen(pieces, solver));
-    } catch {
-      continue;
-    }
-    if (game.inCheck() || game.isGameOver()) continue;
-    const pinMove = `${rookSquare}${targetSquare}`;
-    if (!game.moves({ verbose: true }).some((move) => uci(move) === pinMove)) continue;
-    const key = game.fen().split(" ").slice(0, 4).join(" ");
-    if (seenPositions.has(key)) continue;
-    puzzles.push(makeOriginalPuzzle(game.fen(), [pinMove], ["pin", "advantage", "endgame"], "hard", 1700 + Math.floor(random() * 280)));
-    seenPositions.add(key);
-  }
-  return puzzles;
+  return `/*\n * CHESSGRIND ORIGINAL PUZZLES\n *\n * Generated from complete, locally played legal games and verified twice\n * with Stockfish. The generator rejects positions where the non-moving king\n * is attacked, king-capture moves, unstable best moves, and ambiguous answers.\n * No external puzzle database or chess-service account is used.\n *\n * Run: STOCKFISH_PATH=/path/to/stockfish npm run puzzles:generate\n */\n\nexport type PuzzleDifficulty = "easy" | "medium" | "hard";\n\nexport type Puzzle = {\n  id: string;\n  fen: string;\n  moves: string[];\n  rating: number;\n  themes: string[];\n  difficulty: PuzzleDifficulty;\n  solutionLength: number;\n  source: "ChessGrind Original";\n  verification: { engine: "Stockfish 19"; nodes: number; scoreGap: number };\n};\n\nexport const puzzles: Puzzle[] = ${JSON.stringify(puzzles, null, 2)};\n`;
 }
 
 async function generate() {
+  const engine = new Stockfish(STOCKFISH_PATH);
+  await engine.init();
+  const candidates = collectReachableCandidates();
+  console.log(`Collected ${candidates.length} reachable positions from complete legal games.`);
   const accepted = [];
-  const seenPositions = new Set();
   const counts = { easy: 0, medium: 0, hard: 0 };
-  const baselineLimits = { easy: 68, medium: 68, hard: 64 };
+  const colors = { w: 0, b: 0 };
 
-  const authoredSets = [
-    ...generateMatePuzzles(28, seenPositions),
-    ...generatePromotionPuzzles(22, seenPositions),
-    ...generateForkPuzzles(70, seenPositions),
-    ...generatePinPuzzles(30, seenPositions),
-  ];
-  for (const puzzle of authoredSets) {
-    if (counts[puzzle.difficulty] >= baselineLimits[puzzle.difficulty]) continue;
-    accepted.push(puzzle);
-    counts[puzzle.difficulty] += 1;
-  }
-  console.log(`Seeded ${accepted.length} authored tactical compositions.`);
-
-  for (let gameNumber = 0; gameNumber < 1800 && accepted.length < BASELINE_COUNT; gameNumber += 1) {
-    const game = new Chess();
-    const maxPlies = 26 + Math.floor(random() * 34);
-    for (let ply = 0; ply < maxPlies && !game.isGameOver(); ply += 1) {
-      const sourceFen = game.fen();
-      const setupMove = weightedRandomMove(game, ply);
-      const candidate = createCandidate(sourceFen, setupMove, ply);
-      game.move(setupMove);
-      if (!candidate || seenPositions.has(candidate.targetFen)) continue;
-      if (counts[candidate.difficulty] >= baselineLimits[candidate.difficulty]) continue;
-
-      const ordinal = accepted.length + 1;
-      const ratingBase = candidate.difficulty === "easy" ? 820 : candidate.difficulty === "medium" ? 1280 : 1680;
-      const puzzle = {
-        id: `CG-${String(ordinal).padStart(4, "0")}`,
-        fen: candidate.fen,
-        moves: candidate.moves,
-        rating: ratingBase + Math.floor(random() * 300),
-        themes: candidate.themes,
-        difficulty: candidate.difficulty,
-        solutionLength: Math.ceil(candidate.moves.length / 2),
-        source: "ChessGrind Original",
-      };
-      validatePuzzle(puzzle);
+  try {
+    for (const candidate of candidates) {
+      if (accepted.length >= TARGET_COUNT) break;
+      const solverColor = new Chess(candidate.fen).turn();
+      if (colors[solverColor] >= TARGET_COUNT / 2) continue;
+      const puzzle = await verifyCandidate(engine, candidate);
+      if (!puzzle) continue;
+      puzzle.id = `CG-${String(accepted.length + 1).padStart(4, "0")}`;
       accepted.push(puzzle);
-      seenPositions.add(candidate.targetFen);
-      counts[candidate.difficulty] += 1;
-      if (accepted.length % 25 === 0) {
-        console.log(`Accepted ${accepted.length}/${TARGET_COUNT} puzzles...`);
+      counts[puzzle.difficulty] += 1;
+      colors[solverColor] += 1;
+      if (accepted.length % 50 === 0) {
+        console.log(`Verified ${accepted.length}/${TARGET_COUNT} puzzles...`);
       }
     }
-  }
-
-  if (accepted.length !== BASELINE_COUNT) {
-    throw new Error(`Generated ${accepted.length}/${BASELINE_COUNT} baseline puzzles: ${JSON.stringify(counts)}`);
-  }
-
-  const extensionSets = [
-    ...generateMatePuzzles(8, seenPositions),
-    ...generatePromotionPuzzles(8, seenPositions),
-    ...generatePinPuzzles(9, seenPositions),
-    ...generateMatePuzzles(25, seenPositions),
-    ...generatePromotionPuzzles(25, seenPositions),
-    ...generatePinPuzzles(25, seenPositions),
-    ...generateMatePuzzles(34, seenPositions),
-    ...generatePromotionPuzzles(33, seenPositions),
-    ...generatePinPuzzles(33, seenPositions),
-    ...generateMatePuzzles(67, seenPositions),
-    ...generatePromotionPuzzles(67, seenPositions),
-    ...generatePinPuzzles(66, seenPositions),
-    ...generateMatePuzzles(67, seenPositions),
-    ...generatePromotionPuzzles(67, seenPositions),
-    ...generatePinPuzzles(66, seenPositions),
-    ...generateMatePuzzles(67, seenPositions),
-    ...generatePromotionPuzzles(67, seenPositions),
-    ...generatePinPuzzles(66, seenPositions),
-  ];
-  for (const puzzle of extensionSets) {
-    accepted.push(puzzle);
-    counts[puzzle.difficulty] += 1;
+  } finally {
+    engine.close();
   }
 
   if (accepted.length !== TARGET_COUNT) {
-    throw new Error(`Generated ${accepted.length}/${TARGET_COUNT}: ${JSON.stringify(counts)}`);
+    throw new Error(`Verified only ${accepted.length}/${TARGET_COUNT} puzzles.`);
   }
-
-  accepted.forEach((puzzle, index) => {
-    puzzle.id = `CG-${String(index + 1).padStart(4, "0")}`;
-    validatePuzzle(puzzle);
-  });
-
+  if (Object.values(counts).some((count) => count < 75)) {
+    throw new Error(`Difficulty distribution is too narrow: ${JSON.stringify(counts)}`);
+  }
   await fs.writeFile(OUTPUT_FILE, renderFile(accepted), "utf8");
-  console.log(`Generated ${accepted.length} ChessGrind Original puzzles.`);
+  console.log(`Wrote ${accepted.length} engine-verified ChessGrind Original puzzles.`);
   console.log(`Difficulty: ${JSON.stringify(counts)}`);
-  const colors = { white: 0, black: 0 };
-  for (const puzzle of accepted) {
-    const game = new Chess(puzzle.fen);
-    colors[game.turn() === "w" ? "white" : "black"] += 1;
-  }
   console.log(`Solver colors: ${JSON.stringify(colors)}`);
 }
 

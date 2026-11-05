@@ -21,8 +21,30 @@ for (const puzzle of puzzles) {
   if (!(puzzle.difficulty in difficulty)) throw new Error(`${puzzle.id}: invalid difficulty`);
 
   const game = new Chess(puzzle.fen);
+  const movingColor = game.turn();
+  const waitingColor = movingColor === "w" ? "b" : "w";
+  let waitingKing = null;
+  for (const row of game.board()) {
+    for (const piece of row) {
+      if (piece?.type === "k" && piece.color === waitingColor) waitingKing = piece.square;
+    }
+  }
+  if (!waitingKing) throw new Error(`${puzzle.id}: missing non-moving king`);
+  if (game.isAttacked(waitingKing, movingColor)) {
+    throw new Error(`${puzzle.id}: non-moving king is already attacked`);
+  }
+  if (game.isGameOver()) throw new Error(`${puzzle.id}: terminal starting position`);
+  if (puzzle.verification?.engine !== "Stockfish 19") {
+    throw new Error(`${puzzle.id}: missing Stockfish 19 verification`);
+  }
+  if (puzzle.verification.nodes < 30000 || puzzle.verification.scoreGap < 90) {
+    throw new Error(`${puzzle.id}: insufficient engine verification`);
+  }
   const objectiveGame = new Chess(puzzle.fen);
   const firstMoveText = puzzle.moves[0];
+  if (game.get(firstMoveText.slice(2, 4))?.type === "k") {
+    throw new Error(`${puzzle.id}: solution attempts to capture a king`);
+  }
   const objectiveMove = objectiveGame.move({
     from: firstMoveText.slice(0, 2),
     to: firstMoveText.slice(2, 4),
@@ -57,7 +79,12 @@ for (const puzzle of puzzles) {
 if (Math.abs(colors.white - colors.black) > 10) {
   throw new Error(`Solver color split is imbalanced: ${JSON.stringify(colors)}`);
 }
-for (const [theme, minimum] of [["mate", 25], ["fork", 50], ["pin", 20], ["promotion", 15]]) {
+for (const [theme, minimum] of [
+  ["engineVerified", 1000],
+  ["mate", 10],
+  ["hangingPiece", 300],
+  ["capturingDefender", 300],
+]) {
   if ((themes.get(theme) ?? 0) < minimum) {
     throw new Error(`Theme ${theme} is below its minimum of ${minimum}.`);
   }
