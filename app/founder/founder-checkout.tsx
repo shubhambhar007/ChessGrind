@@ -61,7 +61,7 @@ export default function FounderCheckout() {
         {loading ? "Opening secure checkout…" : "Become a Founder"}
         <span aria-hidden="true">↗</span>
       </button>
-      <p>One payment · one year · secure checkout by Dodo Payments</p>
+      <p>UPI QR · cards · Apple Pay · secure checkout by Dodo Payments</p>
       {error && <div role="alert">{error}</div>}
     </div>
   );

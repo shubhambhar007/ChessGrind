@@ -66,10 +66,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Dodo exposes UPI at hosted checkout only for India + INR sessions and
+    // only through upi_intent (the QR flow). Cards remain as global fallbacks.
     const session = await dodo.checkoutSessions.create({
       product_cart: [{ product_id: productId, quantity: 1 }],
+      allowed_payment_method_types: [
+        "upi_intent",
+        "credit",
+        "debit",
+        "apple_pay",
+      ],
       customer: { email, name: user.handle },
-      billing_currency: "USD",
+      billing_address: { country: "IN" },
+      billing_currency: "INR",
       return_url: `${request.nextUrl.origin}/account?founder=processing`,
       cancel_url: `${request.nextUrl.origin}/founder?checkout=cancelled`,
       metadata: {
@@ -79,11 +88,13 @@ export async function POST(request: NextRequest) {
       },
       customization: { theme: "dark", show_order_details: true },
       feature_flags: {
-        allow_currency_selection: false,
+        allow_currency_selection: true,
+        allow_customer_editing_country: true,
         allow_customer_editing_email: true,
         allow_customer_editing_name: true,
+        allow_customer_editing_zipcode: true,
         allow_discount_code: false,
-        allow_phone_number_collection: false,
+        allow_phone_number_collection: true,
         allow_tax_id: false,
         redirect_immediately: true,
         single_page: true,
