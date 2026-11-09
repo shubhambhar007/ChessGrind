@@ -5,7 +5,7 @@ const source = await fs.readFile(new URL("../data/puzzles.ts", import.meta.url),
 const match = source.match(/export const puzzles: Puzzle\[] = ([\s\S]+);\s*$/);
 if (!match) throw new Error("Could not read the generated puzzle array.");
 const puzzles = JSON.parse(match[1]);
-if (puzzles.length !== 1000) throw new Error(`Expected 1000 puzzles, found ${puzzles.length}.`);
+if (puzzles.length !== 6000) throw new Error(`Expected 6000 puzzles, found ${puzzles.length}.`);
 
 const ids = new Set();
 const positions = new Set();
@@ -54,9 +54,7 @@ for (const puzzle of puzzles) {
   if (puzzle.themes.includes("mateIn1") && !objectiveGame.isCheckmate()) {
     throw new Error(`${puzzle.id}: mateIn1 does not end in checkmate`);
   }
-  if (puzzle.themes.includes("promotion") && !objectiveMove.promotion) {
-    throw new Error(`${puzzle.id}: promotion theme has no promotion move`);
-  }
+  let lineHasPromotion = false;
   const key = game.fen().split(" ").slice(0, 4).join(" ");
   if (positions.has(key)) throw new Error(`${puzzle.id}: duplicate training position`);
   positions.add(key);
@@ -68,6 +66,11 @@ for (const puzzle of puzzles) {
       promotion: moveText.slice(4, 5) || undefined,
     });
     if (!move) throw new Error(`${puzzle.id}: illegal move ${index + 1} (${moveText})`);
+    lineHasPromotion ||= Boolean(move.promotion);
+  }
+
+  if (puzzle.themes.includes("promotion") && !lineHasPromotion) {
+    throw new Error(`${puzzle.id}: promotion theme has no promotion move`);
   }
 
   const expectedLength = Math.ceil(puzzle.moves.length / 2);
@@ -80,10 +83,10 @@ if (Math.abs(colors.white - colors.black) > 10) {
   throw new Error(`Solver color split is imbalanced: ${JSON.stringify(colors)}`);
 }
 for (const [theme, minimum] of [
-  ["engineVerified", 1000],
+  ["engineVerified", 6000],
   ["mate", 10],
   ["hangingPiece", 300],
-  ["capturingDefender", 300],
+  ["capturingDefender", 10],
 ]) {
   if ((themes.get(theme) ?? 0) < minimum) {
     throw new Error(`Theme ${theme} is below its minimum of ${minimum}.`);

@@ -269,19 +269,19 @@ export const openingDrills: OpeningDrill[] = [
     "side": "white",
     "fen": "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 1 5",
     "moves": [
-      "e1g1",
+      "f3e5",
       "d7d6",
       "c2c3",
       "e8g8",
-      "f1e1",
+      "e1g1",
       "a7a6"
     ],
     "sanMoves": [
-      "O-O",
+      "Nxe5",
       "d6",
       "c3",
       "O-O",
-      "Re1",
+      "O-O",
       "a6"
     ],
     "idea": "Develop quickly, fight for d4, and castle before starting an attack.",
@@ -5296,7 +5296,7 @@ export const openingDrills: OpeningDrill[] = [
       "c7c6",
       "f1c4",
       "c8f5",
-      "e1g1"
+      "f3e5"
     ],
     "sanMoves": [
       "Nf6",
@@ -5304,7 +5304,7 @@ export const openingDrills: OpeningDrill[] = [
       "c6",
       "Bc4",
       "Bf5",
-      "O-O"
+      "Ne5"
     ],
     "idea": "Challenge e4 immediately, then develop efficiently after the queen recaptures.",
     "commonMistake": "Do not spend multiple tempi moving the queen while the rest of the army sleeps.",
@@ -5403,7 +5403,7 @@ export const openingDrills: OpeningDrill[] = [
       "c7c6",
       "f1c4",
       "c8f5",
-      "e1g1",
+      "f3e5",
       "e7e6"
     ],
     "sanMoves": [
@@ -5411,7 +5411,7 @@ export const openingDrills: OpeningDrill[] = [
       "c6",
       "Bc4",
       "Bf5",
-      "O-O",
+      "Ne5",
       "e6"
     ],
     "idea": "Challenge e4 immediately, then develop efficiently after the queen recaptures.",

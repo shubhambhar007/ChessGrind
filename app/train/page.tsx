@@ -939,7 +939,8 @@ function getPieceName(
 }
 
 function getHintText(
-  themes: string[]
+  themes: string[],
+  expectedMoveGivesCheck = true
 ) {
   if (
     themes.some(
@@ -950,7 +951,9 @@ function getHintText(
     ) ||
     themes.includes("mate")
   ) {
-    return "Checks are the most forcing moves. Start there.";
+    return expectedMoveGivesCheck
+      ? "Checks are the most forcing moves. Start there."
+      : "There is a forced mate, but it starts with a quiet move. Look for one that takes away the king's escape squares or sets up a threat that cannot be stopped.";
   }
 
   if (
@@ -2254,8 +2257,20 @@ export default function Home() {
     if (
       hintLevel === 1
     ) {
+      const nextMove = puzzle.moves[moveIndex];
+      let givesCheck = true;
+      if (nextMove) {
+        const probe = new Chess(game.fen());
+        try {
+          applyUciMove(probe, nextMove);
+          givesCheck = probe.inCheck();
+        } catch {
+          givesCheck = true;
+        }
+      }
       return getHintText(
-        puzzle.themes
+        puzzle.themes,
+        givesCheck
       );
     }
 
