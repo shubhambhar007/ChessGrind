@@ -2030,6 +2030,8 @@ export default function Home() {
   }
 
   useEffect(() => {
+    let savedProgress: Progress | null = null;
+
     try {
       const raw =
         window.localStorage.getItem(
@@ -2040,16 +2042,21 @@ export default function Home() {
         const saved =
           JSON.parse(raw);
 
-        setProgress({
+        savedProgress = {
           ...DEFAULT_PROGRESS,
           ...saved,
           themes:
             saved.themes || {},
-        });
+        };
       }
     } catch {}
 
-    setProgressLoaded(true);
+    queueMicrotask(() => {
+      if (savedProgress) {
+        setProgress(savedProgress);
+      }
+      setProgressLoaded(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -2068,48 +2075,46 @@ export default function Home() {
       savedDifficulty ===
         "mixed";
 
-    if (
-      validDifficulty
-    ) {
-      setDifficulty(
-        savedDifficulty as TrainingMode
-      );
-    }
-
     const savedAdaptive =
       window.localStorage.getItem(
         ADAPTIVE_KEY
       );
-
-    if (
-      savedAdaptive ===
-      "false"
-    ) {
-      setAdaptiveTraining(
-        false
-      );
-    }
 
     const savedColorPreference =
       window.localStorage.getItem(
         COLOR_PREFERENCE_KEY
       );
 
-    if (
+    const validColorPreference =
       savedColorPreference ===
         "either" ||
       savedColorPreference ===
         "white" ||
       savedColorPreference ===
-        "black"
-    ) {
-      setColorPreference(
-        savedColorPreference
-      );
-    }
+        "black";
 
-    hasLoadedPreferences.current =
-      true;
+    queueMicrotask(() => {
+      if (validDifficulty) {
+        setDifficulty(
+          savedDifficulty as TrainingMode
+        );
+      }
+      if (
+        savedAdaptive ===
+        "false"
+      ) {
+        setAdaptiveTraining(
+          false
+        );
+      }
+      if (validColorPreference) {
+        setColorPreference(
+          savedColorPreference
+        );
+      }
+      hasLoadedPreferences.current =
+        true;
+    });
   }, []);
 
   useEffect(() => {

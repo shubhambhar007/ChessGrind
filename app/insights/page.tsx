@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import FeatureGuide from "../feature-guide";
 import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import AccountLink from "../account-link";
@@ -440,6 +441,8 @@ export default function InsightsPage() {
     useState(false);
 
   useEffect(() => {
+    let savedProgress: Progress | null = null;
+
     try {
       const raw =
         window.localStorage.getItem(
@@ -450,20 +453,25 @@ export default function InsightsPage() {
         const saved =
           JSON.parse(raw);
 
-        setProgress({
+        savedProgress = {
           ...DEFAULT_PROGRESS,
           ...saved,
 
           themes:
             saved.themes ||
             {},
-        });
+        };
       }
     } catch {
       // Ignore broken localStorage.
     }
 
-    setLoaded(true);
+    queueMicrotask(() => {
+      if (savedProgress) {
+        setProgress(savedProgress);
+      }
+      setLoaded(true);
+    });
   }, []);
 
   const accuracy =
@@ -987,6 +995,32 @@ export default function InsightsPage() {
           </div>
 
         </section>
+
+        <FeatureGuide
+          eyebrow="Training insights"
+          title="Read your practice history without turning chess into a spreadsheet."
+          introduction={[
+            "ChessGrind Insights summarizes the training activity saved in this browser. It combines puzzle results, wrong moves, hint use, skipped positions, streaks, and theme performance so you can see whether a session was accurate rather than only whether it was completed.",
+            "The tactical breakdown groups solved puzzles by pattern and adjusts performance when a solution needed mistakes or hints. Use it to spot themes that deserve another session, then let Smart Training mix that history into future puzzle selection.",
+            "These numbers describe your ChessGrind practice, not an official chess rating. Free progress stays private on this device. Founder members can privately sync progress with their Grindbook and repertoire across devices.",
+          ]}
+          steps={[
+            { title: "Train normally", body: "Solve puzzles, request hints when needed, and skip positions that are not useful right now." },
+            { title: "Check the patterns", body: "Compare accuracy, clean moves, hint use, and performance across tactical themes." },
+            { title: "Choose the next session", body: "Return to Smart Training or select a difficulty and color for more focused practice." },
+          ]}
+          questions={[
+            { question: "What is a clean move?", answer: "It is a correct move found without a prior wrong attempt. Clean move rate separates immediate recognition from eventual completion." },
+            { question: "Why is a theme missing?", answer: "A tactical theme appears after you solve relevant puzzles. New accounts and cleared browser data may have little history." },
+            { question: "Is this my chess rating?", answer: "No. Insights reports your ChessGrind training activity and should not be treated as an official over-the-board or online rating." },
+            { question: "Where is progress stored?", answer: "Free progress is stored locally in this browser. Founder adds private cross-device sync for supported training data." },
+          ]}
+          links={[
+            { href: "/train", label: "Continue training" },
+            { href: "/grindbook", label: "Review saved mistakes" },
+            { href: "/founder", label: "See Founder sync" },
+          ]}
+        />
 
       </div>
 

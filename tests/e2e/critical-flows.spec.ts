@@ -36,25 +36,25 @@ test("training shows every legal destination and solves the verified first puzzl
   await openTraining(page);
   await expect(page.getByText("You are Black", { exact: true })).toBeVisible();
 
-  await page.locator('[data-square="f8"] [data-piece="bB"]').click();
-  await expect(page.locator('[data-square="g7"] > div')).toHaveCSS(
-    "box-shadow",
-    /rgba?\(37, 99, 235/
+  await page.locator('[data-square="e4"] [data-piece="bP"]').click();
+  await expect(page.locator('[data-square="e3"] > div')).toHaveCSS(
+    "background-image",
+    /radial-gradient/
   );
 
-  await page.locator('[data-square="g7"]').click();
+  await page.locator('[data-square="e3"]').click();
   await expect(page.getByText("Well played.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Next puzzle" })).toBeVisible();
 });
 
 test("wrong legal move is rejected and the puzzle remains playable", async ({ page }) => {
   await openTraining(page);
-  await page.locator('[data-square="a7"] [data-piece="bP"]').click();
-  await expect(page.locator('[data-square="a6"] > div')).toHaveCSS(
+  await page.locator('[data-square="f4"] [data-piece="bR"]').click();
+  await expect(page.locator('[data-square="f5"] > div')).toHaveCSS(
     "background-image",
     /radial-gradient/
   );
-  await page.locator('[data-square="a6"]').click();
+  await page.locator('[data-square="f5"]').click();
   await expect(page.getByText("Wrong move.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Skip" })).toBeVisible();
 });

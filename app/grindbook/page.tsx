@@ -11,6 +11,7 @@ import CloudStatusBadge from "../cloud-status";
 import CelebrationBurst from "../celebration-burst";
 import { premiumPieces } from "../premium-pieces";
 import BrandLockup from "../brand-lockup";
+import FeatureGuide from "../feature-guide";
 import {
   formatDue,
   isDue,
@@ -655,6 +656,32 @@ export default function GrindbookPage() {
             )}
           </section>
         )}
+
+        <FeatureGuide
+          eyebrow="How Grindbook works"
+          title="Turn the positions you miss into a review queue that remembers."
+          introduction={[
+            "Most chess training ends when the answer appears. Grindbook keeps the useful part: the exact position that made you stop, guess, or make a costly move. Save it from a puzzle or computer game and it becomes a private review card on this device.",
+            "Each review asks you to find the move again before showing the answer. Your rating changes when the position returns, so difficult patterns come back sooner while familiar ones gradually move further apart. The goal is not to memorize coordinates; it is to recognize the tactical or positional idea faster the next time it appears in a real game.",
+            "You can use Grindbook without an external chess account. Founder members can privately sync their saved positions, review history, repertoire, and training progress across devices.",
+          ]}
+          steps={[
+            { title: "Save the useful moment", body: "Add a puzzle position or a mistake from a full computer game with one action." },
+            { title: "Recall before revealing", body: "Play the move on the board, then compare it with the saved continuation." },
+            { title: "Rate the memory", body: "Tell Grindbook how well you remembered it so the next review lands at the right time." },
+          ]}
+          questions={[
+            { question: "Is Grindbook a normal puzzle list?", answer: "No. It is built from positions that matter to you, so the queue becomes more personal as you train and play." },
+            { question: "Where is my data stored?", answer: "Free use is private to this browser and device. Cross-device cloud sync is part of the Founder plan." },
+            { question: "What should I save?", answer: "Save positions where you missed the idea, used a hint, or want to recall a move without guessing next time." },
+            { question: "Do I need Chess.com or Lichess?", answer: "No. ChessGrind works on its own and does not require you to connect an external chess account." },
+          ]}
+          links={[
+            { href: "/train", label: "Find a puzzle to save" },
+            { href: "/play", label: "Play a full game" },
+            { href: "/founder", label: "See Founder sync" },
+          ]}
+        />
       </div>
     </main>
   );
