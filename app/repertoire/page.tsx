@@ -11,6 +11,7 @@ import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import CelebrationBurst from "../celebration-burst";
 import BrandLockup from "../brand-lockup";
+import FeatureGuide from "../feature-guide";
 import {
   createRepertoire,
   loadRepertoires,
@@ -395,6 +396,32 @@ export default function RepertoirePage() {
             </aside>
           </div>
         ) : null}
+
+        <FeatureGuide
+          eyebrow="Repertoire guide"
+          title="Build opening choices you can actually recall over the board."
+          introduction={[
+            "A chess opening repertoire is a set of responses you have chosen in advance. Repertoire Lab lets you build those choices directly on the board for White or Black, including more than one reply when an opponent can branch into a different line.",
+            "Build mode records your moves and the opponent replies you want to prepare for. Practice mode hides that construction work and asks you to reproduce only your side of the line. When the opponent has several saved replies, ChessGrind can take a different branch so you learn the position rather than one rigid sequence.",
+            "Your free repertoire stays on this device and does not require an external chess account. Founder members can keep their lines privately synced with their Grindbook and training progress across devices.",
+          ]}
+          steps={[
+            { title: "Choose a color", body: "Create separate plans for White and Black, then give each repertoire a useful name." },
+            { title: "Build the branches", body: "Play both sides of a line and save the responses you expect to meet." },
+            { title: "Switch to practice", body: "Recall your moves while ChessGrind supplies an opponent reply from the branches you saved." },
+          ]}
+          questions={[
+            { question: "Do I need to know opening notation?", answer: "No. Build every line by moving pieces on the board; ChessGrind records the moves and positions for you." },
+            { question: "Can I prepare more than one opponent response?", answer: "Yes. Add multiple branches from the same position so practice is not limited to one predictable line." },
+            { question: "Is this the same as Opening Lab?", answer: "Opening Lab contains ready-made drills. Repertoire Lab is where you create and rehearse your own choices." },
+            { question: "Does it import games from another site?", answer: "No. The tool is intentionally self-contained and does not require a Chess.com or Lichess connection." },
+          ]}
+          links={[
+            { href: "/openings", label: "Practice opening drills" },
+            { href: "/grindbook", label: "Review saved positions" },
+            { href: "/founder", label: "See Founder sync" },
+          ]}
+        />
       </div>
     </main>
   );

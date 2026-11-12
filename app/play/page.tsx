@@ -8,6 +8,7 @@ import ThemeToggle from "../theme-toggle";
 import VisitorCounter from "../visitor-counter";
 import { premiumPieces } from "../premium-pieces";
 import GrindbookPromo from "../grindbook-promo";
+import FeatureGuide from "../feature-guide";
 import PremiumSelect from "../premium-select";
 import AccountLink from "../account-link";
 import BrandLockup from "../brand-lockup";
@@ -1260,6 +1261,32 @@ export default function PlayPage() {
             </div>
           </section>
         </div>
+
+        <FeatureGuide
+          eyebrow="Play vs computer"
+          title="Play a complete game, then keep the positions worth learning."
+          introduction={[
+            "ChessGrind includes full computer games for players who want practical decisions between puzzle sessions. Choose a difficulty and color, start from the normal opening position, and play through to checkmate, draw, or resignation without connecting another chess account.",
+            "Select one of your pieces to see its legal destinations as blue move guides. The live scorebook records the game in standard chess notation, while the analysis panel shows a simple material snapshot. Copy the PGN when you want a portable record of the moves.",
+            "The important part happens after a mistake. Save the position to Grindbook and it becomes a spaced-review card, so the same idea can return later instead of disappearing with the finished game.",
+          ]}
+          steps={[
+            { title: "Set up the game", body: "Choose Easy, Medium, or Hard and decide whether to play as White or Black." },
+            { title: "Use legal move guides", body: "Select a piece to inspect its legal destinations, then move by click or drag." },
+            { title: "Keep the lesson", body: "Save a costly position to Grindbook and practise finding the stronger move later." },
+          ]}
+          questions={[
+            { question: "Is the computer game free?", answer: "Yes. Full games, difficulty choices, legal move guides, and PGN copying are available without a puzzle paywall." },
+            { question: "What does the evaluation show?", answer: "It is a material snapshot, not a full chess-engine verdict. King safety and positional factors may not be represented." },
+            { question: "Can I play from either side?", answer: "Yes. Start a new game as White or Black and the board orientation changes with your choice." },
+            { question: "How does a game help my training?", answer: "Games expose decisions puzzles cannot pre-label. Saving the difficult moments turns practical mistakes into focused reviews." },
+          ]}
+          links={[
+            { href: "/grindbook", label: "Open Grindbook" },
+            { href: "/train", label: "Train free puzzles" },
+            { href: "/insights", label: "View training insights" },
+          ]}
+        />
       </div>
     </main>
   );
