@@ -97,7 +97,7 @@ export default function FounderCheckout() {
             {loading ? "Opening secure checkout…" : "Never lose a mistake"}
             <span aria-hidden="true">↗</span>
           </button>
-          <p>One year · UPI QR · cards · secure checkout by Dodo Payments</p>
+          <p>One-time $3.99 · no auto-renewal · cards + UPI in India · secure Dodo checkout</p>
         </>
       )}
       {error && <div role="alert">{error}</div>}

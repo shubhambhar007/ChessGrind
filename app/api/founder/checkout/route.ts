@@ -66,19 +66,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Dodo exposes UPI at hosted checkout only for India + INR sessions and
-    // only through upi_intent (the QR flow). Cards remain as global fallbacks.
+    const visitorCountry = request.headers.get("x-vercel-ip-country")?.toUpperCase();
+    const isIndiaCheckout = visitorCountry === "IN";
+
+    // Keep the default checkout global. Dodo can infer a buyer's local currency
+    // and payment methods from their billing country; forcing every visitor to
+    // India/INR adds unnecessary friction for international buyers.
     const session = await dodo.checkoutSessions.create({
       product_cart: [{ product_id: productId, quantity: 1 }],
-      allowed_payment_method_types: [
-        "upi_intent",
-        "credit",
-        "debit",
-        "apple_pay",
-      ],
+      allowed_payment_method_types: isIndiaCheckout
+        ? ["upi_intent", "credit", "debit", "apple_pay", "google_pay"]
+        : ["credit", "debit", "apple_pay", "google_pay"],
       customer: { email, name: user.handle },
-      billing_address: { country: "IN" },
-      billing_currency: "INR",
+      ...(isIndiaCheckout
+        ? { billing_address: { country: "IN" as const }, billing_currency: "INR" as const }
+        : {}),
       return_url: `${request.nextUrl.origin}/account?founder=processing`,
       cancel_url: `${request.nextUrl.origin}/founder?checkout=cancelled`,
       metadata: {
