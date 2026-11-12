@@ -3,6 +3,14 @@ import Link from "next/link";
 import BrandLockup from "../brand-lockup";
 import ThemeToggle from "../theme-toggle";
 import FounderCheckout from "./founder-checkout";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Chess Mistake Memory & Cloud Sync – Founder",
+  description:
+    "Never lose a chess mistake. ChessGrind Founder keeps your Grindbook reviews, repertoire, and training progress privately synced across every device.",
+  alternates: { canonical: "/founder" },
+};
 
 const BENEFITS = [
   ["Cloud memory", "Keep Grindbook reviews and repertoire work synced across every device."],
@@ -36,8 +44,8 @@ export default function FounderPage() {
       <section className="cg-founder-hero">
         <div className="cg-founder-copy">
           <span>FOUNDING SEASON · 2026</span>
-          <h1>Back the grind.<br /><em>Own the year.</em></h1>
-          <p>ChessGrind stays generous: all 6,000 puzzles, hints, sessions, and full games remain free. Founder is for players who want the private memory layer—and want this product to keep getting sharper.</p>
+          <h1>Never lose a<br /><em>chess mistake.</em></h1>
+          <p>Founder remembers every position you save, keeps your review schedule private and synced, and brings weak patterns back until they finally stick. All 6,000 puzzles stay free.</p>
           <div id="join-founder" className="cg-founder-price">
             <div className="cg-founder-price-stack">
               <mark>61% OFF</mark>
@@ -56,6 +64,7 @@ export default function FounderPage() {
               alt=""
               width={260}
               height={260}
+              priority
               unoptimized
               className="cg-founder-seal-logo"
             />
@@ -68,8 +77,8 @@ export default function FounderPage() {
       <section className="cg-founder-comparison" aria-labelledby="founder-comparison-title">
         <div className="cg-founder-comparison-copy">
           <span>FREE VS FOUNDER</span>
-          <h2 id="founder-comparison-title">Pay for memory.<br />Not access.</h2>
-          <p>The chess stays free. Founder is the private layer that remembers your work across devices—and helps fund what ships next.</p>
+          <h2 id="founder-comparison-title">Your training follows you.<br />Your mistakes do not vanish.</h2>
+          <p>Founder turns saved mistakes into a portable review system. Start on your phone, continue on your laptop, and never rebuild the same training history.</p>
         </div>
 
         <div className="cg-founder-comparison-table">
@@ -93,14 +102,14 @@ export default function FounderPage() {
             </tbody>
           </table>
           <div className="cg-founder-comparison-cta">
-            <p><strong>Everything playable stays free.</strong><span>Founder makes your training portable.</span></p>
+            <p><strong>Everything playable stays free.</strong><span>Founder makes every lesson persistent.</span></p>
             <a href="#join-founder">Choose Founder <span aria-hidden="true">↑</span></a>
           </div>
         </div>
       </section>
 
       <section className="cg-founder-benefits">
-        <div><span>WHAT YOU UNLOCK</span><h2>The training is free.<br />The memory is Founder.</h2></div>
+        <div><span>WHAT YOU UNLOCK</span><h2>One mistake.<br />A permanent lesson.</h2></div>
         <div className="cg-founder-benefit-grid">
           {BENEFITS.map(([title, body], index) => (
             <article key={title}><span>0{index + 1}</span><h3>{title}</h3><p>{body}</p></article>

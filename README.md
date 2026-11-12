@@ -119,7 +119,7 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 - Custom pearl/gold and obsidian chess pieces
 - Responsive dark and light themes
 - Custom premium menus instead of browser-native selects
-- Total page views and current online presence
+- Total unique users and current online presence
 - Reduced-motion support for animated rewards
 - Vercel Analytics and Speed Insights
 
@@ -150,7 +150,7 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 | `/insights` | Tactical performance and training recommendations |
 | `/account` | Create, access, and manage a private cloud account |
 
-The server API provides authentication, Grindbook sync, repertoire sync, and visitor-presence endpoints under `/api`.
+The server API provides authentication, Grindbook sync, repertoire sync, visitor presence, and privacy-safe aggregate funnel events under `/api`.
 
 ## Run locally
 

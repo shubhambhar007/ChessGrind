@@ -25,6 +25,7 @@ import {
 } from "@/data/puzzles";
 import { addToGrindbook } from "@/lib/grindbook";
 import { applyLegalMoveMarkers } from "@/lib/chessboard-markers";
+import { recordFunnelEvent } from "@/lib/funnel";
 
 type MoveLog = {
   text: string;
@@ -1686,6 +1687,10 @@ function PlayerColorIndicator({
 }
 
 export default function Home() {
+  useEffect(() => {
+    recordFunnelEvent("training_started", { oncePerSession: true });
+  }, []);
+
   const [
     puzzleIndex,
     setPuzzleIndex,
@@ -2416,7 +2421,9 @@ export default function Home() {
 
     setSavedToGrindbook(true);
 
-    if (!result.added) {
+    if (result.added) {
+      recordFunnelEvent("grindbook_saved");
+    } else {
       setMessage("Already saved in your Grindbook.");
     }
   }
@@ -2827,6 +2834,7 @@ export default function Home() {
           ? "added"
           : "existing"
       );
+      if (captured.added) recordFunnelEvent("grindbook_saved");
     }
 
     setMoveLog(
@@ -3016,6 +3024,7 @@ export default function Home() {
       | string
       | null
   ) {
+    recordFunnelEvent("puzzle_completed");
     setSolved(true);
 
     setSelectedSquare(

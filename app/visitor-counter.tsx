@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 export default function VisitorCounter() {
   const [stats, setStats] = useState<{
     pageViews: number;
+    totalUsers: number;
     online: number;
   } | null>(null);
   const [unavailable, setUnavailable] = useState(false);
@@ -20,14 +21,20 @@ export default function VisitorCounter() {
           if (!res.ok) throw new Error("Visitor stats unavailable");
           return res.json();
         })
-        .then((data: { pageViews?: number; online?: number }) => {
+        .then((data: {
+          pageViews?: number;
+          totalUsers?: number;
+          online?: number;
+        }) => {
           if (
             !cancelled &&
             typeof data.pageViews === "number" &&
+            typeof data.totalUsers === "number" &&
             typeof data.online === "number"
           ) {
             setStats({
               pageViews: data.pageViews,
+              totalUsers: data.totalUsers,
               online: data.online,
             });
             setUnavailable(false);
@@ -86,7 +93,7 @@ export default function VisitorCounter() {
       aria-live="polite"
       aria-label={
         stats
-          ? `${stats.pageViews} page views, ${stats.online} online now`
+          ? `${stats.totalUsers} total users, ${stats.online} online now`
           : "Loading visitor stats"
       }
       className="visitor-stats inline-flex shrink-0 items-center overflow-hidden rounded-full border border-[var(--line)] bg-[var(--surface)] text-[11px] font-semibold shadow-[var(--shadow-soft)]"
@@ -117,12 +124,12 @@ export default function VisitorCounter() {
           <span className="h-4 w-px bg-[var(--line-strong)]" />
           <span className="inline-flex items-center gap-1 px-2.5 py-1.5">
             <strong className="tabular-nums text-[var(--text)]">
-              {stats.pageViews.toLocaleString()}
+              {stats.totalUsers.toLocaleString()}
             </strong>
             <span className="hidden text-[var(--secondary)] md:inline">
-              page views
+              total users
             </span>
-            <span className="text-[var(--secondary)] md:hidden">views</span>
+            <span className="text-[var(--secondary)] md:hidden">users</span>
           </span>
         </>
       )}

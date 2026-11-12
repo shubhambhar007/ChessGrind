@@ -17,7 +17,8 @@ local pageViews = tonumber(redis.call("GET", KEYS[2]))
 if ARGV[5] == "1" then
   pageViews = redis.call("INCR", KEYS[2])
 end
-return {redis.call("ZCARD", KEYS[1]), pageViews}
+local totalUsers = tonumber(redis.call("GET", KEYS[3]) or "0")
+return {redis.call("ZCARD", KEYS[1]), pageViews, totalUsers}
 `;
 
 type VisitorGlobals = typeof globalThis & {
@@ -75,6 +76,7 @@ export async function GET(request: NextRequest) {
 
   let pageViews: number;
   let online: number;
+  let totalUsers: number;
   let storage: "redis" | "memory" = "memory";
 
   if (url && token) {
@@ -85,9 +87,12 @@ export async function GET(request: NextRequest) {
         await redis.incr(VISITOR_KEY);
       }
 
-      [online, pageViews] = await redis.eval<string[], [number, number]>(
+      [online, pageViews, totalUsers] = await redis.eval<
+        string[],
+        [number, number, number]
+      >(
         PRESENCE_SCRIPT,
-        [ONLINE_KEY, PAGE_VIEW_KEY],
+        [ONLINE_KEY, PAGE_VIEW_KEY, VISITOR_KEY],
         [
           String(now - ONLINE_WINDOW_MS),
           String(now),
@@ -99,18 +104,19 @@ export async function GET(request: NextRequest) {
 
       storage = "redis";
     } catch {
-      localVisitorCount(isNewVisitor);
+      totalUsers = localVisitorCount(isNewVisitor);
       pageViews = localPageViewCount(recordPageView);
       online = localOnlineCount(visitorId, now);
     }
   } else {
-    localVisitorCount(isNewVisitor);
+    totalUsers = localVisitorCount(isNewVisitor);
     pageViews = localPageViewCount(recordPageView);
     online = localOnlineCount(visitorId, now);
   }
 
   const response = NextResponse.json({
     pageViews,
+    totalUsers,
     online,
     isNewVisitor,
     storage,

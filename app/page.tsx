@@ -161,8 +161,8 @@ export default function LandingPage() {
           <strong>$3.99</strong>
           <small>one year · limited founder price</small>
         </div>
-        <div><h2>Keep the board free.<br />Fund the memory.</h2><p>All 6,000 puzzles stay free. Founder unlocks private cloud sync, the full Grindbook memory layer, and every new puzzle pack we ship this year.</p></div>
-        <Link href="/founder">Full Founder page <span aria-hidden="true">↗</span></Link>
+        <div><h2>Never lose a<br />chess mistake.</h2><p>Founder keeps every saved position, review schedule, repertoire line, and progress insight privately synced across your devices. All 6,000 puzzles stay free.</p></div>
+        <Link href="/founder">See how memory works <span aria-hidden="true">↗</span></Link>
       </section>
 
       <section className="cg-editorial-comparison" aria-labelledby="landing-plan-title">
