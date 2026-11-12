@@ -119,7 +119,7 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 - Custom pearl/gold and obsidian chess pieces
 - Responsive dark and light themes
 - Custom premium menus instead of browser-native selects
-- Total unique users and current online presence
+- Total users activity counter and current online presence
 - Reduced-motion support for animated rewards
 - Vercel Analytics and Speed Insights
 
