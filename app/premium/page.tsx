@@ -26,6 +26,7 @@ const PLAN_COMPARISON = [
   ["Review schedule", "One device", "Every device"],
   ["Opening repertoire", "This browser", "Synced"],
   ["Automatic backup", "—", "Included"],
+  ["Grind Rank + solve history", "This browser", "Synced"],
   ["Product feedback", "Community", "Direct line"],
 ] as const;
 

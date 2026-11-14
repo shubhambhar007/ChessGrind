@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Chess, type Square } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import { premiumPieces } from "./premium-pieces";
@@ -42,6 +42,8 @@ export default function LandingPuzzleDemo() {
   const [wrongMove, setWrongMove] = useState<{ from: string; to: string } | null>(null);
   const [status, setStatus] = useState<DemoStatus>("playing");
   const [showPremiumPrompt, setShowPremiumPrompt] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailState, setEmailState] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   const puzzle = DEMO_PUZZLES[puzzleIndex];
   const orientation = game.turn() === "w" ? "white" : "black";
@@ -148,6 +150,23 @@ export default function LandingPuzzleDemo() {
     loadPuzzle(0);
   }
 
+  async function joinDailyList(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setEmailState("loading");
+    try {
+      const response = await fetch("/api/daily/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, signupSource: "landing_three_solved" }),
+      });
+      if (!response.ok) throw new Error("subscribe failed");
+      setEmailState("done");
+      recordFunnelEvent("daily_email_submitted");
+    } catch {
+      setEmailState("error");
+    }
+  }
+
   return (
     <div className="cg-landing-puzzle-demo">
       <div className="cg-landing-puzzle-topline">
@@ -204,8 +223,14 @@ export default function LandingPuzzleDemo() {
             <span>3 / 3 · PATTERN FOUND</span>
             <h2 id="premium-prompt-title">Solving is step one.<br />Remembering is Premium.</h2>
             <p>Premium keeps saved positions, review timing, and your repertoire synced—so the patterns you find here do not disappear on the next device.</p>
+            <form className="cg-premium-prompt-signup" onSubmit={joinDailyList}>
+              <label htmlFor="landing-daily-email">Want one fresh puzzle tomorrow?</label>
+              {emailState === "done" ? <p>You&apos;re on the daily list. See you tomorrow.</p> : <div><input id="landing-daily-email" type="email" required autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => setEmail(event.target.value)} /><button type="submit" disabled={emailState === "loading"}>{emailState === "loading" ? "Joining…" : "Join free"}</button></div>}
+              {emailState === "error" && <small>Could not save that email. Try again.</small>}
+            </form>
             <div>
-              <Link href="/premium" onClick={() => recordFunnelEvent("premium_prompt_clicked")}>See Premium · $3.99 ↗</Link>
+              <Link href="/premium" onClick={() => recordFunnelEvent("premium_prompt_clicked")}>See Premium · $3.99</Link>
+              <Link href="/daily">Play today&apos;s puzzle</Link>
               <button type="button" onClick={restartDemo}>Play again</button>
             </div>
             <small>All 6,000 puzzles remain free. Premium is the personal memory layer.</small>

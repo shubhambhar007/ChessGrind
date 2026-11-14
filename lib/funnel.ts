@@ -8,11 +8,19 @@ export type FunnelEvent =
   | "checkout_created"
   | "checkout_failed"
   | "premium_prompt_viewed"
-  | "premium_prompt_clicked";
+  | "premium_prompt_clicked"
+  | "daily_puzzle_viewed"
+  | "daily_puzzle_started"
+  | "daily_puzzle_solved"
+  | "daily_share_clicked"
+  | "daily_card_downloaded"
+  | "daily_email_submitted";
+
+type FunnelMetadata = Record<string, string | undefined>;
 
 export function recordFunnelEvent(
   event: FunnelEvent,
-  options: { oncePerSession?: boolean } = {}
+  options: { oncePerSession?: boolean; metadata?: FunnelMetadata } = {}
 ) {
   if (typeof window === "undefined") return;
 
@@ -31,7 +39,7 @@ export function recordFunnelEvent(
     credentials: "same-origin",
     keepalive: true,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event }),
+    body: JSON.stringify({ event, metadata: options.metadata }),
   }).catch(() => {
     // Product actions must never fail because analytics is unavailable.
   });

@@ -13,6 +13,7 @@
     "openings:generate": "node scripts/generate-opening-drills.mjs",
     "openings:validate": "node scripts/validate-opening-drills.mjs",
     "moves:validate": "tsx scripts/validate-move-guides.mjs",
+    "content:daily": "tsx scripts/generate-daily-social.ts",
     "test:data": "npm run puzzles:validate && npm run openings:validate && npm run moves:validate",
     "test:critical": "playwright test",
     "test:critical:headed": "playwright test --headed"

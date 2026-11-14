@@ -26,6 +26,16 @@ import {
 import { addToGrindbook } from "@/lib/grindbook";
 import { applyLegalMoveMarkers } from "@/lib/chessboard-markers";
 import { recordFunnelEvent } from "@/lib/funnel";
+import GrindRankCard from "../grind-rank-card";
+import {
+  EMPTY_GRIND_RANK,
+  grindElapsedSeconds,
+  grindTimerNow,
+  loadGrindRank,
+  recordGrindResult,
+  type GrindRankResult,
+  type GrindRankState,
+} from "@/lib/grind-rank";
 
 type MoveLog = {
   text: string;
@@ -1849,6 +1859,13 @@ export default function Home() {
     setPuzzleHintsUsed,
   ] = useState(0);
 
+  const [rankState, setRankState] = useState<GrindRankState>(EMPTY_GRIND_RANK);
+  const [rankResult, setRankResult] = useState<GrindRankResult | null>(null);
+  const [rankCelebrationEvent, setRankCelebrationEvent] = useState(0);
+  const [puzzleSeconds, setPuzzleSeconds] = useState(0);
+  const [puzzleTimerStarted, setPuzzleTimerStarted] = useState(false);
+  const puzzleStartedAt = useRef(0);
+
   const [
     savedToGrindbook,
     setSavedToGrindbook,
@@ -2052,12 +2069,27 @@ export default function Home() {
     } catch {}
 
     queueMicrotask(() => {
+      setRankState(loadGrindRank());
       if (savedProgress) {
         setProgress(savedProgress);
       }
       setProgressLoaded(true);
     });
   }, []);
+
+  useEffect(() => {
+    if (!puzzleTimerStarted || solved) return;
+    const timer = window.setInterval(() => {
+      setPuzzleSeconds(Math.max(0, Math.floor((grindTimerNow() - puzzleStartedAt.current) / 1000)));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [puzzleTimerStarted, solved]);
+
+  function startPuzzleTimer() {
+    if (puzzleStartedAt.current > 0) return;
+    puzzleStartedAt.current = grindTimerNow();
+    setPuzzleTimerStarted(true);
+  }
 
   useEffect(() => {
     const savedDifficulty =
@@ -2353,6 +2385,8 @@ export default function Home() {
       return;
     }
 
+    startPuzzleTimer();
+
     setHintLevel(
       (current) =>
         Math.min(
@@ -2470,6 +2504,10 @@ export default function Home() {
     );
 
     resetPuzzleStats();
+    puzzleStartedAt.current = 0;
+    setPuzzleSeconds(0);
+    setPuzzleTimerStarted(false);
+    setRankResult(null);
 
     setMessage(
       "Find the strongest move."
@@ -3029,6 +3067,22 @@ export default function Home() {
       | string
       | null
   ) {
+    const elapsed = grindElapsedSeconds(puzzleStartedAt.current);
+    setPuzzleSeconds(elapsed);
+    setPuzzleTimerStarted(false);
+    const result = recordGrindResult({
+      id: `train:${puzzle.id}:${new Date().toISOString()}`,
+      puzzleId: puzzle.id,
+      puzzleRating: puzzle.rating,
+      difficulty: puzzle.difficulty,
+      solutionLength: puzzle.solutionLength,
+      seconds: elapsed,
+      wrongMoves: puzzleWrongMoves,
+      hintsUsed: puzzleHintsUsed,
+    });
+    setRankState(result.state);
+    setRankResult(result);
+    if (result.promoted) setRankCelebrationEvent((event) => event + 1);
     recordFunnelEvent("puzzle_completed");
     setSolved(true);
 
@@ -3044,9 +3098,11 @@ export default function Home() {
       explanation ?? null
     );
 
-    setPuzzleCelebrationEvent(
-      (event) => event + 1
-    );
+    if (!result.promoted) {
+      setPuzzleCelebrationEvent(
+        (event) => event + 1
+      );
+    }
 
     recordPuzzleSolved();
   }
@@ -3060,6 +3116,8 @@ export default function Home() {
     ) {
       return false;
     }
+
+    startPuzzleTimer();
 
     const sourceSquare =
       attemptedMove.slice(
@@ -3468,6 +3526,7 @@ export default function Home() {
       if (
         clickedOwnPiece
       ) {
+        startPuzzleTimer();
         setSelectedSquare(
           square
         );
@@ -3951,6 +4010,11 @@ export default function Home() {
         }
         variant="mini"
       />
+      <CelebrationBurst
+        eventId={rankCelebrationEvent}
+        title={rankResult?.calibrationCompleted ? `Rank unlocked: ${rankResult.rank?.name}` : `Promoted to ${rankResult?.rank?.name}`}
+        detail="Your Grind Rating moved up. Protect it on the next position."
+      />
       <header className="border-b border-[var(--line)] bg-[var(--header)]">
         <div className="cg-app-header-inner mx-auto flex h-[56px] max-w-[1120px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home">
@@ -4065,6 +4129,13 @@ export default function Home() {
         </div>
 
         <GrindbookPromo className="mb-7" />
+
+        <GrindRankCard
+          state={rankState}
+          result={rankResult}
+          seconds={puzzleSeconds}
+          timerActive={puzzleTimerStarted && !solved}
+        />
 
         {sessionMode ===
           "ten" && (
@@ -4386,6 +4457,7 @@ export default function Home() {
                           playerColor
                         )
                       ) {
+                        startPuzzleTimer();
                         pointerSelectionRef.current = {
                           square,
                           wasSelected:
@@ -4437,6 +4509,7 @@ export default function Home() {
                           playerColor
                         )
                       ) {
+                        startPuzzleTimer();
                         setSelectedSquare(
                           square
                         );

@@ -39,6 +39,23 @@ No external chess-service connection is required. Guests can train locally, whil
 - Lightweight confetti after every solve and a full celebration after a completed session
 - Wrong puzzle moves are automatically captured in Grindbook
 
+### ChessGrind Daily
+
+- One deterministic, original engine-verified position every calendar day
+- Full multi-move solve lines with automatic opponent replies and blue legal-move guides
+- Branded result cards, native sharing, and a daily-puzzle email list
+- Campaign-aware share links for measuring which posts bring players back
+- Reusable social asset generator for puzzle and solution cards
+
+### Grind Rank
+
+- First-move timer on Daily and normal puzzle training
+- Honest 10-puzzle calibration before a public-facing personal rank appears
+- Difficulty-aware 0–100 solve score with mistake, hint, and time penalties
+- Chess divisions from Pawn through King and Grandmaster, with XP and promotion progress
+- Rank-up celebrations without fake opponents, fake users, or fabricated percentiles
+- Local-first history for guests and private cross-device rank sync for Premium accounts
+
 ### Play vs Computer
 
 - Full legal games against three computer difficulty levels
@@ -142,6 +159,7 @@ Grindbook is a private memory system for chess positions—not a generic bookmar
 | Route | Purpose |
 | --- | --- |
 | `/` | Cinematic product landing page |
+| `/daily` | Daily original puzzle, result card, and sharing loop |
 | `/train` | Adaptive puzzle training |
 | `/openings` | 200 guided, opening-specific response drills |
 | `/play` | Full games against the computer |
@@ -178,6 +196,7 @@ npm run build    # Create a production build
 npm run start    # Run the production build
 npm run lint     # Run ESLint
 npm run puzzles:validate # Audit all puzzle positions and solution lines
+npm run content:daily -- --date 2026-11-14 # Generate share cards and captions
 npm run puzzles:generate # Rebuild the deterministic original library
 npm run openings:validate # Replay-check all 200 opening drills
 npm run openings:generate # Rebuild the original opening library
