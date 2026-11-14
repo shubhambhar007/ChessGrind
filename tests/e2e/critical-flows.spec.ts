@@ -89,8 +89,32 @@ test("account entry point renders both private auth modes", async ({ page }) => 
   await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
 });
 
+test("landing puzzle hook leads to the Premium memory prompt", async ({ page }) => {
+  await page.goto("/");
+
+  await page.locator('[data-square="f4"] [data-piece="wQ"]').click();
+  await page.locator('[data-square="f7"]').click();
+
+  await expect(page.getByText("The white king has almost no room left.")).toBeVisible();
+  await page.locator('[data-square="e3"] [data-piece="bQ"]').click();
+  await page.locator('[data-square="e2"]').click();
+
+  await expect(page.getByText("One rook can seal every escape square.")).toBeVisible();
+  await page.locator('[data-square="g5"] [data-piece="wR"]').click();
+  await page.locator('[data-square="g6"]').click();
+
+  const prompt = page.getByRole("dialog", {
+    name: "Solving is step one. Remembering is Premium.",
+  });
+  await expect(prompt).toBeVisible();
+  await expect(prompt.getByRole("link", { name: /See Premium/ })).toHaveAttribute(
+    "href",
+    "/premium"
+  );
+});
+
 test("critical pages fit the active viewport", async ({ page }) => {
-  for (const route of ["/train", "/play", "/grindbook", "/account"]) {
+  for (const route of ["/", "/train", "/play", "/grindbook", "/account", "/premium"]) {
     await page.goto(route);
     await expect(page.locator("main")).toBeVisible();
     await expectNoHorizontalOverflow(page);

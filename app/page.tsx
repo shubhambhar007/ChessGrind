@@ -4,25 +4,7 @@ import AccountLink from "./account-link";
 import BrandLockup from "./brand-lockup";
 import ThemeToggle from "./theme-toggle";
 import VisitorCounter from "./visitor-counter";
-
-function LandingArtwork() {
-  return (
-    <div className="cg-editorial-artwork" aria-label="Luxury chess king flanked by two knights">
-      <div className="cg-editorial-artwork-orbit" aria-hidden="true" />
-      <Image src="/pieces/luxe-v2/bN.png" alt="" width={362} height={362} priority unoptimized
-        className="cg-editorial-artwork-knight cg-editorial-artwork-knight-black" />
-      <Image src="/pieces/luxe-v2/wN.png" alt="" width={362} height={362} priority unoptimized
-        className="cg-editorial-artwork-knight cg-editorial-artwork-knight-white" />
-      <Image src="/pieces/luxe-v2/wK.png" alt="" width={362} height={362} priority unoptimized
-        className="cg-editorial-artwork-king" />
-      <div className="cg-editorial-artwork-caption">
-        <span>CHESSGRIND</span>
-        <strong>Build instinct.<br />Move by move.</strong>
-      </div>
-      <div className="cg-editorial-artwork-index" aria-hidden="true">CG / 01</div>
-    </div>
-  );
-}
+import LandingPuzzleDemo from "./landing-puzzle-demo";
 
 const PRODUCTS = [
   {
@@ -40,10 +22,10 @@ const PRODUCTS = [
 const LANDING_PLAN_COMPARISON = [
   ["Original puzzle library", "6,000 positions", "6,000 positions"],
   ["Sessions, games + hints", "Unlimited", "Unlimited"],
-  ["Grindbook + repertoire", "This device", "Every device"],
-  ["Progress backup", "Local only", "Private cloud sync"],
-  ["Founder status", "—", "Included"],
-  ["Product feedback", "Community", "Direct founder line"],
+  ["Saved Mistake Memory", "This browser", "Private cloud"],
+  ["Review schedule", "One device", "Every device"],
+  ["Opening repertoire", "This browser", "Synced"],
+  ["Automatic backup", "—", "Included"],
 ] as const;
 
 function ProductVisual({ type }: { type: "train" | "play" }) {
@@ -77,7 +59,7 @@ export default function LandingPage() {
           <Link href="/" aria-label="ChessGrind home"><BrandLockup priority /></Link>
           <nav className="cg-app-nav flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]" aria-label="Main navigation">
             <VisitorCounter /><a href="#product">How it works</a><Link href="/openings">Opening Lab</Link><Link href="/grindbook">Grindbook</Link>
-            <Link href="/repertoire">Repertoire</Link><Link href="/founder" className="cg-founder-nav-link">Founder</Link><AccountLink /><ThemeToggle />
+            <Link href="/repertoire">Repertoire</Link><Link href="/premium" className="cg-founder-nav-link">Premium</Link><AccountLink /><ThemeToggle />
           </nav>
           <Link href="/train" className="cg-editorial-header-cta">Start training <span aria-hidden="true">↗</span></Link>
         </div>
@@ -95,9 +77,7 @@ export default function LandingPage() {
           <div className="cg-editorial-trust"><span>No external chess account</span><span>Private by default</span><span>Free to start</span></div>
         </div>
 
-        <div className="cg-editorial-artwork-panel">
-          <LandingArtwork />
-        </div>
+        <div className="cg-editorial-artwork-panel"><LandingPuzzleDemo /></div>
       </section>
 
       <section className="cg-editorial-intro" id="product">
@@ -131,7 +111,7 @@ export default function LandingPage() {
       <section className="cg-editorial-memory">
         <div className="cg-editorial-memory-copy">
           <span>03 · GRINDBOOK</span><h2>Your mistakes should train you twice.</h2>
-          <p>Save a puzzle or game position once. Grindbook schedules it for review and tracks your recall. Founder keeps that memory synced across every device.</p>
+          <p>Save a puzzle or game position once. Grindbook schedules it for review and tracks your recall. Premium keeps that memory synced across every device.</p>
           <Link href="/grindbook">Open Grindbook <span aria-hidden="true">↗</span></Link>
         </div>
         <div className="cg-editorial-review-card">
@@ -156,21 +136,21 @@ export default function LandingPage() {
 
       <section className="cg-editorial-founder">
         <div className="cg-editorial-founder-offer">
-          <div><span>FOUNDING SEASON</span><mark>61% OFF</mark></div>
+          <div><span>PREMIUM MEMORY</span><mark>61% OFF</mark></div>
           <del>$10.18</del>
           <strong>$3.99</strong>
-          <small>one year · limited founder price</small>
+          <small>one year · limited launch price</small>
         </div>
-        <div><h2>Never lose a<br />chess mistake.</h2><p>Founder keeps every saved position, review schedule, repertoire line, and progress insight privately synced across your devices. All 6,000 puzzles stay free.</p></div>
-        <Link href="/founder">See how memory works <span aria-hidden="true">↗</span></Link>
+        <div><h2>Never lose a<br />chess mistake.</h2><p>Premium keeps every saved position, review schedule, and repertoire line privately synced across your devices. All 6,000 puzzles stay free.</p></div>
+        <Link href="/premium">See how memory works <span aria-hidden="true">↗</span></Link>
       </section>
 
       <section className="cg-editorial-comparison" aria-labelledby="landing-plan-title">
         <div className="cg-editorial-comparison-copy">
-          <span>FREE VS FOUNDER</span>
+          <span>FREE VS PREMIUM</span>
           <h2 id="landing-plan-title">Free chess.<br />Paid memory.</h2>
-          <p>No puzzle paywall. Founder is for players who want their Grindbook, repertoire, and progress remembered across every device.</p>
-          <Link href="/founder">See everything Founder includes <span aria-hidden="true">↗</span></Link>
+          <p>No puzzle paywall. Premium is for players who want their Mistake Memory, review queue, and repertoire protected across every device.</p>
+          <Link href="/premium">See everything Premium includes <span aria-hidden="true">↗</span></Link>
         </div>
 
         <div className="cg-founder-comparison-table cg-editorial-comparison-table">
@@ -180,15 +160,15 @@ export default function LandingPage() {
               <tr>
                 <th scope="col">What you get</th>
                 <th scope="col"><span>Free</span><strong>$0</strong></th>
-                <th scope="col"><span>Founder</span><strong>$3.99</strong><small>61% off · one year</small></th>
+                <th scope="col"><span>Premium</span><strong>$3.99</strong><small>61% off · one year</small></th>
               </tr>
             </thead>
             <tbody>
-              {LANDING_PLAN_COMPARISON.map(([feature, free, founder]) => (
+              {LANDING_PLAN_COMPARISON.map(([feature, free, premium]) => (
                 <tr key={feature}>
                   <th scope="row">{feature}</th>
                   <td>{free}</td>
-                  <td>{founder}</td>
+                  <td>{premium}</td>
                 </tr>
               ))}
             </tbody>
@@ -203,7 +183,7 @@ export default function LandingPage() {
 
       <footer className="cg-editorial-footer">
         <BrandLockup /><p>Play. Notice. Remember. Improve.</p>
-        <nav><Link href="/train">Train</Link><Link href="/play">Play</Link><Link href="/grindbook">Grindbook</Link><Link href="/insights">Insights</Link><Link href="/founder">Founder</Link></nav>
+        <nav><Link href="/train">Train</Link><Link href="/play">Play</Link><Link href="/grindbook">Grindbook</Link><Link href="/insights">Insights</Link><Link href="/premium">Premium</Link></nav>
       </footer>
     </main>
   );

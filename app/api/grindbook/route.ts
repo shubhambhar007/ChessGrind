@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
   }
   if (user.plan !== "founder") {
     return NextResponse.json(
-      { error: "Founder access is required for cloud sync." },
+      { error: "Premium access is required for cloud sync." },
       { status: 403 }
     );
   }
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest) {
   }
   if (user.plan !== "founder") {
     return NextResponse.json(
-      { error: "Founder access is required for cloud sync." },
+      { error: "Premium access is required for cloud sync." },
       { status: 403 }
     );
   }

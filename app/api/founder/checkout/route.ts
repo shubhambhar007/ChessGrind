@@ -10,7 +10,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export async function POST(request: NextRequest) {
   const user = await getRequestUser(request);
   if (!user) {
-    return NextResponse.json({ error: "Sign in before joining Founder." }, { status: 401 });
+    return NextResponse.json({ error: "Sign in before unlocking Premium." }, { status: 401 });
   }
   if (user.plan === "founder") {
     return NextResponse.json({ alreadyFounder: true });
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const productId = process.env.DODO_FOUNDER_PRODUCT_ID;
   if (!apiKey || !productId) {
     return NextResponse.json(
-      { error: "Founder checkout is being connected. Try again shortly." },
+      { error: "Premium checkout is being connected. Try again shortly." },
       { status: 503 }
     );
   }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     ) {
       console.warn("Founder checkout paused because the Dodo product price is not $3.99 USD.");
       return NextResponse.json(
-        { error: "Founder checkout is updating to $3.99. Try again shortly." },
+        { error: "Premium checkout is updating to $3.99. Try again shortly." },
         { status: 503 }
       );
     }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
         ? { billing_address: { country: "IN" as const }, billing_currency: "INR" as const }
         : {}),
       return_url: `${request.nextUrl.origin}/account?founder=processing`,
-      cancel_url: `${request.nextUrl.origin}/founder?checkout=cancelled`,
+      cancel_url: `${request.nextUrl.origin}/premium?checkout=cancelled`,
       metadata: {
         chessgrind_user_id: user.id,
         chessgrind_handle: user.handle,

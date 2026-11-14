@@ -6,7 +6,9 @@ export type FunnelEvent =
   | "checkout_clicked"
   | "checkout_account_required"
   | "checkout_created"
-  | "checkout_failed";
+  | "checkout_failed"
+  | "premium_prompt_viewed"
+  | "premium_prompt_clicked";
 
 export function recordFunnelEvent(
   event: FunnelEvent,

@@ -10,6 +10,8 @@ const CLIENT_EVENTS = [
   "checkout_account_required",
   "checkout_created",
   "checkout_failed",
+  "premium_prompt_viewed",
+  "premium_prompt_clicked",
 ] as const;
 
 const EVENTS = [
