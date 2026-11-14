@@ -36,8 +36,10 @@ test.beforeEach(async ({ page }) => {
 test("training shows every legal destination and solves the verified first puzzle", async ({ page }) => {
   await openTraining(page);
   await expect(page.getByText("You are Black", { exact: true })).toBeVisible();
+  await expect(page.getByText("0 / 10", { exact: true })).toBeVisible();
 
   await page.locator('[data-square="e4"] [data-piece="bP"]').click();
+  await expect(page.getByText("RUNNING", { exact: true })).toBeVisible();
   await expect(page.locator('[data-square="e3"] > div')).toHaveCSS(
     "background-image",
     /radial-gradient/
@@ -46,6 +48,8 @@ test("training shows every legal destination and solves the verified first puzzl
   await page.locator('[data-square="e3"]').click();
   await expect(page.getByText("Well played.", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Next puzzle" })).toBeVisible();
+  await expect(page.getByText("1 / 10", { exact: true })).toBeVisible();
+  await expect(page.getByText(/XP · \d+\/100/)).toBeVisible();
 });
 
 test("wrong legal move is rejected and the puzzle remains playable", async ({ page }) => {
@@ -119,6 +123,7 @@ test("daily puzzle exposes legal moves and completes its verified line", async (
   const puzzle = getDailyPuzzle(date);
   await page.goto(`/daily?date=${date}`);
   await expect(page.getByTestId("daily-app")).toHaveAttribute("data-status", "playing");
+  await expect(page.getByText("STARTS ON MOVE", { exact: true })).toBeVisible();
 
   for (let index = 0; index < puzzle.moves.length; index += 2) {
     const move = puzzle.moves[index];
@@ -141,6 +146,7 @@ test("daily puzzle exposes legal moves and completes its verified line", async (
 
   await expect(page.getByRole("heading", { name: "Clean work." })).toBeVisible();
   await expect(page.getByRole("button", { name: "Share result" })).toBeVisible();
+  await expect(page.getByText("1 / 10", { exact: true })).toBeVisible();
 });
 
 test("critical pages fit the active viewport", async ({ page }) => {

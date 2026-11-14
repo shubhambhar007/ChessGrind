@@ -47,6 +47,15 @@ No external chess-service connection is required. Guests can train locally, whil
 - Campaign-aware share links for measuring which posts bring players back
 - Reusable social asset generator for puzzle and solution cards
 
+### Grind Rank
+
+- First-move timer on Daily and normal puzzle training
+- Honest 10-puzzle calibration before a public-facing personal rank appears
+- Difficulty-aware 0–100 solve score with mistake, hint, and time penalties
+- Chess divisions from Pawn through King and Grandmaster, with XP and promotion progress
+- Rank-up celebrations without fake opponents, fake users, or fabricated percentiles
+- Local-first history for guests and private cross-device rank sync for Premium accounts
+
 ### Play vs Computer
 
 - Full legal games against three computer difficulty levels

@@ -26,6 +26,7 @@ const LANDING_PLAN_COMPARISON = [
   ["Review schedule", "One device", "Every device"],
   ["Opening repertoire", "This browser", "Synced"],
   ["Automatic backup", "—", "Included"],
+  ["Grind Rank + solve history", "This browser", "Synced"],
 ] as const;
 
 function ProductVisual({ type }: { type: "train" | "play" }) {

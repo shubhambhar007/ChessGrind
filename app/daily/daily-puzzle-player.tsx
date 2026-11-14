@@ -9,6 +9,17 @@ import { premiumPieces } from "../premium-pieces";
 import { applyLegalMoveMarkers } from "@/lib/chessboard-markers";
 import type { DailyPuzzle } from "@/lib/daily-puzzle";
 import { recordFunnelEvent } from "@/lib/funnel";
+import CelebrationBurst from "../celebration-burst";
+import GrindRankCard from "../grind-rank-card";
+import {
+  EMPTY_GRIND_RANK,
+  grindElapsedSeconds,
+  grindTimerNow,
+  loadGrindRank,
+  recordGrindResult,
+  type GrindRankResult,
+  type GrindRankState,
+} from "@/lib/grind-rank";
 
 type Status = "playing" | "wrong" | "opponent" | "solved";
 
@@ -53,6 +64,10 @@ export default function DailyPuzzlePlayer({
   const [shareState, setShareState] = useState("Share result");
   const [email, setEmail] = useState("");
   const [emailState, setEmailState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [rankState, setRankState] = useState<GrindRankState>(EMPTY_GRIND_RANK);
+  const [rankResult, setRankResult] = useState<GrindRankResult | null>(null);
+  const [rankCelebration, setRankCelebration] = useState(0);
+  const [timerStarted, setTimerStarted] = useState(false);
   const startedAt = useRef(0);
   const orientation = puzzle.fen.split(" ")[1] === "w" ? "white" : "black";
   const displayDate = new Intl.DateTimeFormat("en", {
@@ -63,11 +78,11 @@ export default function DailyPuzzlePlayer({
   }).format(new Date(`${date}T12:00:00.000Z`));
 
   useEffect(() => {
-    if (startedAt.current === 0) startedAt.current = performance.now();
+    queueMicrotask(() => setRankState(loadGrindRank()));
     recordFunnelEvent("daily_puzzle_viewed", { oncePerSession: true, metadata: campaignMetadata() });
     const timer = window.setInterval(() => {
-      if (status === "playing" || status === "opponent") {
-        setSeconds(Math.max(0, Math.floor((performance.now() - startedAt.current) / 1000)));
+      if (startedAt.current > 0 && (status === "playing" || status === "opponent")) {
+        setSeconds(Math.max(0, Math.floor((grindTimerNow() - startedAt.current) / 1000)));
       }
     }, 1000);
     return () => window.clearInterval(timer);
@@ -90,17 +105,44 @@ export default function DailyPuzzlePlayer({
     return game.get(square as Square)?.color === game.turn();
   }
 
+  function startTimer() {
+    if (startedAt.current > 0) return;
+    startedAt.current = grindTimerNow();
+    setTimerStarted(true);
+  }
+
+  function awardRank(totalAttempts: number) {
+    const elapsed = grindElapsedSeconds(startedAt.current);
+    setSeconds(elapsed);
+    setTimerStarted(false);
+    const correctUserMoves = Math.ceil(puzzle.moves.length / 2);
+    const result = recordGrindResult({
+      id: `daily:${date}`,
+      puzzleId: puzzle.id,
+      puzzleRating: puzzle.rating,
+      difficulty: puzzle.difficulty,
+      solutionLength: puzzle.solutionLength,
+      seconds: elapsed,
+      wrongMoves: Math.max(0, totalAttempts - correctUserMoves),
+      hintsUsed: hintVisible ? 1 : 0,
+    });
+    setRankState(result.state);
+    setRankResult(result);
+    if (result.promoted) setRankCelebration((value) => value + 1);
+  }
+
   function playMoveOn(copy: Chess, uci: string) {
     const from = uci.slice(0, 2);
     const to = uci.slice(2, 4);
     copy.move({ from, to, promotion: uci[4] || "q" });
   }
 
-  function finish(nextGame: Chess, finalMoveIndex: number) {
+  function finish(nextGame: Chess, finalMoveIndex: number, totalAttempts: number) {
     if (finalMoveIndex >= puzzle.moves.length) {
       setGame(nextGame);
       setStatus("solved");
       setSelectedSquare(null);
+      awardRank(totalAttempts);
       recordFunnelEvent("daily_puzzle_solved", {
         metadata: { ...campaignMetadata(), puzzle: puzzle.id, attempts: String(attempts + 1) },
       });
@@ -116,6 +158,7 @@ export default function DailyPuzzlePlayer({
       setMoveIndex(afterReply);
       if (afterReply >= puzzle.moves.length) {
         setStatus("solved");
+        awardRank(totalAttempts);
         recordFunnelEvent("daily_puzzle_solved", {
           metadata: { ...campaignMetadata(), puzzle: puzzle.id, attempts: String(attempts + 1) },
         });
@@ -129,6 +172,7 @@ export default function DailyPuzzlePlayer({
     if (status !== "playing" || !isOwnPiece(sourceSquare)) return false;
     const legalMove = game.moves({ square: sourceSquare as Square, verbose: true }).find((move) => move.to === targetSquare);
     if (!legalMove) return false;
+    startTimer();
 
     if (moveIndex === 0 && attempts === 0) {
       recordFunnelEvent("daily_puzzle_started", { metadata: campaignMetadata() });
@@ -152,14 +196,17 @@ export default function DailyPuzzlePlayer({
     const nextMoveIndex = moveIndex + 1;
     setMoveIndex(nextMoveIndex);
     setSelectedSquare(null);
-    finish(nextGame, nextMoveIndex);
+    finish(nextGame, nextMoveIndex, attempts + 1);
     return true;
   }
 
   function handleSquareClick(square: string) {
     if (status !== "playing") return;
     if (!selectedSquare) {
-      if (isOwnPiece(square)) setSelectedSquare(square);
+      if (isOwnPiece(square)) {
+        startTimer();
+        setSelectedSquare(square);
+      }
       return;
     }
     if (square === selectedSquare) return setSelectedSquare(null);
@@ -167,7 +214,7 @@ export default function DailyPuzzlePlayer({
     attemptMove(selectedSquare, square);
   }
 
-  const resultText = `ChessGrind Daily #${dailyNumber} ✅\n${attempts} attempt${attempts === 1 ? "" : "s"} · ${formatTime(seconds)}\n\nCan you find today's move?`;
+  const resultText = `ChessGrind Daily #${dailyNumber} ✅\n${rankResult?.score ?? 0}/100 · ${attempts} attempt${attempts === 1 ? "" : "s"} · ${formatTime(seconds)}\n\nCan you find today's move?`;
   const shareUrl = `https://chessgrind.fyi/daily?date=${date}&utm_source=player_share&utm_medium=social&utm_campaign=daily_${date}`;
 
   async function shareResult() {
@@ -240,6 +287,11 @@ export default function DailyPuzzlePlayer({
 
   return (
     <div className="cg-daily-wrap" data-testid="daily-app" data-status={status}>
+      <CelebrationBurst
+        eventId={rankCelebration}
+        title={rankResult?.calibrationCompleted ? `Rank unlocked: ${rankResult.rank?.name}` : `Promoted to ${rankResult?.rank?.name}`}
+        detail="Your Grind Rating moved up. Protect it on the next position."
+      />
       <section className="cg-daily-intro">
         <div><span>DAILY / {String(dailyNumber).padStart(3, "0")}</span><h1>One position.<br />No excuses.</h1></div>
         <div><p>{displayDate}</p><strong>{orientation === "white" ? "White" : "Black"} to move</strong><small>{puzzle.difficulty} · {puzzle.rating}</small></div>
@@ -264,6 +316,7 @@ export default function DailyPuzzlePlayer({
 
         <aside className="cg-daily-panel">
           <div className="cg-daily-panel-kicker"><span>{status === "solved" ? "PATTERN FOUND" : "TODAY'S POSITION"}</span><strong>{formatTime(seconds)}</strong></div>
+          <GrindRankCard state={rankState} result={rankResult} seconds={seconds} timerActive={timerStarted && status !== "solved"} compact />
           {status === "solved" ? (
             <div className="cg-daily-result">
               <span aria-hidden="true">✓</span>
@@ -282,7 +335,7 @@ export default function DailyPuzzlePlayer({
               <h2>Find the strongest move.</h2>
               <p>{status === "wrong" ? "Legal, but not the idea. Look again." : status === "opponent" ? "Opponent is replying…" : "Select one of your pieces to reveal every legal destination."}</p>
               <dl><div><dt>Attempts</dt><dd>{attempts}</dd></div><div><dt>Line</dt><dd>{Math.ceil(puzzle.moves.length / 2)} move{puzzle.moves.length > 2 ? "s" : ""}</dd></div></dl>
-              <button type="button" onClick={() => setHintVisible((value) => !value)}>{hintVisible ? "Hide hint" : "Need a hint?"}</button>
+              <button type="button" onClick={() => { startTimer(); setHintVisible((value) => !value); }}>{hintVisible ? "Hide hint" : "Need a hint?"}</button>
               {hintVisible && <div className="cg-daily-hint"><span>LOOK FOR</span><strong>{labelTheme(puzzle.themes[0] ?? "forcing move")}</strong><p>The first move starts on {puzzle.moves[moveIndex]?.slice(0, 2)}.</p></div>}
             </div>
           )}

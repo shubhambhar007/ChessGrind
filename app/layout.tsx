@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GrindbookCloudSync from "./grindbook-cloud-sync";
 import RepertoireCloudSync from "./repertoire-cloud-sync";
+import GrindRankCloudSync from "./grind-rank-cloud-sync";
 import "./globals.css";
 
 const themeScript = `
@@ -135,6 +136,7 @@ export default function RootLayout({
         />
         <GrindbookCloudSync />
         <RepertoireCloudSync />
+        <GrindRankCloudSync />
         {children}
 
         <Analytics />
