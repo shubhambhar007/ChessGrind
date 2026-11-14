@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
 import { Webhook } from "standardwebhooks";
 import { grantFounderAccess } from "@/lib/server/auth";
 
@@ -20,6 +21,32 @@ function isPaymentSucceededEvent(value: unknown): value is DodoPaymentSucceededE
   if (!value || typeof value !== "object") return false;
   const event = value as { type?: unknown; data?: unknown };
   return event.type === "payment.succeeded" && !!event.data && typeof event.data === "object";
+}
+
+async function recordFounderPayment(userId: string, paymentId: string) {
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ??
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ??
+    process.env.UPSTASH_REDIS_REST_KV_REST_API_TOKEN;
+  if (!url || !token) return;
+
+  try {
+    const redis = new Redis({ url, token });
+    const firstDelivery = await redis.set(
+      `chessgrind:funnel:payment_succeeded:payment:${paymentId}`,
+      1,
+      { nx: true }
+    );
+    if (!firstDelivery) return;
+    await Promise.all([
+      redis.incr("chessgrind:funnel:payment_succeeded:total"),
+      redis.sadd("chessgrind:funnel:payment_succeeded:users", userId),
+    ]);
+  } catch (error) {
+    console.warn("Could not record Founder payment analytics", error);
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -61,8 +88,7 @@ export async function POST(request: NextRequest) {
     !purchasedFounderProduct ||
     typeof userId !== "string" ||
     !isFounderPurchase ||
-    payment.currency !== "USD" ||
-    payment.total_amount < 399 ||
+    payment.total_amount <= 0 ||
     !/^pay_[A-Za-z0-9]+$/.test(payment.payment_id)
   ) {
     console.error("Rejected mismatched Dodo Founder payment", payment.payment_id);
@@ -70,5 +96,6 @@ export async function POST(request: NextRequest) {
   }
 
   await grantFounderAccess(userId, payment.payment_id);
+  await recordFounderPayment(userId, payment.payment_id);
   return NextResponse.json({ received: true });
 }

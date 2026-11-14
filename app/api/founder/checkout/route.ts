@@ -10,7 +10,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export async function POST(request: NextRequest) {
   const user = await getRequestUser(request);
   if (!user) {
-    return NextResponse.json({ error: "Sign in before joining Founder." }, { status: 401 });
+    return NextResponse.json({ error: "Sign in before unlocking Premium." }, { status: 401 });
   }
   if (user.plan === "founder") {
     return NextResponse.json({ alreadyFounder: true });
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const productId = process.env.DODO_FOUNDER_PRODUCT_ID;
   if (!apiKey || !productId) {
     return NextResponse.json(
-      { error: "Founder checkout is being connected. Try again shortly." },
+      { error: "Premium checkout is being connected. Try again shortly." },
       { status: 503 }
     );
   }
@@ -61,26 +61,28 @@ export async function POST(request: NextRequest) {
     ) {
       console.warn("Founder checkout paused because the Dodo product price is not $3.99 USD.");
       return NextResponse.json(
-        { error: "Founder checkout is updating to $3.99. Try again shortly." },
+        { error: "Premium checkout is updating to $3.99. Try again shortly." },
         { status: 503 }
       );
     }
 
-    // Dodo exposes UPI at hosted checkout only for India + INR sessions and
-    // only through upi_intent (the QR flow). Cards remain as global fallbacks.
+    const visitorCountry = request.headers.get("x-vercel-ip-country")?.toUpperCase();
+    const isIndiaCheckout = visitorCountry === "IN";
+
+    // Keep the default checkout global. Dodo can infer a buyer's local currency
+    // and payment methods from their billing country; forcing every visitor to
+    // India/INR adds unnecessary friction for international buyers.
     const session = await dodo.checkoutSessions.create({
       product_cart: [{ product_id: productId, quantity: 1 }],
-      allowed_payment_method_types: [
-        "upi_intent",
-        "credit",
-        "debit",
-        "apple_pay",
-      ],
+      allowed_payment_method_types: isIndiaCheckout
+        ? ["upi_intent", "credit", "debit", "apple_pay", "google_pay"]
+        : ["credit", "debit", "apple_pay", "google_pay"],
       customer: { email, name: user.handle },
-      billing_address: { country: "IN" },
-      billing_currency: "INR",
+      ...(isIndiaCheckout
+        ? { billing_address: { country: "IN" as const }, billing_currency: "INR" as const }
+        : {}),
       return_url: `${request.nextUrl.origin}/account?founder=processing`,
-      cancel_url: `${request.nextUrl.origin}/founder?checkout=cancelled`,
+      cancel_url: `${request.nextUrl.origin}/premium?checkout=cancelled`,
       metadata: {
         chessgrind_user_id: user.id,
         chessgrind_handle: user.handle,

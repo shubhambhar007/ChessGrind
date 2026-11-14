@@ -403,7 +403,7 @@ export default function RepertoirePage() {
           introduction={[
             "A chess opening repertoire is a set of responses you have chosen in advance. Repertoire Lab lets you build those choices directly on the board for White or Black, including more than one reply when an opponent can branch into a different line.",
             "Build mode records your moves and the opponent replies you want to prepare for. Practice mode hides that construction work and asks you to reproduce only your side of the line. When the opponent has several saved replies, ChessGrind can take a different branch so you learn the position rather than one rigid sequence.",
-            "Your free repertoire stays on this device and does not require an external chess account. Founder members can keep their lines privately synced with their Grindbook and training progress across devices.",
+            "Your free repertoire stays on this device and does not require an external chess account. Premium members can keep their lines privately synced with their Grindbook across devices.",
           ]}
           steps={[
             { title: "Choose a color", body: "Create separate plans for White and Black, then give each repertoire a useful name." },
@@ -419,7 +419,7 @@ export default function RepertoirePage() {
           links={[
             { href: "/openings", label: "Practice opening drills" },
             { href: "/grindbook", label: "Review saved positions" },
-            { href: "/founder", label: "See Founder sync" },
+            { href: "/premium", label: "See Premium sync" },
           ]}
         />
       </div>

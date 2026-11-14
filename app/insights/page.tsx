@@ -1002,7 +1002,7 @@ export default function InsightsPage() {
           introduction={[
             "ChessGrind Insights summarizes the training activity saved in this browser. It combines puzzle results, wrong moves, hint use, skipped positions, streaks, and theme performance so you can see whether a session was accurate rather than only whether it was completed.",
             "The tactical breakdown groups solved puzzles by pattern and adjusts performance when a solution needed mistakes or hints. Use it to spot themes that deserve another session, then let Smart Training mix that history into future puzzle selection.",
-            "These numbers describe your ChessGrind practice, not an official chess rating. Free progress stays private on this device. Founder members can privately sync progress with their Grindbook and repertoire across devices.",
+            "These numbers describe your ChessGrind practice, not an official chess rating. Free progress stays private on this device. Premium keeps supported Grindbook review history and repertoire data synced across devices.",
           ]}
           steps={[
             { title: "Train normally", body: "Solve puzzles, request hints when needed, and skip positions that are not useful right now." },
@@ -1013,12 +1013,12 @@ export default function InsightsPage() {
             { question: "What is a clean move?", answer: "It is a correct move found without a prior wrong attempt. Clean move rate separates immediate recognition from eventual completion." },
             { question: "Why is a theme missing?", answer: "A tactical theme appears after you solve relevant puzzles. New accounts and cleared browser data may have little history." },
             { question: "Is this my chess rating?", answer: "No. Insights reports your ChessGrind training activity and should not be treated as an official over-the-board or online rating." },
-            { question: "Where is progress stored?", answer: "Free progress is stored locally in this browser. Founder adds private cross-device sync for supported training data." },
+            { question: "Where is progress stored?", answer: "Free progress is stored locally in this browser. Premium adds private cross-device sync for supported Grindbook and repertoire data." },
           ]}
           links={[
             { href: "/train", label: "Continue training" },
             { href: "/grindbook", label: "Review saved mistakes" },
-            { href: "/founder", label: "See Founder sync" },
+            { href: "/premium", label: "See Premium memory" },
           ]}
         />
 

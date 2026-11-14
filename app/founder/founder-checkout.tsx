@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import type { AccountUser } from "@/lib/account-client";
 import { recordFunnelEvent } from "@/lib/funnel";
 
-export default function FounderCheckout() {
+export default function PremiumCheckout() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +47,7 @@ export default function FounderCheckout() {
       };
       if (response.status === 401) {
         recordFunnelEvent("checkout_account_required");
-        router.push("/account?next=/founder");
+        router.push("/account?next=/premium");
         return;
       }
       if (payload.alreadyFounder) {
@@ -75,8 +75,8 @@ export default function FounderCheckout() {
         <button type="button" disabled>Checking your account…</button>
       ) : !user ? (
         <>
-          <Link className="cg-founder-signin" href="/account?next=/founder">
-            Sign in to unlock Founder <span aria-hidden="true">↗</span>
+          <Link className="cg-founder-signin" href="/account?next=/premium">
+            Sign in to unlock Premium <span aria-hidden="true">↗</span>
           </Link>
           <p>Create a private ChessGrind account first. It takes about 30 seconds.</p>
         </>
@@ -97,7 +97,7 @@ export default function FounderCheckout() {
             {loading ? "Opening secure checkout…" : "Never lose a mistake"}
             <span aria-hidden="true">↗</span>
           </button>
-          <p>One year · UPI QR · cards · secure checkout by Dodo Payments</p>
+          <p>One-time $3.99 · no auto-renewal · cards + UPI in India · secure Dodo checkout</p>
         </>
       )}
       {error && <div role="alert">{error}</div>}

@@ -8,7 +8,7 @@ const routes = [
   ["/grindbook", "monthly", 0.8],
   ["/repertoire", "monthly", 0.75],
   ["/insights", "monthly", 0.7],
-  ["/founder", "monthly", 0.6],
+  ["/premium", "monthly", 0.65],
 ] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {

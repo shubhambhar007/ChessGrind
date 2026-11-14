@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 import { NextRequest, NextResponse } from "next/server";
 
-const EVENTS = [
+const CLIENT_EVENTS = [
   "training_started",
   "puzzle_completed",
   "grindbook_saved",
@@ -10,6 +10,13 @@ const EVENTS = [
   "checkout_account_required",
   "checkout_created",
   "checkout_failed",
+  "premium_prompt_viewed",
+  "premium_prompt_clicked",
+] as const;
+
+const EVENTS = [
+  ...CLIENT_EVENTS,
+  "payment_succeeded",
 ] as const;
 
 type FunnelEvent = (typeof EVENTS)[number];
@@ -18,7 +25,7 @@ type FunnelGlobals = typeof globalThis & {
   __chessgrindFunnel?: Map<FunnelEvent, FunnelRecord>;
 };
 
-const EVENT_SET = new Set<string>(EVENTS);
+const EVENT_SET = new Set<string>(CLIENT_EVENTS);
 const VISITOR_COOKIE = "chessgrind-visitor-v1";
 const ONE_YEAR = 60 * 60 * 24 * 365;
 

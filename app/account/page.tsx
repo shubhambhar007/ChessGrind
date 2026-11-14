@@ -198,11 +198,11 @@ export default function AccountPage() {
           </h1>
           <p className="mt-6 max-w-[520px] text-[16px] leading-7 text-[var(--secondary)]">
             Create a private ChessGrind account to keep your training identity.
-            Founder players also get cloud memory across every device. No social login. No external chess account.
+            Premium players also get cloud memory across every device. No social login. No external chess account.
           </p>
 
           <div className="mt-9 grid max-w-[520px] border-y border-[var(--line-strong)] sm:grid-cols-3">
-            {["Private by default", "Train free", "Founder cloud memory"].map((label) => (
+            {["Private by default", "Train free", "Premium cloud memory"].map((label) => (
               <div
                 key={label}
                 className="border-b border-[var(--line)] px-3 py-4 text-[12px] font-semibold leading-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0"
@@ -223,7 +223,7 @@ export default function AccountPage() {
               <div className="min-h-[420px]">
                 {founderMessage === "active" && (
                   <div className="mb-5 rounded-[12px] border border-[color-mix(in_srgb,var(--success)_35%,transparent)] bg-[color-mix(in_srgb,var(--success)_10%,transparent)] px-4 py-3 text-[12px] font-semibold text-[var(--success)]">
-                    Founder unlocked. Welcome to the first class.
+                    Premium unlocked. Your memory now travels.
                   </div>
                 )}
                 {founderMessage === "pending" && (
@@ -233,7 +233,7 @@ export default function AccountPage() {
                 )}
                 {founderMessage === "processing" && (
                   <div className="mb-5 rounded-[12px] border border-[var(--line-strong)] px-4 py-3 text-[12px] text-[var(--secondary)]">
-                    Payment received. Attaching Founder to your account…
+                    Payment received. Attaching Premium to your account…
                   </div>
                 )}
                 {founderMessage === "error" && (
@@ -253,20 +253,20 @@ export default function AccountPage() {
                 <div className="mt-6 flex items-center gap-3 rounded-[14px] border border-[var(--line-strong)] bg-[var(--accent-soft)] p-4">
                   <span className={`h-2 w-2 rounded-full ${user.plan === "founder" ? "bg-[var(--success)]" : "bg-[var(--brass)]"}`} />
                   <div>
-                    <div className="text-[12px] font-semibold">{user.plan === "founder" ? "Founder cloud sync active" : "Free player account"}</div>
+                    <div className="text-[12px] font-semibold">{user.plan === "founder" ? "Premium cloud memory active" : "Free player account"}</div>
                     <div className="mt-0.5 text-[11px] text-[var(--secondary)]">
                       {user.plan === "founder"
                         ? "Your Grindbook and repertoires are protected."
-                        : "All puzzles and full games are open. Cloud memory is Founder."}
+                        : "All puzzles and full games are open. Cross-device memory is Premium."}
                     </div>
                   </div>
                 </div>
                 {user.plan !== "founder" && (
                   <Link
-                    href="/founder"
+                    href="/premium"
                     className="control mt-5 flex h-12 items-center justify-center rounded-[12px] bg-[var(--button)] text-[13px] font-semibold text-[var(--button-text)]"
                   >
-                    Unlock Founder · $3.99/year
+                    Unlock Premium · $3.99 for one year
                   </Link>
                 )}
                 <Link
@@ -319,7 +319,7 @@ export default function AccountPage() {
                 <p className="mt-2 text-[13px] leading-5 text-[var(--secondary)]">
                   {mode === "signup"
                     ? localCardCount > 0
-                      ? `${localCardCount} saved ${localCardCount === 1 ? "position stays" : "positions stay"} safely on this device. Founder can sync them later.`
+                      ? `${localCardCount} saved ${localCardCount === 1 ? "position stays" : "positions stay"} safely on this device. Premium can sync them later.`
                       : "Start a private ChessGrind identity with a unique handle."
                     : "Use your ChessGrind handle and passphrase."}
                 </p>
