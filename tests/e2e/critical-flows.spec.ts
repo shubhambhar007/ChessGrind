@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { getDailyPuzzle, normalizeDailyDate } from "../../lib/daily-puzzle";
 
 async function expectNoHorizontalOverflow(page: Page) {
   const dimensions = await page.evaluate(() => ({
@@ -113,8 +114,37 @@ test("landing puzzle hook leads to the Premium memory prompt", async ({ page }) 
   );
 });
 
+test("daily puzzle exposes legal moves and completes its verified line", async ({ page }) => {
+  const date = normalizeDailyDate();
+  const puzzle = getDailyPuzzle(date);
+  await page.goto(`/daily?date=${date}`);
+  await expect(page.getByTestId("daily-app")).toHaveAttribute("data-status", "playing");
+
+  for (let index = 0; index < puzzle.moves.length; index += 2) {
+    const move = puzzle.moves[index];
+    const source = move.slice(0, 2);
+    const target = move.slice(2, 4);
+    await page.locator(`[data-square="${source}"]`).click();
+    await expect(page.locator(`[data-square="${target}"] > div`)).toHaveCSS(
+      "background-image",
+      /radial-gradient/
+    ).catch(async () => {
+      await expect(page.locator(`[data-square="${target}"] > div`)).toHaveCSS("box-shadow", /rgb/);
+    });
+    await page.locator(`[data-square="${target}"]`).click();
+    await expect(page.getByTestId("daily-app")).toHaveAttribute(
+      "data-status",
+      index + 1 >= puzzle.moves.length ? "solved" : index + 2 >= puzzle.moves.length ? "solved" : "playing",
+      { timeout: 4_000 }
+    );
+  }
+
+  await expect(page.getByRole("heading", { name: "Clean work." })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Share result" })).toBeVisible();
+});
+
 test("critical pages fit the active viewport", async ({ page }) => {
-  for (const route of ["/", "/train", "/play", "/grindbook", "/account", "/premium"]) {
+  for (const route of ["/", "/daily", "/train", "/play", "/grindbook", "/account", "/premium"]) {
     await page.goto(route);
     await expect(page.locator("main")).toBeVisible();
     await expectNoHorizontalOverflow(page);

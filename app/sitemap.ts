@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 const routes = [
   ["", "daily", 1],
+  ["/daily", "daily", 0.98],
   ["/train", "weekly", 0.95],
   ["/play", "weekly", 0.85],
   ["/openings", "weekly", 0.85],

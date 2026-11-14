@@ -12,6 +12,12 @@ const CLIENT_EVENTS = [
   "checkout_failed",
   "premium_prompt_viewed",
   "premium_prompt_clicked",
+  "daily_puzzle_viewed",
+  "daily_puzzle_started",
+  "daily_puzzle_solved",
+  "daily_share_clicked",
+  "daily_card_downloaded",
+  "daily_email_submitted",
 ] as const;
 
 const EVENTS = [
@@ -55,9 +61,18 @@ function noStore(response: NextResponse) {
 
 export async function POST(request: NextRequest) {
   let event = "";
+  let metadata: Record<string, string> = {};
   try {
-    const body = (await request.json()) as { event?: unknown };
+    const body = (await request.json()) as { event?: unknown; metadata?: unknown };
     event = typeof body.event === "string" ? body.event : "";
+    if (body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)) {
+      metadata = Object.fromEntries(
+        Object.entries(body.metadata as Record<string, unknown>)
+          .filter(([, value]) => typeof value === "string" && value.length > 0)
+          .slice(0, 8)
+          .map(([key, value]) => [key.slice(0, 40), String(value).slice(0, 100)])
+      );
+    }
   } catch {
     return noStore(NextResponse.json({ error: "Invalid event." }, { status: 400 }));
   }
@@ -77,6 +92,9 @@ export async function POST(request: NextRequest) {
       await Promise.all([
         redis.incr(`chessgrind:funnel:${typedEvent}:total`),
         redis.sadd(`chessgrind:funnel:${typedEvent}:users`, visitorId),
+        ...(metadata.campaign
+          ? [redis.hincrby(`chessgrind:funnel:${typedEvent}:campaigns`, metadata.campaign, 1)]
+          : []),
       ]);
     } catch {
       const store = memoryStore();

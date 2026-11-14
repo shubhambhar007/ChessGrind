@@ -58,7 +58,7 @@ export default function LandingPage() {
         <div className="cg-app-header-inner mx-auto flex h-[64px] max-w-[1180px] items-center justify-between px-6">
           <Link href="/" aria-label="ChessGrind home"><BrandLockup priority /></Link>
           <nav className="cg-app-nav flex items-center gap-5 text-[12px] font-semibold text-[var(--secondary)]" aria-label="Main navigation">
-            <VisitorCounter /><a href="#product">How it works</a><Link href="/openings">Opening Lab</Link><Link href="/grindbook">Grindbook</Link>
+            <VisitorCounter /><Link href="/daily">Daily</Link><a href="#product">How it works</a><Link href="/openings">Opening Lab</Link><Link href="/grindbook">Grindbook</Link>
             <Link href="/repertoire">Repertoire</Link><Link href="/premium" className="cg-founder-nav-link">Premium</Link><AccountLink /><ThemeToggle />
           </nav>
           <Link href="/train" className="cg-editorial-header-cta">Start training <span aria-hidden="true">↗</span></Link>
@@ -183,7 +183,7 @@ export default function LandingPage() {
 
       <footer className="cg-editorial-footer">
         <BrandLockup /><p>Play. Notice. Remember. Improve.</p>
-        <nav><Link href="/train">Train</Link><Link href="/play">Play</Link><Link href="/grindbook">Grindbook</Link><Link href="/insights">Insights</Link><Link href="/premium">Premium</Link></nav>
+        <nav><Link href="/daily">Daily</Link><Link href="/train">Train</Link><Link href="/play">Play</Link><Link href="/grindbook">Grindbook</Link><Link href="/insights">Insights</Link><Link href="/premium">Premium</Link></nav>
       </footer>
     </main>
   );
