@@ -20,6 +20,7 @@ import {
   type GrindRankResult,
   type GrindRankState,
 } from "@/lib/grind-rank";
+import { submitPuzzlePerformance, type PuzzlePerformance } from "@/lib/puzzle-performance";
 
 type Status = "playing" | "wrong" | "opponent" | "solved";
 
@@ -66,6 +67,7 @@ export default function DailyPuzzlePlayer({
   const [emailState, setEmailState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [rankState, setRankState] = useState<GrindRankState>(EMPTY_GRIND_RANK);
   const [rankResult, setRankResult] = useState<GrindRankResult | null>(null);
+  const [puzzlePerformance, setPuzzlePerformance] = useState<PuzzlePerformance | null>(null);
   const [rankCelebration, setRankCelebration] = useState(0);
   const [timerStarted, setTimerStarted] = useState(false);
   const startedAt = useRef(0);
@@ -128,6 +130,13 @@ export default function DailyPuzzlePlayer({
     });
     setRankState(result.state);
     setRankResult(result);
+    void submitPuzzlePerformance({
+      puzzleId: puzzle.id,
+      score: result.score,
+      seconds: elapsed,
+      wrongMoves: Math.max(0, totalAttempts - correctUserMoves),
+      hintsUsed: hintVisible ? 1 : 0,
+    }).then(setPuzzlePerformance);
     if (result.promoted) setRankCelebration((value) => value + 1);
   }
 
@@ -169,11 +178,9 @@ export default function DailyPuzzlePlayer({
   }
 
   function attemptMove(sourceSquare: string, targetSquare: string) {
-    if (status !== "playing" || !isOwnPiece(sourceSquare)) return false;
+    if (status !== "playing" || !timerStarted || !isOwnPiece(sourceSquare)) return false;
     const legalMove = game.moves({ square: sourceSquare as Square, verbose: true }).find((move) => move.to === targetSquare);
     if (!legalMove) return false;
-    startTimer();
-
     if (moveIndex === 0 && attempts === 0) {
       recordFunnelEvent("daily_puzzle_started", { metadata: campaignMetadata() });
     }
@@ -201,10 +208,9 @@ export default function DailyPuzzlePlayer({
   }
 
   function handleSquareClick(square: string) {
-    if (status !== "playing") return;
+    if (status !== "playing" || !timerStarted) return;
     if (!selectedSquare) {
       if (isOwnPiece(square)) {
-        startTimer();
         setSelectedSquare(square);
       }
       return;
@@ -307,8 +313,8 @@ export default function DailyPuzzlePlayer({
             darkSquareStyle: { backgroundColor: "var(--board-dark)" },
             lightSquareStyle: { backgroundColor: "var(--board-light)" },
             squareStyles,
-            canDragPiece: ({ square }) => Boolean(square && status === "playing" && isOwnPiece(square)),
-            onPieceDrag: ({ square }) => { if (square && status === "playing" && isOwnPiece(square)) setSelectedSquare(square); },
+            canDragPiece: ({ square }) => Boolean(square && status === "playing" && timerStarted && isOwnPiece(square)),
+            onPieceDrag: ({ square }) => { if (square && status === "playing" && timerStarted && isOwnPiece(square)) setSelectedSquare(square); },
             onSquareClick: ({ square }) => { if (square) handleSquareClick(square); },
             onPieceDrop: ({ sourceSquare, targetSquare }) => Boolean(sourceSquare && targetSquare && attemptMove(sourceSquare, targetSquare)),
           }} />
@@ -316,7 +322,7 @@ export default function DailyPuzzlePlayer({
 
         <aside className="cg-daily-panel">
           <div className="cg-daily-panel-kicker"><span>{status === "solved" ? "PATTERN FOUND" : "TODAY'S POSITION"}</span><strong>{formatTime(seconds)}</strong></div>
-          <GrindRankCard state={rankState} result={rankResult} seconds={seconds} timerActive={timerStarted && status !== "solved"} compact />
+          <GrindRankCard state={rankState} result={rankResult} seconds={seconds} timerActive={timerStarted && status !== "solved"} performance={puzzlePerformance} onStart={!timerStarted && status !== "solved" ? startTimer : undefined} compact />
           {status === "solved" ? (
             <div className="cg-daily-result">
               <span aria-hidden="true">✓</span>
@@ -335,7 +341,7 @@ export default function DailyPuzzlePlayer({
               <h2>Find the strongest move.</h2>
               <p>{status === "wrong" ? "Legal, but not the idea. Look again." : status === "opponent" ? "Opponent is replying…" : "Select one of your pieces to reveal every legal destination."}</p>
               <dl><div><dt>Attempts</dt><dd>{attempts}</dd></div><div><dt>Line</dt><dd>{Math.ceil(puzzle.moves.length / 2)} move{puzzle.moves.length > 2 ? "s" : ""}</dd></div></dl>
-              <button type="button" onClick={() => { startTimer(); setHintVisible((value) => !value); }}>{hintVisible ? "Hide hint" : "Need a hint?"}</button>
+              <button type="button" disabled={!timerStarted} onClick={() => setHintVisible((value) => !value)}>{!timerStarted ? "Start the puzzle first" : hintVisible ? "Hide hint" : "Need a hint?"}</button>
               {hintVisible && <div className="cg-daily-hint"><span>LOOK FOR</span><strong>{labelTheme(puzzle.themes[0] ?? "forcing move")}</strong><p>The first move starts on {puzzle.moves[moveIndex]?.slice(0, 2)}.</p></div>}
             </div>
           )}
