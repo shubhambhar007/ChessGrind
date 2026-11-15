@@ -37,6 +37,7 @@ test("training shows every legal destination and solves the verified first puzzl
   await openTraining(page);
   await expect(page.getByText("You are Black", { exact: true })).toBeVisible();
   await expect(page.getByText("0 / 10", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Start puzzle/ }).click();
 
   await page.locator('[data-square="e4"] [data-piece="bP"]').click();
   await expect(page.getByText("RUNNING", { exact: true })).toBeVisible();
@@ -54,6 +55,7 @@ test("training shows every legal destination and solves the verified first puzzl
 
 test("wrong legal move is rejected and the puzzle remains playable", async ({ page }) => {
   await openTraining(page);
+  await page.getByRole("button", { name: /Start puzzle/ }).click();
   await page.locator('[data-square="f4"] [data-piece="bR"]').click();
   await expect(page.locator('[data-square="f5"] > div')).toHaveCSS(
     "background-image",
@@ -123,7 +125,8 @@ test("daily puzzle exposes legal moves and completes its verified line", async (
   const puzzle = getDailyPuzzle(date);
   await page.goto(`/daily?date=${date}`);
   await expect(page.getByTestId("daily-app")).toHaveAttribute("data-status", "playing");
-  await expect(page.getByText("STARTS ON MOVE", { exact: true })).toBeVisible();
+  await expect(page.getByText("TIMER READY", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Start puzzle/ }).click();
 
   for (let index = 0; index < puzzle.moves.length; index += 2) {
     const move = puzzle.moves[index];

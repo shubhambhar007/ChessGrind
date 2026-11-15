@@ -36,6 +36,7 @@ import {
   type GrindRankResult,
   type GrindRankState,
 } from "@/lib/grind-rank";
+import { submitPuzzlePerformance, type PuzzlePerformance } from "@/lib/puzzle-performance";
 
 type MoveLog = {
   text: string;
@@ -1861,6 +1862,7 @@ export default function Home() {
 
   const [rankState, setRankState] = useState<GrindRankState>(EMPTY_GRIND_RANK);
   const [rankResult, setRankResult] = useState<GrindRankResult | null>(null);
+  const [puzzlePerformance, setPuzzlePerformance] = useState<PuzzlePerformance | null>(null);
   const [rankCelebrationEvent, setRankCelebrationEvent] = useState(0);
   const [puzzleSeconds, setPuzzleSeconds] = useState(0);
   const [puzzleTimerStarted, setPuzzleTimerStarted] = useState(false);
@@ -2380,12 +2382,11 @@ export default function Home() {
     if (
       solved ||
       isOpponentMoving ||
+      !puzzleTimerStarted ||
       hintLevel >= 3
     ) {
       return;
     }
-
-    startPuzzleTimer();
 
     setHintLevel(
       (current) =>
@@ -2508,6 +2509,7 @@ export default function Home() {
     setPuzzleSeconds(0);
     setPuzzleTimerStarted(false);
     setRankResult(null);
+    setPuzzlePerformance(null);
 
     setMessage(
       "Find the strongest move."
@@ -3082,6 +3084,13 @@ export default function Home() {
     });
     setRankState(result.state);
     setRankResult(result);
+    void submitPuzzlePerformance({
+      puzzleId: puzzle.id,
+      score: result.score,
+      seconds: elapsed,
+      wrongMoves: puzzleWrongMoves,
+      hintsUsed: puzzleHintsUsed,
+    }).then(setPuzzlePerformance);
     if (result.promoted) setRankCelebrationEvent((event) => event + 1);
     recordFunnelEvent("puzzle_completed");
     setSolved(true);
@@ -3112,12 +3121,11 @@ export default function Home() {
   ) {
     if (
       solved ||
-      isOpponentMoving
+      isOpponentMoving ||
+      !puzzleTimerStarted
     ) {
       return false;
     }
-
-    startPuzzleTimer();
 
     const sourceSquare =
       attemptedMove.slice(
@@ -3427,6 +3435,7 @@ export default function Home() {
     if (
       solved ||
       isOpponentMoving ||
+      !puzzleTimerStarted ||
       pendingPromotion
     ) {
       return false;
@@ -3483,6 +3492,7 @@ export default function Home() {
     if (
       solved ||
       isOpponentMoving ||
+      !puzzleTimerStarted ||
       pendingPromotion
     ) {
       return;
@@ -3526,7 +3536,6 @@ export default function Home() {
       if (
         clickedOwnPiece
       ) {
-        startPuzzleTimer();
         setSelectedSquare(
           square
         );
@@ -4135,6 +4144,8 @@ export default function Home() {
           result={rankResult}
           seconds={puzzleSeconds}
           timerActive={puzzleTimerStarted && !solved}
+          performance={puzzlePerformance}
+          onStart={!solved && !puzzleTimerStarted && puzzleSeconds === 0 ? startPuzzleTimer : undefined}
         />
 
         {sessionMode ===
@@ -4445,6 +4456,7 @@ export default function Home() {
                         !square ||
                         solved ||
                         isOpponentMoving ||
+                        !puzzleTimerStarted ||
                         pendingPromotion
                       ) {
                         return;
@@ -4457,7 +4469,6 @@ export default function Home() {
                           playerColor
                         )
                       ) {
-                        startPuzzleTimer();
                         pointerSelectionRef.current = {
                           square,
                           wasSelected:
@@ -4478,6 +4489,7 @@ export default function Home() {
                         !square ||
                         solved ||
                         isOpponentMoving ||
+                        !puzzleTimerStarted ||
                         pendingPromotion
                       ) {
                         return false;
@@ -4497,6 +4509,7 @@ export default function Home() {
                         !square ||
                         solved ||
                         isOpponentMoving ||
+                        !puzzleTimerStarted ||
                         pendingPromotion
                       ) {
                         return;
@@ -4509,7 +4522,6 @@ export default function Home() {
                           playerColor
                         )
                       ) {
-                        startPuzzleTimer();
                         setSelectedSquare(
                           square
                         );
@@ -4815,6 +4827,7 @@ export default function Home() {
                   }
                   disabled={
                     isOpponentMoving ||
+                    !puzzleTimerStarted ||
                     hintLevel >=
                       3
                   }
@@ -4828,7 +4841,7 @@ export default function Home() {
                     <div className="mt-1 text-[12px] text-[var(--secondary)]">
                       {hintLevel ===
                       0
-                        ? "Reveal a clue"
+                        ? puzzleTimerStarted ? "Reveal a clue" : "Start the puzzle first"
                         : `Hint ${hintLevel} of 3`}
                     </div>
                   </div>
